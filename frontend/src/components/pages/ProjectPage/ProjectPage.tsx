@@ -9,22 +9,22 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
 const dummySections: Section[] = [
-  { id: ulid(), name: "section 1" },
-  { id: ulid(), name: "section 2" },
-  { id: ulid(), name: "section 3" },
+  { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
+  { projectId: "dummyprojectid", id: ulid(), index: 1, name: "section 2" },
+  { projectId: "dummyprojectid", id: ulid(), index: 2, name: "section 3" },
 ];
 
 const dummyTasks: Task[] = [
-  { sectionId: null, id: ulid(), title: "task 1" },
-  { sectionId: null, id: ulid(), title: "task 2" },
-  { sectionId: dummySections[0].id, id: ulid(), title: "task 3" },
-  { sectionId: dummySections[0].id, id: ulid(), title: "task 4" },
-  { sectionId: dummySections[1].id, id: ulid(), title: "task 5" },
-  { sectionId: dummySections[1].id, id: ulid(), title: "task 6" },
-  { sectionId: dummySections[2].id, id: ulid(), title: "task 7" },
-  { sectionId: dummySections[2].id, id: ulid(), title: "task 8" },
-  { sectionId: dummySections[2].id, id: ulid(), title: "task 9" },
-  { sectionId: dummySections[2].id, id: ulid(), title: "task 10" },
+  { sectionId: null, id: ulid(), index: 0, title: "task 1" },
+  { sectionId: null, id: ulid(), index: 1, title: "task 2" },
+  { sectionId: dummySections[0].id, index: 0, id: ulid(), title: "task 3" },
+  { sectionId: dummySections[0].id, index: 1, id: ulid(), title: "task 4" },
+  { sectionId: dummySections[1].id, index: 0, id: ulid(), title: "task 5" },
+  { sectionId: dummySections[1].id, index: 1, id: ulid(), title: "task 6" },
+  { sectionId: dummySections[2].id, index: 0, id: ulid(), title: "task 7" },
+  { sectionId: dummySections[2].id, index: 1, id: ulid(), title: "task 8" },
+  { sectionId: dummySections[2].id, index: 2, id: ulid(), title: "task 9" },
+  { sectionId: dummySections[2].id, index: 3, id: ulid(), title: "task 10" },
 ];
 
 const ProjectPage: React.VFC = React.memo(() => {
