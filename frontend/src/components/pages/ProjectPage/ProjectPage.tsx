@@ -37,16 +37,45 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const handleDragEndTask = useCallback((result: DropResult) => {
-    const { destination } = result;
-    if (!destination) return;
+  const handleDragEndTask = useCallback(
+    (result: DropResult) => {
+      const { source, destination } = result;
+      if (!destination) return;
 
-    const taskId = result.draggableId;
-    const destSectionId =
-      destination.droppableId === "none" ? null : destination.droppableId;
-    const destIndex = destination.index;
-    console.log({ taskId, destIndex, destSectionId });
-  }, []);
+      const srcSectionId =
+        source.droppableId === "none" ? null : source.droppableId;
+      const srcIndex = source.index;
+      const destSectionId =
+        destination.droppableId === "none" ? null : destination.droppableId;
+      const destIndex = destination.index;
+      if (srcSectionId === destSectionId && srcIndex === destIndex) return;
+
+      const srcSectionTasks = tasks
+        .filter((task) => task.sectionId === srcSectionId)
+        .sort((a, b) => a.index - b.index);
+
+      if (srcSectionId === destSectionId) {
+        // 同一セクション内の移動
+        const nextSrcSectionTasks = arrayMoveImmutable(
+          srcSectionTasks,
+          srcIndex,
+          destIndex
+        ).map((task, i) => ({ ...task, index: i }));
+        setTasks(
+          tasks.map((prevTask) => {
+            const nextTask = nextSrcSectionTasks.find(
+              (task) => prevTask.id === task.id
+            );
+            return nextTask ?? prevTask;
+          })
+        );
+      } else {
+        // 異なるセクション間の移動
+        console.log("未実装");
+      }
+    },
+    [tasks]
+  );
 
   const handleDragEndSection = useCallback(
     (result: DropResult) => {
@@ -111,10 +140,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                   tasks={tasks.filter((task) => task.sectionId == null)}
                 />
               </div>
-              <SectionList
-                sections={sections.sort((a, b) => a.index - b.index)}
-                tasks={tasks}
-              />
+              <SectionList sections={sections} tasks={tasks} />
             </div>
           </DragDropContext>
         </div>

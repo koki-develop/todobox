@@ -16,21 +16,23 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     <Droppable droppableId="sections" type="sections">
       {(provided) => (
         <div ref={provided.innerRef} {...provided.droppableProps}>
-          {sections.map((section, i) => (
-            <Draggable key={section.id} draggableId={section.id} index={i}>
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.draggableProps}>
-                  <div {...provided.dragHandleProps}>{section.name}</div>
-                  <TaskList
-                    sectionId={section.id}
-                    tasks={tasks.filter(
-                      (task) => task.sectionId === section.id
-                    )}
-                  />
-                </div>
-              )}
-            </Draggable>
-          ))}
+          {sections
+            .sort((a, b) => a.index - b.index)
+            .map((section, i) => (
+              <Draggable key={section.id} draggableId={section.id} index={i}>
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.draggableProps}>
+                    <div {...provided.dragHandleProps}>{section.name}</div>
+                    <TaskList
+                      sectionId={section.id}
+                      tasks={tasks.filter(
+                        (task) => task.sectionId === section.id
+                      )}
+                    />
+                  </div>
+                )}
+              </Draggable>
+            ))}
           {provided.placeholder}
         </div>
       )}

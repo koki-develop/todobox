@@ -18,19 +18,21 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     <Droppable droppableId={droppableId} type="tasks">
       {(provided) => (
         <ul ref={provided.innerRef} {...provided.droppableProps}>
-          {tasks.map((task, i) => (
-            <Draggable key={task.id} draggableId={task.id} index={i}>
-              {(provided) => (
-                <li
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                >
-                  {task.title}
-                </li>
-              )}
-            </Draggable>
-          ))}
+          {tasks
+            .sort((a, b) => a.index - b.index)
+            .map((task, i) => (
+              <Draggable key={task.id} draggableId={task.id} index={i}>
+                {(provided) => (
+                  <li
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    {task.title}
+                  </li>
+                )}
+              </Draggable>
+            ))}
           {provided.placeholder}
         </ul>
       )}
