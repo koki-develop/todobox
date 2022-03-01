@@ -7,6 +7,7 @@ import {
 } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { ulid } from "ulid";
+import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
@@ -43,10 +44,11 @@ const ProjectPage: React.VFC = React.memo(() => {
     const { destination } = result;
     if (!destination) return;
 
+    const taskId = result.draggableId;
     const destSectionId =
       destination.droppableId === "none" ? null : destination.droppableId;
     const destIndex = destination.index;
-    console.log({ destIndex, destSectionId });
+    console.log({ taskId, destIndex, destSectionId });
   }, []);
 
   const handleDragEnd = useCallback(
@@ -85,66 +87,21 @@ const ProjectPage: React.VFC = React.memo(() => {
           <DragDropContext onDragEnd={handleDragEnd}>
             <div>
               <div>
-                <Droppable droppableId="none" type="tasks">
-                  {(provided) => (
-                    <ul ref={provided.innerRef} {...provided.droppableProps}>
-                      {tasks
-                        .filter((task) => task.sectionId == null)
-                        .map((task, i) => (
-                          <Draggable
-                            key={task.id}
-                            draggableId={task.id}
-                            index={i}
-                          >
-                            {(provided) => (
-                              <li
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                {task.title}
-                              </li>
-                            )}
-                          </Draggable>
-                        ))}
-                      {provided.placeholder}
-                    </ul>
-                  )}
-                </Droppable>
+                <TaskList
+                  sectionId={null}
+                  tasks={tasks.filter((task) => task.sectionId == null)}
+                />
               </div>
               <div>
                 {sections.map((section) => (
                   <div key={section.id}>
                     <div>{section.name}</div>
-                    <Droppable droppableId={section.id} type="tasks">
-                      {(provided) => (
-                        <ul
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                        >
-                          {tasks
-                            .filter((task) => task.sectionId === section.id)
-                            .map((task, i) => (
-                              <Draggable
-                                key={task.id}
-                                draggableId={task.id}
-                                index={i}
-                              >
-                                {(provided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    {task.title}
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                          {provided.placeholder}
-                        </ul>
+                    <TaskList
+                      sectionId={section.id}
+                      tasks={tasks.filter(
+                        (task) => task.sectionId === section.id
                       )}
-                    </Droppable>
+                    />
                   </div>
                 ))}
               </div>
