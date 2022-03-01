@@ -62,6 +62,11 @@ module.exports = {
             group: "internal",
             position: "before",
           },
+          {
+            pattern: "@/lib/**",
+            group: "internal",
+            position: "before",
+          },
         ],
       },
     ],
