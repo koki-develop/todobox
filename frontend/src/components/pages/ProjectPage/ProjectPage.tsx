@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { ulid } from "ulid";
+import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
@@ -104,37 +100,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                   tasks={tasks.filter((task) => task.sectionId == null)}
                 />
               </div>
-              <Droppable droppableId={project.id} type="sections">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {sections.map((section, i) => (
-                      <Draggable
-                        key={section.id}
-                        draggableId={section.id}
-                        index={i}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                          >
-                            <div {...provided.dragHandleProps}>
-                              {section.name}
-                            </div>
-                            <TaskList
-                              sectionId={section.id}
-                              tasks={tasks.filter(
-                                (task) => task.sectionId === section.id
-                              )}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
+              <SectionList sections={sections} tasks={tasks} />
             </div>
           </DragDropContext>
         </div>
