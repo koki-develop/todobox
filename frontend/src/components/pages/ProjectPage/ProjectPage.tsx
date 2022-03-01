@@ -1,3 +1,4 @@
+import { arrayMoveImmutable } from "array-move";
 import React, { useCallback, useEffect, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
@@ -47,14 +48,24 @@ const ProjectPage: React.VFC = React.memo(() => {
     console.log({ taskId, destIndex, destSectionId });
   }, []);
 
-  const handleDragEndSection = useCallback((result: DropResult) => {
-    const { destination } = result;
-    if (!destination) return;
+  const handleDragEndSection = useCallback(
+    (result: DropResult) => {
+      const { source, destination } = result;
+      if (!destination) return;
 
-    const sectionId = result.draggableId;
-    const destIndex = destination.index;
-    console.log({ sectionId, destIndex });
-  }, []);
+      const srcIndex = source.index;
+      const destIndex = destination.index;
+      if (srcIndex === destIndex) return;
+
+      const nextSections = arrayMoveImmutable(
+        sections,
+        srcIndex,
+        destIndex
+      ).map((section, i) => ({ ...section, index: i }));
+      setSections(nextSections);
+    },
+    [sections]
+  );
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -100,7 +111,10 @@ const ProjectPage: React.VFC = React.memo(() => {
                   tasks={tasks.filter((task) => task.sectionId == null)}
                 />
               </div>
-              <SectionList sections={sections} tasks={tasks} />
+              <SectionList
+                sections={sections.sort((a, b) => a.index - b.index)}
+                tasks={tasks}
+              />
             </div>
           </DragDropContext>
         </div>
