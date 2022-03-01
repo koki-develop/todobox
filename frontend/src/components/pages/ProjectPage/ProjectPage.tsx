@@ -37,10 +37,14 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  // TODO: リファクタ
   const handleDragEndTask = useCallback(
     (result: DropResult) => {
       const { source, destination } = result;
       if (!destination) return;
+
+      const task = tasks.find((task) => task.id === result.draggableId);
+      if (!task) return;
 
       const srcSectionId =
         source.droppableId === "none" ? null : source.droppableId;
@@ -71,7 +75,37 @@ const ProjectPage: React.VFC = React.memo(() => {
         );
       } else {
         // 異なるセクション間の移動
-        console.log("未実装");
+        const nextSrcSectionTasks = srcSectionTasks
+          .filter((prevTask) => prevTask.id !== task.id)
+          .map((task, i) => ({ ...task, index: i }));
+
+        const destSectionTasks = tasks
+          .filter((task) => task.sectionId === destSectionId)
+          .sort((a, b) => a.index - b.index);
+        const nextDestSectionTasks = (
+          destSectionTasks.length === 0
+            ? [{ ...task, sectionId: destSectionId }]
+            : destSectionTasks.reduce((result, current, i) => {
+                if (i === destIndex) {
+                  return [
+                    ...result,
+                    { ...task, sectionId: destSectionId },
+                    current,
+                  ];
+                } else {
+                  return [...result, current];
+                }
+              }, [] as Task[])
+        ).map((task, i) => ({ ...task, index: i }));
+        setTasks(
+          tasks.map((prevTask) => {
+            const nextTask = [
+              ...nextSrcSectionTasks,
+              ...nextDestSectionTasks,
+            ].find((task) => prevTask.id === task.id);
+            return nextTask ?? prevTask;
+          })
+        );
       }
     },
     [tasks]
