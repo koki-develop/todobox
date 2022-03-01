@@ -24,11 +24,7 @@ const ProjectPage: React.VFC = React.memo(() => {
     return <div>loading...</div>;
   }
 
-  return (
-    <div>
-      <div>id: {id}</div>
-    </div>
-  );
+  return <div>{project && <div>{project.name}</div>}</div>;
 });
 
 ProjectPage.displayName = "ProjectPage";
