@@ -1,4 +1,3 @@
-import { arrayMoveImmutable } from "array-move";
 import React, { useCallback, useEffect, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
@@ -8,6 +7,7 @@ import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
+import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -60,7 +60,7 @@ const ProjectPage: React.VFC = React.memo(() => {
 
       if (srcSectionId === destSectionId) {
         // 同一セクション内の移動
-        const nextSrcSectionTasks = arrayMoveImmutable(
+        const nextSrcSectionTasks = arrayMove(
           srcSectionTasks,
           srcIndex,
           destIndex
@@ -75,33 +75,26 @@ const ProjectPage: React.VFC = React.memo(() => {
         );
       } else {
         // 異なるセクション間の移動
-        const nextSrcSectionTasks = srcSectionTasks
-          .filter((prevTask) => prevTask.id !== task.id)
-          .map((task, i) => ({ ...task, index: i }));
-
         const destSectionTasks = tasks
           .filter((task) => task.sectionId === destSectionId)
           .sort((a, b) => a.index - b.index);
-        const nextDestSectionTasks = (
-          destSectionTasks.length === 0
-            ? [{ ...task, sectionId: destSectionId }]
-            : destSectionTasks.reduce((result, current, i) => {
-                if (i === destIndex) {
-                  return [
-                    ...result,
-                    { ...task, sectionId: destSectionId },
-                    current,
-                  ];
-                } else {
-                  return [...result, current];
-                }
-              }, [] as Task[])
-        ).map((task, i) => ({ ...task, index: i }));
+
+        const [nextSrcSectionTasks, nextDestSectionTasks] = arrayMoveToArray(
+          srcSectionTasks,
+          destSectionTasks,
+          srcIndex,
+          destIndex
+        );
+
         setTasks(
           tasks.map((prevTask) => {
             const nextTask = [
-              ...nextSrcSectionTasks,
-              ...nextDestSectionTasks,
+              ...nextSrcSectionTasks.map((task, i) => ({ ...task, index: i })),
+              ...nextDestSectionTasks.map((task, i) => ({
+                ...task,
+                sectionId: destSectionId,
+                index: i,
+              })),
             ].find((task) => prevTask.id === task.id);
             return nextTask ?? prevTask;
           })
@@ -120,11 +113,9 @@ const ProjectPage: React.VFC = React.memo(() => {
       const destIndex = destination.index;
       if (srcIndex === destIndex) return;
 
-      const nextSections = arrayMoveImmutable(
-        sections,
-        srcIndex,
-        destIndex
-      ).map((section, i) => ({ ...section, index: i }));
+      const nextSections = arrayMove(sections, srcIndex, destIndex).map(
+        (section, i) => ({ ...section, index: i })
+      );
       setSections(nextSections);
     },
     [sections]
