@@ -13,6 +13,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
     "prettier",
   ],
   parserOptions: {
@@ -22,8 +23,38 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["react", "react-hooks"],
-  rules: {},
+  plugins: ["react", "react-hooks", "import", "unused-imports"],
+  rules: {
+    "unused-imports/no-unused-imports": "error",
+    "import/order": [
+      "error",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          ["parent", "sibling"],
+          "object",
+          "type",
+          "index",
+        ],
+        pathGroupsExcludedImportTypes: ["builtin"],
+        alphabetize: { order: "asc", caseInsensitive: true },
+        pathGroups: [
+          {
+            pattern: "@/components/App/**",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/components/pages/**",
+            group: "internal",
+            position: "before",
+          },
+        ],
+      },
+    ],
+  },
   overrides: [
     {
       files: ["*.ts", "*.tsx"],
