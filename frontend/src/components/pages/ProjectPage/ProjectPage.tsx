@@ -39,7 +39,15 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const handleDragEnd = useCallback((result: DropResult) => {}, []);
+  const handleDragEnd = useCallback((result: DropResult) => {
+    const { destination } = result;
+    if (!destination) return;
+
+    const destSectionId =
+      destination.droppableId === "none" ? null : destination.droppableId;
+    const destIndex = destination.index;
+    console.log({ destIndex, destSectionId });
+  }, []);
 
   useEffect(() => {
     setProjectLoaded(false);
