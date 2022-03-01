@@ -51,6 +51,16 @@ module.exports = {
             group: "internal",
             position: "before",
           },
+          {
+            pattern: "@/components/model/**",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/models/**",
+            group: "internal",
+            position: "before",
+          },
         ],
       },
     ],
