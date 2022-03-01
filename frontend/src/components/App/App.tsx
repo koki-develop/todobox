@@ -1,11 +1,16 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LoginPage from "@/components/pages/LoginPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 
 const App: React.VFC = React.memo(() => {
   return (
-    <div>
-      <ProjectsPage />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 });
 
