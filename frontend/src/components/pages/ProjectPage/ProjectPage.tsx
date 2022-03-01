@@ -51,15 +51,27 @@ const ProjectPage: React.VFC = React.memo(() => {
     console.log({ taskId, destIndex, destSectionId });
   }, []);
 
+  const handleDragEndSection = useCallback((result: DropResult) => {
+    const { destination } = result;
+    if (!destination) return;
+
+    const sectionId = result.draggableId;
+    const destIndex = destination.index;
+    console.log({ sectionId, destIndex });
+  }, []);
+
   const handleDragEnd = useCallback(
     (result: DropResult) => {
       switch (result.type) {
         case "tasks":
           handleDragEndTask(result);
           break;
+        case "sections":
+          handleDragEndSection(result);
+          break;
       }
     },
-    [handleDragEndTask]
+    [handleDragEndTask, handleDragEndSection]
   );
 
   useEffect(() => {
