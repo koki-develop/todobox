@@ -39,7 +39,7 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const handleDragEnd = useCallback((result: DropResult) => {
+  const handleDragEndTask = useCallback((result: DropResult) => {
     const { destination } = result;
     if (!destination) return;
 
@@ -48,6 +48,17 @@ const ProjectPage: React.VFC = React.memo(() => {
     const destIndex = destination.index;
     console.log({ destIndex, destSectionId });
   }, []);
+
+  const handleDragEnd = useCallback(
+    (result: DropResult) => {
+      switch (result.type) {
+        case "tasks":
+          handleDragEndTask(result);
+          break;
+      }
+    },
+    [handleDragEndTask]
+  );
 
   useEffect(() => {
     setProjectLoaded(false);
@@ -105,13 +116,35 @@ const ProjectPage: React.VFC = React.memo(() => {
                 {sections.map((section) => (
                   <div key={section.id}>
                     <div>{section.name}</div>
-                    <ul>
-                      {tasks
-                        .filter((task) => task.sectionId === section.id)
-                        .map((task) => (
-                          <li key={task.id}>{task.title}</li>
-                        ))}
-                    </ul>
+                    <Droppable droppableId={section.id} type="tasks">
+                      {(provided) => (
+                        <ul
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                        >
+                          {tasks
+                            .filter((task) => task.sectionId === section.id)
+                            .map((task, i) => (
+                              <Draggable
+                                key={task.id}
+                                draggableId={task.id}
+                                index={i}
+                              >
+                                {(provided) => (
+                                  <li
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    {task.title}
+                                  </li>
+                                )}
+                              </Draggable>
+                            ))}
+                          {provided.placeholder}
+                        </ul>
+                      )}
+                    </Droppable>
                   </div>
                 ))}
               </div>
