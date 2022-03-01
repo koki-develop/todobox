@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import { ulid } from "ulid";
@@ -36,6 +36,10 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [project, setProject] = useState<Project | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+
+  const noSectionTasks = useMemo(() => {
+    return tasks.filter((task) => task.sectionId == null);
+  }, [tasks]);
 
   // TODO: リファクタ
   const handleDragEndTask = useCallback(
@@ -160,10 +164,7 @@ const ProjectPage: React.VFC = React.memo(() => {
           <DragDropContext onDragEnd={handleDragEnd}>
             <div>
               <div>
-                <TaskList
-                  sectionId={null}
-                  tasks={tasks.filter((task) => task.sectionId == null)}
-                />
+                <TaskList sectionId={null} tasks={noSectionTasks} />
               </div>
               <SectionList sections={sections} tasks={tasks} />
             </div>
