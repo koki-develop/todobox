@@ -12,7 +12,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
-  }, []);
+  }, [sectionId]);
 
   return (
     <Droppable droppableId={droppableId} type="tasks">
