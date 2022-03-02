@@ -138,15 +138,18 @@ export const moveTasks = (
     movedFirstTask.index + 1
   );
 
-  return result.map((task) => {
-    const sorted = sortedMovedTasks.find(
-      (sortedTask) => sortedTask.id === task.id
-    );
-    if (!sorted) {
-      return task;
-    }
-    return { ...task, index: sorted.index + movedFirstTask.index };
-  });
+  return sortTasks(
+    sections,
+    result.map((task) => {
+      const sorted = sortedMovedTasks.find(
+        (sortedTask) => sortedTask.id === task.id
+      );
+      if (!sorted) {
+        return task;
+      }
+      return { ...task, index: sorted.index + movedFirstTask.index };
+    })
+  );
 };
 
 export const insertTasksToTasks = (
