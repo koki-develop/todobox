@@ -1,6 +1,8 @@
 import { Task } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
+// TODO: 全体的に汚すぎるのでリファクタする
+
 export const sortTasks = (tasks: Task[]): Task[] => {
   const tasksClone = tasks.concat();
 
@@ -74,4 +76,77 @@ export const moveTask = (
     const sorted = sortTasks(nextTasks);
     return sorted;
   }
+};
+
+export const moveTasks = (
+  tasks: Task[],
+  taskIds: string[],
+  toSectionId: string | null,
+  toIndex: number
+): Task[] => {
+  const [firstTask, ...otherTasks] = sortTasks(
+    tasks.filter((task) => taskIds.some((taskId) => taskId === task.id))
+  );
+
+  const movedTasks = moveTask(tasks, firstTask.id, toSectionId, toIndex);
+  const filteredTasks = movedTasks.filter((task) =>
+    otherTasks.some((otherTask) => otherTask.id !== task.id)
+  );
+  let currentIndex = 0;
+  let currentSectionId: string | null = null;
+  const indexedFilteredTasks = filteredTasks.map((filteredTask) => {
+    if (filteredTask.sectionId !== currentSectionId) {
+      currentIndex = 0;
+      currentSectionId = filteredTask.sectionId;
+    }
+    const next = { ...filteredTask, index: currentIndex };
+    currentIndex++;
+    return next;
+  });
+  const movedFirstTask = indexedFilteredTasks.find(
+    (task) => task.id === firstTask.id
+  );
+
+  return insertTasksToTasks(
+    indexedFilteredTasks,
+    otherTasks,
+    toSectionId,
+    (movedFirstTask?.index ?? 0) + 1
+  );
+};
+
+export const insertTasksToTasks = (
+  tasks: Task[],
+  tasksToInsert: Task[],
+  sectionId: string | null,
+  index: number
+): Task[] => {
+  const tasksClone = tasks.concat();
+  const tasksToInsertClone = tasksToInsert.concat();
+
+  const sectionTasks = tasksClone.filter(
+    (task) => task.sectionId === sectionId
+  );
+  sectionTasks.splice(index, 0, ...tasksToInsertClone);
+
+  const indexedSectionTasks = sectionTasks.map((nextTask, i) => ({
+    ...nextTask,
+    sectionId,
+    index: i,
+  }));
+
+  const result = tasks.map((task) => {
+    const nextTaskIndex = indexedSectionTasks.findIndex(
+      (indexedTask) => indexedTask.id === task.id
+    );
+    if (nextTaskIndex !== -1) {
+      const nextTask = indexedSectionTasks[nextTaskIndex];
+      indexedSectionTasks.splice(nextTaskIndex, 1);
+      return nextTask;
+    }
+    return task;
+  });
+  result.splice(0, 0, ...indexedSectionTasks);
+
+  return sortTasks(result);
 };
