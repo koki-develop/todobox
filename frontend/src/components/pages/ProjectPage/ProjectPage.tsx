@@ -51,10 +51,18 @@ const ProjectPage: React.VFC = React.memo(() => {
   );
 
   const handleCreateTask = useCallback(
-    (task: Task) => {
-      setTasks(sortTasks(sections, [...tasks, task]));
+    (createdTask: Task) => {
+      setTasks(sortTasks(sections, [...tasks, createdTask]));
     },
     [sections, tasks]
+  );
+
+  const handleDeleteTask = useCallback(
+    (deletedTask: Task) => {
+      // FIXME: index の振り直しをする
+      setTasks(tasks.filter((task) => task.id !== deletedTask.id));
+    },
+    [tasks]
   );
 
   const handleClickTask = useCallback((task: Task) => {
@@ -202,6 +210,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                   tasks={noSectionTasks}
                   selectedTasks={selectedTasks}
                   onCreateTask={handleCreateTask}
+                  onDeleteTask={handleDeleteTask}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}
@@ -214,6 +223,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                 selectedTasks={selectedTasks}
                 onCreateSection={handleCreateSection}
                 onCreateTask={handleCreateTask}
+                onDeleteTask={handleDeleteTask}
                 onClickTask={handleClickTask}
                 onSelectTask={handleSelectTask}
                 onMultiSelectTask={handleMultiSelectTask}

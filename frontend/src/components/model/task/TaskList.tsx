@@ -10,6 +10,7 @@ export type TaskListProps = {
   selectedTasks: Task[];
 
   onCreateTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -21,6 +22,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     tasks,
     selectedTasks,
     onCreateTask,
+    onDeleteTask,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -63,6 +65,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 key={task.id}
                 task={task}
                 selectedTasks={selectedTasks}
+                onDelete={onDeleteTask}
                 onClick={onClickTask}
                 onSelect={onSelectTask}
                 onMultiSelect={onMultiSelectTask}
