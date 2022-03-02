@@ -8,7 +8,7 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
-import { moveTask, moveTasks } from "@/lib/taskUtils";
+import { getTasksRange, moveTask, moveTasks } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -60,9 +60,23 @@ const ProjectPage: React.VFC = React.memo(() => {
     [selectedTasks]
   );
 
-  const handleMultiSelectTask = useCallback((task: Task) => {
-    console.log("multi selected:", task);
-  }, []);
+  const handleMultiSelectTask = useCallback(
+    (task: Task) => {
+      if (selectedTasks.length === 0) {
+        setSelectedTasks([task]);
+        return;
+      }
+      const toTask = selectedTasks.slice(-1)[0];
+      const range = getTasksRange(sections, tasks, task.id, toTask.id);
+      setSelectedTasks([
+        ...selectedTasks.filter(
+          (task) => !range.some((rangeTask) => rangeTask.id === task.id)
+        ),
+        ...range,
+      ]);
+    },
+    [sections, selectedTasks, tasks]
+  );
 
   // TODO: リファクタ
   const handleDragEndTask = useCallback(

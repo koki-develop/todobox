@@ -185,3 +185,23 @@ export const insertTasksToTasks = (
 
   return sortTasks(sections, result);
 };
+
+export const getTasksRange = (
+  sections: Section[],
+  tasks: Task[],
+  fromTaskId: string,
+  toTaskId: string
+) => {
+  const sortedTasks = sortTasks(sections, tasks);
+
+  const index1 = sortedTasks.findIndex((task) => task.id === fromTaskId);
+  if (index1 === -1) return sortedTasks;
+
+  const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
+  if (index2 === -1) return sortedTasks;
+
+  return sortedTasks.slice(
+    Math.min(index1, index2),
+    Math.max(index1, index2) + 1
+  );
+};
