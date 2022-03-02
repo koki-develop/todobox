@@ -1,23 +1,28 @@
+import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
 // TODO: 全体的に汚すぎるのでリファクタする
 
-export const sortTasks = (tasks: Task[]): Task[] => {
+export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   const tasksClone = tasks.concat();
 
   return tasksClone.sort((a, b) => {
     if (a.sectionId === b.sectionId) {
       return a.index - b.index;
     } else {
-      if (a.sectionId == null) return -1;
-      if (b.sectionId == null) return 1;
-      return a.sectionId > b.sectionId ? 1 : -1;
+      const aSection = sections.find((section) => section.id === a.sectionId);
+      if (!aSection) return -1;
+
+      const bSection = sections.find((section) => section.id === b.sectionId);
+      if (!bSection) return 1;
+      return aSection.index - bSection.index;
     }
   });
 };
 
 export const moveTask = (
+  sections: Section[],
   tasks: Task[],
   taskId: string,
   toSectionId: string | null,
@@ -47,7 +52,7 @@ export const moveTask = (
       );
       return nextTask ?? task;
     });
-    return sortTasks(nextTasks);
+    return sortTasks(sections, nextTasks);
   } else {
     // 異なるセクション間の移動
     const toSectionTasks = tasks.filter(
@@ -73,12 +78,13 @@ export const moveTask = (
       );
       return nextTask ?? task;
     });
-    const sorted = sortTasks(nextTasks);
+    const sorted = sortTasks(sections, nextTasks);
     return sorted;
   }
 };
 
 export const moveTasks = (
+  sections: Section[],
   tasks: Task[],
   firstTaskId: string,
   otherTaskIds: string[],
@@ -95,7 +101,17 @@ export const moveTasks = (
   );
   if (otherTasks.some((otherTask) => !otherTask)) return tasksClone;
 
-  const movedTasks = moveTask(tasks, firstTask.id, toSectionId, toIndex);
+  const sortedMovedTasks = sortTasks(sections, [firstTask, ...otherTasks]).map(
+    (task, i) => ({ ...task, sectionId: null, index: i })
+  );
+
+  const movedTasks = moveTask(
+    sections,
+    tasks,
+    firstTask.id,
+    toSectionId,
+    toIndex
+  );
   const filteredTasks = movedTasks.filter(
     (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
   );
@@ -112,17 +128,29 @@ export const moveTasks = (
   });
   const movedFirstTask = indexedFilteredTasks.find(
     (task) => task.id === firstTask.id
-  );
+  )!;
 
-  return insertTasksToTasks(
+  const result = insertTasksToTasks(
+    sections,
     indexedFilteredTasks,
     otherTasks,
     toSectionId,
-    (movedFirstTask?.index ?? 0) + 1
+    movedFirstTask.index + 1
   );
+
+  return result.map((task) => {
+    const sorted = sortedMovedTasks.find(
+      (sortedTask) => sortedTask.id === task.id
+    );
+    if (!sorted) {
+      return task;
+    }
+    return { ...task, index: sorted.index + movedFirstTask.index };
+  });
 };
 
 export const insertTasksToTasks = (
+  sections: Section[],
   tasks: Task[],
   tasksToInsert: Task[],
   sectionId: string | null,
@@ -155,5 +183,5 @@ export const insertTasksToTasks = (
   });
   result.splice(0, 0, ...indexedSectionTasks);
 
-  return sortTasks(result);
+  return sortTasks(sections, result);
 };

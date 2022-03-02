@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { moveTask, moveTasks, insertTasksToTasks } from "./taskUtils";
+
+const dummySections: Section[] = [
+  { projectId: "dummyprojectid", id: "SECTION_1", index: 0, name: "section 1" },
+  { projectId: "dummyprojectid", id: "SECTION_2", index: 1, name: "section 2" },
+  { projectId: "dummyprojectid", id: "SECTION_3", index: 2, name: "section 3" },
+];
 
 describe("moveTask", () => {
   type Args = [
@@ -223,6 +230,7 @@ describe("moveTask", () => {
     }) to equal ${JSON.stringify(testcase.expected)}`, () => {
       expect(
         moveTask(
+          dummySections,
           testcase.args[0],
           testcase.args[1].taskId,
           testcase.args[1].toSectionId,
@@ -586,6 +594,7 @@ describe("moveTasks", () => {
     }) to equal ${JSON.stringify(testcase.expected)}`, () => {
       expect(
         moveTasks(
+          dummySections,
           testcase.args[0],
           testcase.args[1].firstTaskId,
           testcase.args[1].otherTaskIds,
@@ -657,6 +666,7 @@ describe("insertTasksToTasks", () => {
     it("hogefuga", () => {
       expect(
         insertTasksToTasks(
+          dummySections,
           testcase.args[0],
           testcase.args[1],
           testcase.args[2].sectionId,

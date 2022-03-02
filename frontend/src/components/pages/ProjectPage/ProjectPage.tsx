@@ -85,7 +85,13 @@ const ProjectPage: React.VFC = React.memo(() => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        const movedTasks = moveTask(tasks, taskId, toSectionId, toIndex);
+        const movedTasks = moveTask(
+          sections,
+          tasks,
+          taskId,
+          toSectionId,
+          toIndex
+        );
         setTasks(movedTasks);
       } else {
         // 複数移動
@@ -94,6 +100,7 @@ const ProjectPage: React.VFC = React.memo(() => {
           .filter((selectedTask) => selectedTask.id !== firstTaskId)
           .map((selectedTask) => selectedTask.id);
         const movedTasks = moveTasks(
+          sections,
           tasks,
           firstTaskId,
           otherTaskIds,
@@ -103,7 +110,7 @@ const ProjectPage: React.VFC = React.memo(() => {
         setTasks(movedTasks);
       }
     },
-    [selectedTasks, tasks]
+    [sections, selectedTasks, tasks]
   );
 
   const handleDragEndSection = useCallback(
