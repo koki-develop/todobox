@@ -89,9 +89,14 @@ const ProjectPage: React.VFC = React.memo(() => {
         setTasks(movedTasks);
       } else {
         // 複数移動
+        const firstTaskId = taskId;
+        const otherTaskIds = selectedTasks
+          .filter((selectedTask) => selectedTask.id !== firstTaskId)
+          .map((selectedTask) => selectedTask.id);
         const movedTasks = moveTasks(
           tasks,
-          selectedTasks.map((selectedTask) => selectedTask.id),
+          firstTaskId,
+          otherTaskIds,
           toSectionId,
           toIndex
         );

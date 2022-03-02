@@ -237,7 +237,8 @@ describe("moveTasks", () => {
   type Args = [
     Task[],
     {
-      taskIds: string[];
+      firstTaskId: string;
+      otherTaskIds: string[];
       toSectionId: string | null;
       toIndex: number;
     }
@@ -257,7 +258,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_2"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_2"],
           toSectionId: null,
           toIndex: 0,
         },
@@ -286,7 +288,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_2"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_2"],
           toSectionId: null,
           toIndex: 1,
         },
@@ -315,7 +318,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_2"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_2"],
           toSectionId: null,
           toIndex: 2,
         },
@@ -344,7 +348,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_2"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_2"],
           toSectionId: null,
           toIndex: 3,
         },
@@ -373,7 +378,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_3"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_3"],
           toSectionId: null,
           toIndex: 0,
         },
@@ -402,7 +408,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_3"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_3"],
           toSectionId: null,
           toIndex: 1,
         },
@@ -431,7 +438,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_3"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_3"],
           toSectionId: null,
           toIndex: 2,
         },
@@ -460,7 +468,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_3"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_3"],
           toSectionId: null,
           toIndex: 3,
         },
@@ -491,7 +500,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_3"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_3"],
           toSectionId: "SECTION_1",
           toIndex: 0,
         },
@@ -520,7 +530,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_5"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_5"],
           toSectionId: "SECTION_2",
           toIndex: 0,
         },
@@ -549,7 +560,8 @@ describe("moveTasks", () => {
           { sectionId: "SECTION_2", index: 1, id: "TASK_8", title: "task 8" },
         ],
         {
-          taskIds: ["TASK_1", "TASK_5", "TASK_6"],
+          firstTaskId: "TASK_1",
+          otherTaskIds: ["TASK_5", "TASK_6"],
           toSectionId: "SECTION_1",
           toIndex: 0,
         },
@@ -568,14 +580,15 @@ describe("moveTasks", () => {
   ];
   for (const testcase of testcases) {
     it(`moveTasks(${JSON.stringify(testcase.args[0])}, ${JSON.stringify(
-      testcase.args[1].taskIds
+      testcase.args[1].otherTaskIds
     )}, ${testcase.args[1].toSectionId}, ${
       testcase.args[1].toIndex
     }) to equal ${JSON.stringify(testcase.expected)}`, () => {
       expect(
         moveTasks(
           testcase.args[0],
-          testcase.args[1].taskIds,
+          testcase.args[1].firstTaskId,
+          testcase.args[1].otherTaskIds,
           testcase.args[1].toSectionId,
           testcase.args[1].toIndex
         )

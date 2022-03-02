@@ -80,13 +80,20 @@ export const moveTask = (
 
 export const moveTasks = (
   tasks: Task[],
-  taskIds: string[],
+  firstTaskId: string,
+  otherTaskIds: string[],
   toSectionId: string | null,
   toIndex: number
 ): Task[] => {
-  const [firstTask, ...otherTasks] = sortTasks(
-    tasks.filter((task) => taskIds.some((taskId) => taskId === task.id))
+  const tasksClone = tasks.concat();
+
+  const firstTask = tasks.find((task) => task.id === firstTaskId);
+  if (!firstTask) return tasksClone;
+
+  const otherTasks: Task[] = otherTaskIds.map(
+    (otherTaskId) => tasks.find((task) => task.id === otherTaskId)!
   );
+  if (otherTasks.some((otherTask) => !otherTask)) return tasksClone;
 
   const movedTasks = moveTask(tasks, firstTask.id, toSectionId, toIndex);
   const filteredTasks = movedTasks.filter(
