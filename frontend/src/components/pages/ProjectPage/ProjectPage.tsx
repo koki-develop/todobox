@@ -7,7 +7,8 @@ import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
+import { arrayMove } from "@/lib/arrayUtils";
+import { moveTask } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -62,64 +63,17 @@ const ProjectPage: React.VFC = React.memo(() => {
     (result: DropResult) => {
       const { source, destination } = result;
       if (!destination) return;
-
-      const task = tasks.find((task) => task.id === result.draggableId);
-      if (!task) return;
-
-      const srcSectionId =
+      const fromSectionId =
         source.droppableId === "none" ? null : source.droppableId;
       const srcIndex = source.index;
-      const destSectionId =
+      const toSectionId =
         destination.droppableId === "none" ? null : destination.droppableId;
-      const destIndex = destination.index;
-      if (srcSectionId === destSectionId && srcIndex === destIndex) return;
+      const toIndex = destination.index;
+      if (fromSectionId === toSectionId && srcIndex === toIndex) return;
 
-      const srcSectionTasks = tasks
-        .filter((task) => task.sectionId === srcSectionId)
-        .sort((a, b) => a.index - b.index);
-
-      if (srcSectionId === destSectionId) {
-        // 同一セクション内の移動
-        const nextSrcSectionTasks = arrayMove(
-          srcSectionTasks,
-          srcIndex,
-          destIndex
-        ).map((task, i) => ({ ...task, index: i }));
-        setTasks(
-          tasks.map((prevTask) => {
-            const nextTask = nextSrcSectionTasks.find(
-              (task) => prevTask.id === task.id
-            );
-            return nextTask ?? prevTask;
-          })
-        );
-      } else {
-        // 異なるセクション間の移動
-        const destSectionTasks = tasks
-          .filter((task) => task.sectionId === destSectionId)
-          .sort((a, b) => a.index - b.index);
-
-        const [nextSrcSectionTasks, nextDestSectionTasks] = arrayMoveToArray(
-          srcSectionTasks,
-          destSectionTasks,
-          srcIndex,
-          destIndex
-        );
-
-        setTasks(
-          tasks.map((prevTask) => {
-            const nextTask = [
-              ...nextSrcSectionTasks.map((task, i) => ({ ...task, index: i })),
-              ...nextDestSectionTasks.map((task, i) => ({
-                ...task,
-                sectionId: destSectionId,
-                index: i,
-              })),
-            ].find((task) => prevTask.id === task.id);
-            return nextTask ?? prevTask;
-          })
-        );
-      }
+      const taskId = result.draggableId;
+      const movedTasks = moveTask(tasks, taskId, toSectionId, toIndex);
+      setTasks(movedTasks);
     },
     [tasks]
   );
