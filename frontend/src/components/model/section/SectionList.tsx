@@ -7,6 +7,7 @@ import { Task } from "@/models/task";
 export type SectionListProps = {
   sections: Section[];
   tasks: Task[];
+  selectedTasks: Task[];
 
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
@@ -14,8 +15,14 @@ export type SectionListProps = {
 };
 
 const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
-  const { sections, tasks, onClickTask, onSelectTask, onMultiSelectTask } =
-    props;
+  const {
+    sections,
+    tasks,
+    selectedTasks,
+    onClickTask,
+    onSelectTask,
+    onMultiSelectTask,
+  } = props;
 
   const sectionsWithTasks: { section: Section; tasks: Task[] }[] =
     useMemo(() => {
@@ -47,6 +54,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
                     <TaskList
                       sectionId={sectionWithTasks.section.id}
                       tasks={sectionWithTasks.tasks}
+                      selectedTasks={selectedTasks}
                       onClickTask={onClickTask}
                       onSelectTask={onSelectTask}
                       onMultiSelectTask={onMultiSelectTask}

@@ -1,9 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { Task } from "@/models/task";
 
 export type TaskListItemProps = {
   task: Task;
+  selectedTasks: Task[];
 
   onClick: (task: Task) => void;
   onSelect: (task: Task) => void;
@@ -11,7 +12,11 @@ export type TaskListItemProps = {
 };
 
 const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
-  const { task, onClick, onSelect, onMultiSelect } = props;
+  const { task, selectedTasks, onClick, onSelect, onMultiSelect } = props;
+
+  const selected = useMemo(() => {
+    return selectedTasks.some((selectedTask) => selectedTask.id === task.id);
+  }, [selectedTasks, task.id]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -37,7 +42,9 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
           {...provided.dragHandleProps}
           onClick={handleClick}
         >
-          {task.index}: {task.title}
+          <span style={{ fontWeight: selected ? "bold" : undefined }}>
+            {task.index}: {task.title}
+          </span>
         </li>
       )}
     </Draggable>

@@ -36,6 +36,7 @@ const ProjectPage: React.VFC = React.memo(() => {
   const [project, setProject] = useState<Project | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
   const noSectionTasks = useMemo(() => {
     return tasks.filter((task) => task.sectionId == null);
@@ -45,9 +46,12 @@ const ProjectPage: React.VFC = React.memo(() => {
     console.log("clicked:", task);
   }, []);
 
-  const handleSelectTask = useCallback((task: Task) => {
-    console.log("selected:", task);
-  }, []);
+  const handleSelectTask = useCallback(
+    (task: Task) => {
+      setSelectedTasks([...selectedTasks, task]);
+    },
+    [selectedTasks]
+  );
 
   const handleMultiSelectTask = useCallback((task: Task) => {
     console.log("multi selected:", task);
@@ -179,6 +183,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                 <TaskList
                   sectionId={null}
                   tasks={noSectionTasks}
+                  selectedTasks={selectedTasks}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}
@@ -187,6 +192,7 @@ const ProjectPage: React.VFC = React.memo(() => {
               <SectionList
                 sections={sections}
                 tasks={tasks}
+                selectedTasks={selectedTasks}
                 onClickTask={handleClickTask}
                 onSelectTask={handleSelectTask}
                 onMultiSelectTask={handleMultiSelectTask}
