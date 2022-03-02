@@ -28,11 +28,11 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
         <div ref={provided.innerRef} {...provided.droppableProps}>
           {sectionsWithTasks
             .sort((a, b) => a.section.index - b.section.index)
-            .map((sectionWithTasks, i) => (
+            .map((sectionWithTasks) => (
               <Draggable
                 key={sectionWithTasks.section.id}
                 draggableId={sectionWithTasks.section.id}
-                index={i}
+                index={sectionWithTasks.section.index}
               >
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.draggableProps}>
