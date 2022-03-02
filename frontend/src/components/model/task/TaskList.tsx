@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
+import TaskListItem from "@/components/model/task/TaskListItem";
 import { Task } from "@/models/task";
 
 export type TaskListProps = {
@@ -20,18 +21,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
         <ul ref={provided.innerRef} {...provided.droppableProps}>
           {tasks
             .sort((a, b) => a.index - b.index)
-            .map((task, i) => (
-              <Draggable key={task.id} draggableId={task.id} index={i}>
-                {(provided) => (
-                  <li
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    {task.title}
-                  </li>
-                )}
-              </Draggable>
+            .map((task) => (
+              <TaskListItem key={task.id} task={task} />
             ))}
           {provided.placeholder}
         </ul>
