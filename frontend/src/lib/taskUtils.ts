@@ -20,20 +20,24 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
-export const updateTasks = (
+export const updateOrAddTasks = (
   sections: Section[],
   tasks: Task[],
-  updatedTasks: Task[]
+  updatedOrAddedTasks: Task[]
 ): Task[] => {
-  return sortTasks(
-    sections,
-    tasks.map((task) => {
-      const updatedTask = updatedTasks.find(
+  const tasksToAdd = updatedOrAddedTasks.filter(
+    (updatedTask) => !tasks.some((task) => task.id === updatedTask.id)
+  );
+
+  return sortTasks(sections, [
+    ...tasks.map((task) => {
+      const updatedTask = updatedOrAddedTasks.find(
         (updatedTask) => updatedTask.id === task.id
       );
       return updatedTask ?? task;
-    })
-  );
+    }),
+    ...tasksToAdd,
+  ]);
 };
 
 export const getTasksByRange = (
@@ -118,7 +122,7 @@ export const moveTask = (
     );
 
     // タスクを更新
-    return updateTasks(sections, tasks, updatedTasks);
+    return updateOrAddTasks(sections, tasks, updatedTasks);
   } else {
     // 異なるセクション間の移動
     // 移動先のタスク一覧を取得
@@ -143,7 +147,7 @@ export const moveTask = (
         }))
       ),
     ];
-    return updateTasks(sections, tasks, updatedTasks);
+    return updateOrAddTasks(sections, tasks, updatedTasks);
   }
 };
 
@@ -226,29 +230,15 @@ export const insertTasksToTasks = (
   const tasksClone = tasks.concat();
   const tasksToInsertClone = tasksToInsert.concat();
 
-  const sectionTasks = tasksClone.filter(
-    (task) => task.sectionId === sectionId
+  // 挿入先のセクションのタスク一覧を取得
+  const sectionTasks = getTasksBySectionId(sections, tasksClone, sectionId);
+
+  // タスクを挿入して採番
+  sectionTasks.splice(
+    index,
+    0,
+    ...tasksToInsertClone.map((task) => ({ ...task, sectionId }))
   );
-  sectionTasks.splice(index, 0, ...tasksToInsertClone);
-
-  const indexedSectionTasks = sectionTasks.map((nextTask, i) => ({
-    ...nextTask,
-    sectionId,
-    index: i,
-  }));
-
-  const result = tasks.map((task) => {
-    const nextTaskIndex = indexedSectionTasks.findIndex(
-      (indexedTask) => indexedTask.id === task.id
-    );
-    if (nextTaskIndex !== -1) {
-      const nextTask = indexedSectionTasks[nextTaskIndex];
-      indexedSectionTasks.splice(nextTaskIndex, 1);
-      return nextTask;
-    }
-    return task;
-  });
-  result.splice(0, 0, ...indexedSectionTasks);
-
-  return sortTasks(sections, result);
+  const indexedSectionTasks = indexTasks(sections, sectionTasks);
+  return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
 };
