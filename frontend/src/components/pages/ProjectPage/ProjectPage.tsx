@@ -8,7 +8,12 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
-import { getTasksRange, moveTask, moveTasks, sortTasks } from "@/lib/taskUtils";
+import {
+  getTasksByRange,
+  moveTask,
+  moveTasks,
+  sortTasks,
+} from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -89,7 +94,7 @@ const ProjectPage: React.VFC = React.memo(() => {
         return;
       }
       const toTask = selectedTasks.slice(-1)[0];
-      const range = getTasksRange(sections, tasks, task.id, toTask.id);
+      const range = getTasksByRange(sections, tasks, task.id, toTask.id);
       setSelectedTasks([
         ...selectedTasks.filter(
           (task) => !range.some((rangeTask) => rangeTask.id === task.id)

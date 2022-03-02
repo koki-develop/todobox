@@ -13,12 +13,79 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
     } else {
       const aSection = sections.find((section) => section.id === a.sectionId);
       if (!aSection) return -1;
-
       const bSection = sections.find((section) => section.id === b.sectionId);
       if (!bSection) return 1;
       return aSection.index - bSection.index;
     }
   });
+};
+
+export const updateTasks = (
+  sections: Section[],
+  tasks: Task[],
+  updatedTasks: Task[]
+): Task[] => {
+  return sortTasks(
+    sections,
+    tasks.map((task) => {
+      const updatedTask = updatedTasks.find(
+        (updatedTask) => updatedTask.id === task.id
+      );
+      return updatedTask ?? task;
+    })
+  );
+};
+
+export const getTasksByRange = (
+  sections: Section[],
+  tasks: Task[],
+  fromTaskId: string,
+  toTaskId: string
+) => {
+  const sortedTasks = sortTasks(sections, tasks);
+
+  const index1 = sortedTasks.findIndex((task) => task.id === fromTaskId);
+  if (index1 === -1) return [];
+  const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
+  if (index2 === -1) return [];
+
+  return sortedTasks.slice(
+    Math.min(index1, index2),
+    Math.max(index1, index2) + 1
+  );
+};
+
+export const getTasksBySectionId = (
+  sections: Section[],
+  tasks: Task[],
+  sectionId: string | null
+): Task[] => {
+  return sortTasks(
+    sections,
+    tasks.filter((task) => task.sectionId === sectionId)
+  );
+};
+
+export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
+  type Group = { sectionId: string | null; tasks: Task[] };
+  const groups: Group[] = tasks.reduce((result, current) => {
+    const group = result.find((group) => group.sectionId === current.sectionId);
+    if (!group) {
+      return [...result, { sectionId: current.sectionId, tasks: [current] }];
+    } else {
+      group.tasks.push(current);
+      return result;
+    }
+  }, [] as Group[]);
+
+  const indexedTasks: Task[] = groups.reduce((result, current) => {
+    return [
+      ...result,
+      ...current.tasks.map((task, i) => ({ ...task, index: i })),
+    ];
+  }, [] as Task[]);
+
+  return sortTasks(sections, indexedTasks);
 };
 
 export const moveTask = (
@@ -31,55 +98,52 @@ export const moveTask = (
   const tasksClone = tasks.concat();
   if (tasksClone.length === 0) return tasksClone;
 
-  const task = tasksClone.find((task) => task.id === taskId);
-  if (!task) return tasksClone;
+  // 移動対象のタスクを取得
+  const movingTask = tasksClone.find((task) => task.id === taskId);
+  if (!movingTask) return tasksClone;
 
-  const fromSectionTasks = tasks.filter(
-    (fromTask) => fromTask.sectionId === task.sectionId
+  // 移動元のセクションのタスク一覧を取得
+  const fromSectionTasks = getTasksBySectionId(
+    sections,
+    tasks,
+    movingTask.sectionId
   );
 
-  if (task.sectionId === toSectionId) {
+  if (movingTask.sectionId === toSectionId) {
     // 同一セクション内の移動
-    const nextFromSectionTasks = arrayMove(
-      fromSectionTasks,
-      task.index,
-      toIndex
-    ).map((task, i) => ({ ...task, index: i }));
+    // タスクを移動して index を採番
+    const updatedTasks = indexTasks(
+      sections,
+      arrayMove(fromSectionTasks, movingTask.index, toIndex)
+    );
 
-    const nextTasks = tasks.map((task) => {
-      const nextTask = nextFromSectionTasks.find(
-        (nextTask) => nextTask.id === task.id
-      );
-      return nextTask ?? task;
-    });
-    return sortTasks(sections, nextTasks);
+    // タスクを更新
+    return updateTasks(sections, tasks, updatedTasks);
   } else {
     // 異なるセクション間の移動
-    const toSectionTasks = tasks.filter(
-      (task) => task.sectionId === toSectionId
-    );
-    const [nextFromSectionTasks, nextToSectionTasks] = arrayMoveToArray(
+    // 移動先のタスク一覧を取得
+    const toSectionTasks = getTasksBySectionId(sections, tasks, toSectionId);
+
+    // タスクを移動
+    const [updatedFromSectionTasks, updatedToSectionTasks] = arrayMoveToArray(
       fromSectionTasks,
       toSectionTasks,
-      task.index,
+      movingTask.index,
       toIndex
     );
-    const mergedNextTasks = [
-      ...nextFromSectionTasks.map((task, i) => ({ ...task, index: i })),
-      ...nextToSectionTasks.map((task, i) => ({
-        ...task,
-        sectionId: toSectionId,
-        index: i,
-      })),
+
+    // index を採番してタスクを更新
+    const updatedTasks = [
+      ...indexTasks(sections, updatedFromSectionTasks),
+      ...indexTasks(
+        sections,
+        updatedToSectionTasks.map((task) => ({
+          ...task,
+          sectionId: toSectionId,
+        }))
+      ),
     ];
-    const nextTasks = tasks.map((task) => {
-      const nextTask = mergedNextTasks.find(
-        (nextTask) => nextTask.id === task.id
-      );
-      return nextTask ?? task;
-    });
-    const sorted = sortTasks(sections, nextTasks);
-    return sorted;
+    return updateTasks(sections, tasks, updatedTasks);
   }
 };
 
@@ -187,24 +251,4 @@ export const insertTasksToTasks = (
   result.splice(0, 0, ...indexedSectionTasks);
 
   return sortTasks(sections, result);
-};
-
-export const getTasksRange = (
-  sections: Section[],
-  tasks: Task[],
-  fromTaskId: string,
-  toTaskId: string
-) => {
-  const sortedTasks = sortTasks(sections, tasks);
-
-  const index1 = sortedTasks.findIndex((task) => task.id === fromTaskId);
-  if (index1 === -1) return sortedTasks;
-
-  const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
-  if (index2 === -1) return sortedTasks;
-
-  return sortedTasks.slice(
-    Math.min(index1, index2),
-    Math.max(index1, index2) + 1
-  );
 };
