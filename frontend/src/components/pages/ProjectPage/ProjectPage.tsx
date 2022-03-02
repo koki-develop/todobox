@@ -31,7 +31,7 @@ const dummyTasks: Task[] = [
 
 const ProjectPage: React.VFC = React.memo(() => {
   const params = useParams();
-  const id = params.id as string;
+  const projectId = params.id as string;
 
   const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
   const [project, setProject] = useState<Project | null>(null);
@@ -42,6 +42,13 @@ const ProjectPage: React.VFC = React.memo(() => {
   const noSectionTasks = useMemo(() => {
     return tasks.filter((task) => task.sectionId == null);
   }, [tasks]);
+
+  const handleCreateSection = useCallback(
+    (section: Section) => {
+      setSections([...sections, section]);
+    },
+    [sections]
+  );
 
   const handleCreateTask = useCallback(
     (task: Task) => {
@@ -169,14 +176,14 @@ const ProjectPage: React.VFC = React.memo(() => {
     setProjectLoaded(false);
     const timeoutId = setTimeout(() => {
       setProjectLoaded(true);
-      setProject({ id, name: "sample project" });
+      setProject({ id: projectId, name: "sample project" });
       setSections(dummySections);
       setTasks(dummyTasks);
     }, 500);
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [id]);
+  }, [projectId]);
 
   if (!projectLoaded) {
     return <div>loading...</div>;
@@ -201,9 +208,11 @@ const ProjectPage: React.VFC = React.memo(() => {
                 />
               </div>
               <SectionList
+                projectId={projectId}
                 sections={sections}
                 tasks={tasks}
                 selectedTasks={selectedTasks}
+                onCreateSection={handleCreateSection}
                 onCreateTask={handleCreateTask}
                 onClickTask={handleClickTask}
                 onSelectTask={handleSelectTask}
