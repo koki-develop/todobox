@@ -8,7 +8,7 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
-import { getTasksRange, moveTask, moveTasks } from "@/lib/taskUtils";
+import { getTasksRange, moveTask, moveTasks, sortTasks } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -42,6 +42,13 @@ const ProjectPage: React.VFC = React.memo(() => {
   const noSectionTasks = useMemo(() => {
     return tasks.filter((task) => task.sectionId == null);
   }, [tasks]);
+
+  const handleCreateTask = useCallback(
+    (task: Task) => {
+      setTasks(sortTasks(sections, [...tasks, task]));
+    },
+    [sections, tasks]
+  );
 
   const handleClickTask = useCallback((task: Task) => {
     console.log("clicked:", task);
@@ -187,6 +194,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                   sectionId={null}
                   tasks={noSectionTasks}
                   selectedTasks={selectedTasks}
+                  onCreateTask={handleCreateTask}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}
@@ -196,6 +204,7 @@ const ProjectPage: React.VFC = React.memo(() => {
                 sections={sections}
                 tasks={tasks}
                 selectedTasks={selectedTasks}
+                onCreateTask={handleCreateTask}
                 onClickTask={handleClickTask}
                 onSelectTask={handleSelectTask}
                 onMultiSelectTask={handleMultiSelectTask}
