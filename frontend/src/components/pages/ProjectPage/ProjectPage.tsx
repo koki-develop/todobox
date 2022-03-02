@@ -8,7 +8,7 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
-import { moveTask } from "@/lib/taskUtils";
+import { moveTask, moveTasks } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
@@ -72,10 +72,27 @@ const ProjectPage: React.VFC = React.memo(() => {
       if (fromSectionId === toSectionId && srcIndex === toIndex) return;
 
       const taskId = result.draggableId;
-      const movedTasks = moveTask(tasks, taskId, toSectionId, toIndex);
-      setTasks(movedTasks);
+
+      if (
+        selectedTasks.length === 0 ||
+        (selectedTasks.length === 1 && selectedTasks[0].id === taskId) ||
+        !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
+      ) {
+        // 単一移動
+        const movedTasks = moveTask(tasks, taskId, toSectionId, toIndex);
+        setTasks(movedTasks);
+      } else {
+        // 複数移動
+        const movedTasks = moveTasks(
+          tasks,
+          selectedTasks.map((selectedTask) => selectedTask.id),
+          toSectionId,
+          toIndex
+        );
+        setTasks(movedTasks);
+      }
     },
-    [tasks]
+    [selectedTasks, tasks]
   );
 
   const handleDragEndSection = useCallback(

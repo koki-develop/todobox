@@ -89,8 +89,8 @@ export const moveTasks = (
   );
 
   const movedTasks = moveTask(tasks, firstTask.id, toSectionId, toIndex);
-  const filteredTasks = movedTasks.filter((task) =>
-    otherTasks.some((otherTask) => otherTask.id !== task.id)
+  const filteredTasks = movedTasks.filter(
+    (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
   );
   let currentIndex = 0;
   let currentSectionId: string | null = null;
