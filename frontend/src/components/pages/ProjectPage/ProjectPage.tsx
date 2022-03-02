@@ -49,7 +49,13 @@ const ProjectPage: React.VFC = React.memo(() => {
 
   const handleSelectTask = useCallback(
     (task: Task) => {
-      setSelectedTasks([...selectedTasks, task]);
+      if (selectedTasks.some((selectedTask) => selectedTask.id === task.id)) {
+        setSelectedTasks(
+          selectedTasks.filter((selectedTask) => selectedTask.id !== task.id)
+        );
+      } else {
+        setSelectedTasks([...selectedTasks, task]);
+      }
     },
     [selectedTasks]
   );
