@@ -41,6 +41,10 @@ const ProjectPage: React.VFC = React.memo(() => {
     return tasks.filter((task) => task.sectionId == null);
   }, [tasks]);
 
+  const handleClickTask = useCallback((task: Task) => {
+    console.log("clicked:", task);
+  }, []);
+
   // TODO: リファクタ
   const handleDragEndTask = useCallback(
     (result: DropResult) => {
@@ -164,9 +168,17 @@ const ProjectPage: React.VFC = React.memo(() => {
           <DragDropContext onDragEnd={handleDragEnd}>
             <div>
               <div>
-                <TaskList sectionId={null} tasks={noSectionTasks} />
+                <TaskList
+                  sectionId={null}
+                  tasks={noSectionTasks}
+                  onClickTask={handleClickTask}
+                />
               </div>
-              <SectionList sections={sections} tasks={tasks} />
+              <SectionList
+                sections={sections}
+                tasks={tasks}
+                onClickTask={handleClickTask}
+              />
             </div>
           </DragDropContext>
         </div>

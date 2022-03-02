@@ -7,10 +7,12 @@ import { Task } from "@/models/task";
 export type SectionListProps = {
   sections: Section[];
   tasks: Task[];
+
+  onClickTask: (task: Task) => void;
 };
 
 const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
-  const { sections, tasks } = props;
+  const { sections, tasks, onClickTask } = props;
 
   const sectionsWithTasks: { section: Section; tasks: Task[] }[] =
     useMemo(() => {
@@ -42,6 +44,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
                     <TaskList
                       sectionId={sectionWithTasks.section.id}
                       tasks={sectionWithTasks.tasks}
+                      onClickTask={onClickTask}
                     />
                   </div>
                 )}

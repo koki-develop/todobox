@@ -6,10 +6,12 @@ import { Task } from "@/models/task";
 export type TaskListProps = {
   sectionId: string | null;
   tasks: Task[];
+
+  onClickTask: (task: Task) => void;
 };
 
 const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
-  const { sectionId, tasks } = props;
+  const { sectionId, tasks, onClickTask } = props;
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
@@ -22,7 +24,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
           {tasks
             .sort((a, b) => a.index - b.index)
             .map((task) => (
-              <TaskListItem key={task.id} task={task} />
+              <TaskListItem key={task.id} task={task} onClick={onClickTask} />
             ))}
           {provided.placeholder}
         </ul>
