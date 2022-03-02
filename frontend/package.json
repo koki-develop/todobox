@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "vitest",
     "lint": "eslint --max-warnings 0 --ext .js,.ts,.tsx .",
     "fmt": "yarn lint --fix && prettier --write ."
   },
