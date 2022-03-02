@@ -9,10 +9,13 @@ export type SectionListProps = {
   tasks: Task[];
 
   onClickTask: (task: Task) => void;
+  onSelectTask: (task: Task) => void;
+  onMultiSelectTask: (task: Task) => void;
 };
 
 const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
-  const { sections, tasks, onClickTask } = props;
+  const { sections, tasks, onClickTask, onSelectTask, onMultiSelectTask } =
+    props;
 
   const sectionsWithTasks: { section: Section; tasks: Task[] }[] =
     useMemo(() => {
@@ -45,6 +48,8 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
                       sectionId={sectionWithTasks.section.id}
                       tasks={sectionWithTasks.tasks}
                       onClickTask={onClickTask}
+                      onSelectTask={onSelectTask}
+                      onMultiSelectTask={onMultiSelectTask}
                     />
                   </div>
                 )}

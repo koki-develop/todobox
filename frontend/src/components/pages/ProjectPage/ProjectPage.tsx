@@ -45,6 +45,14 @@ const ProjectPage: React.VFC = React.memo(() => {
     console.log("clicked:", task);
   }, []);
 
+  const handleSelectTask = useCallback((task: Task) => {
+    console.log("selected:", task);
+  }, []);
+
+  const handleMultiSelectTask = useCallback((task: Task) => {
+    console.log("multi selected:", task);
+  }, []);
+
   // TODO: リファクタ
   const handleDragEndTask = useCallback(
     (result: DropResult) => {
@@ -172,12 +180,16 @@ const ProjectPage: React.VFC = React.memo(() => {
                   sectionId={null}
                   tasks={noSectionTasks}
                   onClickTask={handleClickTask}
+                  onSelectTask={handleSelectTask}
+                  onMultiSelectTask={handleMultiSelectTask}
                 />
               </div>
               <SectionList
                 sections={sections}
                 tasks={tasks}
                 onClickTask={handleClickTask}
+                onSelectTask={handleSelectTask}
+                onMultiSelectTask={handleMultiSelectTask}
               />
             </div>
           </DragDropContext>

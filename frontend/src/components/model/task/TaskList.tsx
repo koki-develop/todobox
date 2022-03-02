@@ -8,10 +8,13 @@ export type TaskListProps = {
   tasks: Task[];
 
   onClickTask: (task: Task) => void;
+  onSelectTask: (task: Task) => void;
+  onMultiSelectTask: (task: Task) => void;
 };
 
 const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
-  const { sectionId, tasks, onClickTask } = props;
+  const { sectionId, tasks, onClickTask, onSelectTask, onMultiSelectTask } =
+    props;
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
@@ -24,7 +27,13 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
           {tasks
             .sort((a, b) => a.index - b.index)
             .map((task) => (
-              <TaskListItem key={task.id} task={task} onClick={onClickTask} />
+              <TaskListItem
+                key={task.id}
+                task={task}
+                onClick={onClickTask}
+                onSelect={onSelectTask}
+                onMultiSelect={onMultiSelectTask}
+              />
             ))}
           {provided.placeholder}
         </ul>
