@@ -161,44 +161,53 @@ export const moveTasks = (
 ): Task[] => {
   const tasksClone = tasks.concat();
 
-  const firstTask = tasks.find((task) => task.id === firstTaskId);
+  // 移動対象のタスクを取得
+  const firstTask = tasksClone.find((task) => task.id === firstTaskId);
   if (!firstTask) return tasksClone;
 
-  const otherTasks: Task[] = otherTaskIds.map(
-    (otherTaskId) => tasks.find((task) => task.id === otherTaskId)!
-  );
-  if (otherTasks.some((otherTask) => !otherTask)) return tasksClone;
+  // 付随する移動対象のタスク一覧を取得
+  const otherTasks: Task[] = otherTaskIds.reduce((result, current) => {
+    const otherTask = tasksClone.find((task) => task.id === current);
+    if (!otherTask) {
+      return result;
+    }
+    return [...result, otherTask];
+  }, [] as Task[]);
 
-  const sortedMovedTasks = sortTasks(sections, [firstTask, ...otherTasks]).map(
-    (task, i) => ({ ...task, sectionId: null, index: i })
+  // 全ての移動対象のタスクの順序を保持しておく
+  const sortedMovingTasks = indexTasks(
+    sections,
+    sortTasks(sections, [firstTask, ...otherTasks]).map((task) => ({
+      ...task,
+      sectionId: toSectionId,
+    }))
   );
 
+  // 移動対象のタスクを移動する
   const movedTasks = moveTask(
     sections,
-    tasks,
+    tasksClone,
     firstTask.id,
     toSectionId,
     toIndex
   );
+
+  // 付随する移動対象のタスクを一旦タスク一覧から省いて採番する
   const filteredTasks = movedTasks.filter(
     (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
   );
-  let currentIndex = 0;
-  let currentSectionId: string | null = null;
-  const indexedFilteredTasks = filteredTasks.map((filteredTask) => {
-    if (filteredTask.sectionId !== currentSectionId) {
-      currentIndex = 0;
-      currentSectionId = filteredTask.sectionId;
-    }
-    const next = { ...filteredTask, index: currentIndex };
-    currentIndex++;
-    return next;
-  });
+  const indexedFilteredTasks = indexTasks(sections, filteredTasks);
+
+  // 移動後のタスクを取得
   const movedFirstTask = indexedFilteredTasks.find(
     (task) => task.id === firstTask.id
-  )!;
+  );
+  if (!movedFirstTask) {
+    throw new Error();
+  }
 
-  const result = insertTasksToTasks(
+  // 移動後のタスクの直下に付随するタスク一覧を挿入
+  const insertedTasks = insertTasksToTasks(
     sections,
     indexedFilteredTasks,
     otherTasks,
@@ -206,17 +215,14 @@ export const moveTasks = (
     movedFirstTask.index + 1
   );
 
-  return sortTasks(
+  // 移動したタスクの index を最初の順序に更新
+  return updateOrAddTasks(
     sections,
-    result.map((task) => {
-      const sorted = sortedMovedTasks.find(
-        (sortedTask) => sortedTask.id === task.id
-      );
-      if (!sorted) {
-        return task;
-      }
-      return { ...task, index: sorted.index + movedFirstTask.index };
-    })
+    insertedTasks,
+    sortedMovingTasks.map((task) => ({
+      ...task,
+      index: task.index + movedFirstTask.index,
+    }))
   );
 };
 
