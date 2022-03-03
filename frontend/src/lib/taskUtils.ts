@@ -7,6 +7,16 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
 
   return tasksClone.sort((a, b) => {
     if (a.sectionId === b.sectionId) {
+      if (a.completedAt && b.completedAt) {
+        return b.completedAt.getTime() - a.completedAt.getTime();
+      }
+      if (a.completedAt) {
+        return 1;
+      }
+      if (b.completedAt) {
+        return -1;
+      }
+
       return a.index - b.index;
     } else {
       const aSection = sections.find((section) => section.id === a.sectionId);
@@ -27,9 +37,12 @@ export const completeTask = (
   if (!completedTask) {
     return sortTasks(sections, tasks);
   }
-  return updateTasks(sections, tasks, [
-    { ...completedTask, completedAt: new Date() },
-  ]);
+  return indexTasks(
+    sections,
+    updateTasks(sections, tasks, [
+      { ...completedTask, completedAt: new Date() },
+    ])
+  );
 };
 
 export const incompleteTask = (
@@ -41,9 +54,29 @@ export const incompleteTask = (
   if (!incompletedTask) {
     return sortTasks(sections, tasks);
   }
-  return updateTasks(sections, tasks, [
-    { ...incompletedTask, completedAt: null },
-  ]);
+
+  const [, incompletedTasks] = separateTasks(tasks);
+  const index = (incompletedTasks.slice(-1)[0]?.index ?? -1) + 1;
+
+  return indexTasks(
+    sections,
+    updateTasks(sections, tasks, [
+      { ...incompletedTask, index, completedAt: null },
+    ])
+  );
+};
+
+export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
+  return tasks.reduce(
+    (result, current) => {
+      if (current.completedAt) {
+        return [[...result[0], current], result[1]];
+      } else {
+        return [result[0], [...result[1], current]];
+      }
+    },
+    [[], []] as [Task[], Task[]]
+  );
 };
 
 export const updateTasks = (
@@ -115,13 +148,40 @@ export const getTasksBySectionId = (
 };
 
 export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
-  type Group = { sectionId: string | null; tasks: Task[] };
+  type Group = {
+    sectionId: string | null;
+    completedTasks: Task[];
+    incompletedTasks: Task[];
+  };
   const groups: Group[] = tasks.reduce((result, current) => {
     const group = result.find((group) => group.sectionId === current.sectionId);
     if (!group) {
-      return [...result, { sectionId: current.sectionId, tasks: [current] }];
+      if (current.completedAt) {
+        console.log("hoge");
+        return [
+          ...result,
+          {
+            sectionId: current.sectionId,
+            completedTasks: [{ ...current, index: -1 }],
+            incompletedTasks: [],
+          },
+        ];
+      } else {
+        return [
+          ...result,
+          {
+            sectionId: current.sectionId,
+            completedTasks: [],
+            incompletedTasks: [current],
+          },
+        ];
+      }
     } else {
-      group.tasks.push(current);
+      if (current.completedAt) {
+        group.completedTasks.push({ ...current, index: -1 });
+      } else {
+        group.incompletedTasks.push(current);
+      }
       return result;
     }
   }, [] as Group[]);
@@ -129,7 +189,8 @@ export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
   const indexedTasks: Task[] = groups.reduce((result, current) => {
     return [
       ...result,
-      ...current.tasks.map((task, i) => ({ ...task, index: i })),
+      ...current.completedTasks,
+      ...current.incompletedTasks.map((task, i) => ({ ...task, index: i })),
     ];
   }, [] as Task[]);
 

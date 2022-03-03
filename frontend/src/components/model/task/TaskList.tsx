@@ -3,6 +3,7 @@ import { Droppable } from "react-beautiful-dnd";
 import { ulid } from "ulid";
 import TaskListItem from "@/components/model/task/TaskListItem";
 import { Task } from "@/models/task";
+import { separateTasks } from "@/lib/taskUtils";
 
 export type TaskListProps = {
   sectionId: string | null;
@@ -38,6 +39,10 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     return sectionId == null ? "none" : sectionId;
   }, [sectionId]);
 
+  const [completedTasks, incompletedTasks] = useMemo(() => {
+    return separateTasks(tasks);
+  }, [tasks]);
+
   const handleChangeTitle = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(e.currentTarget.value);
@@ -49,7 +54,10 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     const trimmedTitle = title.trim();
     if (trimmedTitle === "") return;
     setTitle("");
-    const index = tasks.length === 0 ? 0 : tasks.slice(-1)[0].index + 1;
+    const index =
+      incompletedTasks.length === 0
+        ? 0
+        : incompletedTasks.slice(-1)[0].index + 1;
     onCreateTask({
       id: ulid(),
       sectionId,
@@ -57,32 +65,43 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
       index,
       completedAt: null,
     });
-  }, [onCreateTask, sectionId, tasks, title]);
+  }, [onCreateTask, sectionId, incompletedTasks, title]);
 
   return (
     <Droppable droppableId={droppableId} type="tasks">
       {(provided) => (
         <ul ref={provided.innerRef} {...provided.droppableProps}>
-          {tasks
-            .sort((a, b) => a.index - b.index)
-            .map((task) => (
-              <TaskListItem
-                key={task.id}
-                task={task}
-                selectedTasks={selectedTasks}
-                onComplete={onCompleteTask}
-                onIncomplete={onIncompleteTask}
-                onDelete={onDeleteTask}
-                onClick={onClickTask}
-                onSelect={onSelectTask}
-                onMultiSelect={onMultiSelectTask}
-              />
-            ))}
+          {incompletedTasks.map((task) => (
+            <TaskListItem
+              key={task.id}
+              task={task}
+              selectedTasks={selectedTasks}
+              onComplete={onCompleteTask}
+              onIncomplete={onIncompleteTask}
+              onDelete={onDeleteTask}
+              onClick={onClickTask}
+              onSelect={onSelectTask}
+              onMultiSelect={onMultiSelectTask}
+            />
+          ))}
           {provided.placeholder}
           <li>
             <input type="text" value={title} onChange={handleChangeTitle} />
             <button onClick={handleCreate}>create</button>
           </li>
+          {completedTasks.map((task) => (
+            <TaskListItem
+              key={task.id}
+              task={task}
+              selectedTasks={selectedTasks}
+              onComplete={onCompleteTask}
+              onIncomplete={onIncompleteTask}
+              onDelete={onDeleteTask}
+              onClick={onClickTask}
+              onSelect={onSelectTask}
+              onMultiSelect={onMultiSelectTask}
+            />
+          ))}
         </ul>
       )}
     </Droppable>

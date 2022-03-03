@@ -61,7 +61,11 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
   }, [onDelete, task]);
 
   return (
-    <Draggable draggableId={task.id} index={task.index}>
+    <Draggable
+      isDragDisabled={Boolean(task.completedAt)}
+      draggableId={task.id}
+      index={task.index}
+    >
       {(provided) => (
         <li ref={provided.innerRef} {...provided.draggableProps}>
           <span {...provided.dragHandleProps}>handle</span>
