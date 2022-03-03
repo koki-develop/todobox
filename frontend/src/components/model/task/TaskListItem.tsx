@@ -6,6 +6,8 @@ export type TaskListItemProps = {
   task: Task;
   selectedTasks: Task[];
 
+  onComplete: (task: Task) => void;
+  onIncomplete: (task: Task) => void;
   onDelete: (task: Task) => void;
   onClick: (task: Task) => void;
   onSelect: (task: Task) => void;
@@ -13,8 +15,16 @@ export type TaskListItemProps = {
 };
 
 const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
-  const { task, selectedTasks, onClick, onSelect, onMultiSelect, onDelete } =
-    props;
+  const {
+    task,
+    selectedTasks,
+    onClick,
+    onSelect,
+    onMultiSelect,
+    onComplete,
+    onIncomplete,
+    onDelete,
+  } = props;
 
   const selected = useMemo(() => {
     return selectedTasks.some((selectedTask) => selectedTask.id === task.id);
@@ -35,6 +45,17 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
     [onClick, onMultiSelect, onSelect, task]
   );
 
+  const handleChangeCompleted = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.currentTarget.checked) {
+        onComplete(task);
+      } else {
+        onIncomplete(task);
+      }
+    },
+    [onComplete, onIncomplete, task]
+  );
+
   const handleDelete = useCallback(() => {
     onDelete(task);
   }, [onDelete, task]);
@@ -42,14 +63,19 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
   return (
     <Draggable draggableId={task.id} index={task.index}>
       {(provided) => (
-        <li
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          onClick={handleClick}
-        >
+        <li ref={provided.innerRef} {...provided.draggableProps}>
           <span {...provided.dragHandleProps}>handle</span>
-          <span style={{ fontWeight: selected ? "bold" : undefined }}>
-            {task.index}: {task.title}
+          <input
+            type="checkbox"
+            checked={Boolean(task.completedAt)}
+            onChange={handleChangeCompleted}
+          />
+          <span>[{task.index}]</span>
+          <span
+            style={{ fontWeight: selected ? "bold" : undefined }}
+            onClick={handleClick}
+          >
+            {task.title}
           </span>
           <button onClick={handleDelete}>delete</button>
         </li>

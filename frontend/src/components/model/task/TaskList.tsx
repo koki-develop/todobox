@@ -9,6 +9,8 @@ export type TaskListProps = {
   tasks: Task[];
   selectedTasks: Task[];
 
+  onCompleteTask: (task: Task) => void;
+  onIncompleteTask: (task: Task) => void;
   onCreateTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
@@ -21,6 +23,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     sectionId,
     tasks,
     selectedTasks,
+    onCompleteTask,
+    onIncompleteTask,
     onCreateTask,
     onDeleteTask,
     onClickTask,
@@ -51,6 +55,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
       sectionId,
       title: trimmedTitle,
       index,
+      completedAt: null,
     });
   }, [onCreateTask, sectionId, tasks, title]);
 
@@ -65,6 +70,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 key={task.id}
                 task={task}
                 selectedTasks={selectedTasks}
+                onComplete={onCompleteTask}
+                onIncomplete={onIncompleteTask}
                 onDelete={onDeleteTask}
                 onClick={onClickTask}
                 onSelect={onSelectTask}

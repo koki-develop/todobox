@@ -9,11 +9,13 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
 import {
+  completeTask,
   getTasksByRange,
+  incompleteTask,
   moveTask,
   moveTasks,
-  sortTasks,
   removeTasks,
+  sortTasks,
 } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
@@ -23,16 +25,64 @@ const dummySections: Section[] = [
 ];
 
 const dummyTasks: Task[] = [
-  { sectionId: null, id: ulid(), index: 0, title: "task 1" },
-  { sectionId: null, id: ulid(), index: 1, title: "task 2" },
-  { sectionId: dummySections[0].id, index: 0, id: ulid(), title: "task 3" },
-  { sectionId: dummySections[0].id, index: 1, id: ulid(), title: "task 4" },
-  { sectionId: dummySections[1].id, index: 0, id: ulid(), title: "task 5" },
-  { sectionId: dummySections[1].id, index: 1, id: ulid(), title: "task 6" },
-  { sectionId: dummySections[2].id, index: 0, id: ulid(), title: "task 7" },
-  { sectionId: dummySections[2].id, index: 1, id: ulid(), title: "task 8" },
-  { sectionId: dummySections[2].id, index: 2, id: ulid(), title: "task 9" },
-  { sectionId: dummySections[2].id, index: 3, id: ulid(), title: "task 10" },
+  { sectionId: null, id: ulid(), index: 0, title: "task 1", completedAt: null },
+  { sectionId: null, id: ulid(), index: 1, title: "task 2", completedAt: null },
+  {
+    sectionId: dummySections[0].id,
+    index: 0,
+    id: ulid(),
+    title: "task 3",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[0].id,
+    index: 1,
+    id: ulid(),
+    title: "task 4",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[1].id,
+    index: 0,
+    id: ulid(),
+    title: "task 5",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[1].id,
+    index: 1,
+    id: ulid(),
+    title: "task 6",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[2].id,
+    index: 0,
+    id: ulid(),
+    title: "task 7",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[2].id,
+    index: 1,
+    id: ulid(),
+    title: "task 8",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[2].id,
+    index: 2,
+    id: ulid(),
+    title: "task 9",
+    completedAt: null,
+  },
+  {
+    sectionId: dummySections[2].id,
+    index: 3,
+    id: ulid(),
+    title: "task 10",
+    completedAt: null,
+  },
 ];
 
 const ProjectPage: React.VFC = React.memo(() => {
@@ -54,6 +104,22 @@ const ProjectPage: React.VFC = React.memo(() => {
       setSections([...sections, section]);
     },
     [sections]
+  );
+
+  const handleCompleteTask = useCallback(
+    (completedTask: Task) => {
+      const updatedTasks = completeTask(sections, tasks, completedTask.id);
+      setTasks(updatedTasks);
+    },
+    [sections, tasks]
+  );
+
+  const handleIncompleteTask = useCallback(
+    (incompletedTask: Task) => {
+      const updatedTasks = incompleteTask(sections, tasks, incompletedTask.id);
+      setTasks(updatedTasks);
+    },
+    [sections, tasks]
   );
 
   const handleCreateTask = useCallback(
@@ -226,6 +292,8 @@ const ProjectPage: React.VFC = React.memo(() => {
                   sectionId={null}
                   tasks={noSectionTasks}
                   selectedTasks={selectedTasks}
+                  onCompleteTask={handleCompleteTask}
+                  onIncompleteTask={handleIncompleteTask}
                   onCreateTask={handleCreateTask}
                   onDeleteTask={handleDeleteTask}
                   onClickTask={handleClickTask}
@@ -238,6 +306,8 @@ const ProjectPage: React.VFC = React.memo(() => {
                 sections={sections}
                 tasks={tasks}
                 selectedTasks={selectedTasks}
+                onCompleteTask={handleCompleteTask}
+                onIncompleteTask={handleIncompleteTask}
                 onCreateSection={handleCreateSection}
                 onCreateTask={handleCreateTask}
                 onDeleteTask={handleDeleteTask}

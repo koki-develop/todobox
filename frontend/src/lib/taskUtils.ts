@@ -18,6 +18,34 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
+export const completeTask = (
+  sections: Section[],
+  tasks: Task[],
+  taskId: string
+): Task[] => {
+  const completedTask = tasks.find((task) => task.id === taskId);
+  if (!completedTask) {
+    return sortTasks(sections, tasks);
+  }
+  return updateTasks(sections, tasks, [
+    { ...completedTask, completedAt: new Date() },
+  ]);
+};
+
+export const incompleteTask = (
+  sections: Section[],
+  tasks: Task[],
+  taskId: string
+): Task[] => {
+  const incompletedTask = tasks.find((task) => task.id === taskId);
+  if (!incompletedTask) {
+    return sortTasks(sections, tasks);
+  }
+  return updateTasks(sections, tasks, [
+    { ...incompletedTask, completedAt: null },
+  ]);
+};
+
 export const updateTasks = (
   sections: Section[],
   tasks: Task[],
