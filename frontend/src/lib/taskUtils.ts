@@ -264,3 +264,17 @@ export const insertTasksToTasks = (
   const indexedSectionTasks = indexTasks(sections, sectionTasks);
   return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
 };
+
+export const removeTask = (
+  sections: Section[],
+  tasks: Task[],
+  taskId: string
+): Task[] => {
+  return sortTasks(
+    sections,
+    indexTasks(
+      sections,
+      tasks.filter((task) => task.id !== taskId)
+    )
+  );
+};
