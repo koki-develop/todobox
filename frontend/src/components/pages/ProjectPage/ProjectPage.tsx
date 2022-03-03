@@ -65,9 +65,21 @@ const ProjectPage: React.VFC = React.memo(() => {
 
   const handleDeleteTask = useCallback(
     (deletedTask: Task) => {
-      setTasks(removeTasks(sections, tasks, [deletedTask.id]));
+      if (
+        selectedTasks.some((selectedTask) => selectedTask.id === deletedTask.id)
+      ) {
+        setTasks(
+          removeTasks(
+            sections,
+            tasks,
+            selectedTasks.map((selectedTask) => selectedTask.id)
+          )
+        );
+      } else {
+        setTasks(removeTasks(sections, tasks, [deletedTask.id]));
+      }
     },
-    [sections, tasks]
+    [sections, selectedTasks, tasks]
   );
 
   const handleClickTask = useCallback((task: Task) => {
