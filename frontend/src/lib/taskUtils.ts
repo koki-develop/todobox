@@ -265,16 +265,16 @@ export const insertTasksToTasks = (
   return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
 };
 
-export const removeTask = (
+export const removeTasks = (
   sections: Section[],
   tasks: Task[],
-  taskId: string
+  taskIds: string[]
 ): Task[] => {
   return sortTasks(
     sections,
     indexTasks(
       sections,
-      tasks.filter((task) => task.id !== taskId)
+      tasks.filter((task) => !taskIds.includes(task.id))
     )
   );
 };

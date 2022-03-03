@@ -13,7 +13,7 @@ import {
   moveTask,
   moveTasks,
   sortTasks,
-  removeTask,
+  removeTasks,
 } from "@/lib/taskUtils";
 
 const dummySections: Section[] = [
@@ -65,7 +65,7 @@ const ProjectPage: React.VFC = React.memo(() => {
 
   const handleDeleteTask = useCallback(
     (deletedTask: Task) => {
-      setTasks(removeTask(sections, tasks, deletedTask.id));
+      setTasks(removeTasks(sections, tasks, [deletedTask.id]));
     },
     [sections, tasks]
   );
