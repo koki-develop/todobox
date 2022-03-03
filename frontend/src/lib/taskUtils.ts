@@ -130,10 +130,12 @@ export const getTasksByRange = (
   const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
   if (index2 === -1) return [];
 
-  return sortedTasks.slice(
+  const range = sortedTasks.slice(
     Math.min(index1, index2),
     Math.max(index1, index2) + 1
   );
+
+  return range.filter((task) => !task.completedAt);
 };
 
 export const getTasksBySectionId = (
@@ -157,7 +159,6 @@ export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
     const group = result.find((group) => group.sectionId === current.sectionId);
     if (!group) {
       if (current.completedAt) {
-        console.log("hoge");
         return [
           ...result,
           {

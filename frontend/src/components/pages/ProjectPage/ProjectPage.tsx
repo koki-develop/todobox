@@ -110,8 +110,13 @@ const ProjectPage: React.VFC = React.memo(() => {
     (completedTask: Task) => {
       const updatedTasks = completeTask(sections, tasks, completedTask.id);
       setTasks(updatedTasks);
+      setSelectedTasks(
+        selectedTasks.filter(
+          (selectedTask) => selectedTask.id !== completedTask.id
+        )
+      );
     },
-    [sections, tasks]
+    [sections, selectedTasks, tasks]
   );
 
   const handleIncompleteTask = useCallback(
@@ -154,6 +159,9 @@ const ProjectPage: React.VFC = React.memo(() => {
 
   const handleSelectTask = useCallback(
     (task: Task) => {
+      if (task.completedAt) {
+        return;
+      }
       if (selectedTasks.some((selectedTask) => selectedTask.id === task.id)) {
         setSelectedTasks(
           selectedTasks.filter((selectedTask) => selectedTask.id !== task.id)
@@ -167,6 +175,9 @@ const ProjectPage: React.VFC = React.memo(() => {
 
   const handleMultiSelectTask = useCallback(
     (task: Task) => {
+      if (task.completedAt) {
+        return;
+      }
       if (selectedTasks.length === 0) {
         setSelectedTasks([task]);
         return;
