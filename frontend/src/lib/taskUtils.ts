@@ -2,8 +2,6 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
-// TODO: 全体的に汚すぎるのでリファクタする
-
 export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   const tasksClone = tasks.concat();
 
