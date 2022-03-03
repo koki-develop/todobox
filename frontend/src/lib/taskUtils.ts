@@ -20,22 +20,40 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
+export const updateTasks = (
+  sections: Section[],
+  tasks: Task[],
+  updatedTasks: Task[]
+): Task[] => {
+  return sortTasks(sections, [
+    ...tasks.map((task) => {
+      const updatedTask = updatedTasks.find(
+        (updatedTask) => updatedTask.id === task.id
+      );
+      return updatedTask ?? task;
+    }),
+  ]);
+};
+
 export const updateOrAddTasks = (
   sections: Section[],
   tasks: Task[],
   updatedOrAddedTasks: Task[]
 ): Task[] => {
-  const tasksToAdd = updatedOrAddedTasks.filter(
-    (updatedTask) => !tasks.some((task) => task.id === updatedTask.id)
-  );
+  const [tasksToAdd, tasksToUpdate]: [Task[], Task[]] =
+    updatedOrAddedTasks.reduce(
+      (result, current) => {
+        if (tasks.some((task) => task.id === current.id)) {
+          return [result[0], [...result[1], current]];
+        } else {
+          return [[...result[0], current], result[1]];
+        }
+      },
+      [[], []] as [Task[], Task[]]
+    );
 
   return sortTasks(sections, [
-    ...tasks.map((task) => {
-      const updatedTask = updatedOrAddedTasks.find(
-        (updatedTask) => updatedTask.id === task.id
-      );
-      return updatedTask ?? task;
-    }),
+    ...updateTasks(sections, tasks, tasksToUpdate),
     ...tasksToAdd,
   ]);
 };
@@ -122,7 +140,7 @@ export const moveTask = (
     );
 
     // タスクを更新
-    return updateOrAddTasks(sections, tasks, updatedTasks);
+    return updateTasks(sections, tasks, updatedTasks);
   } else {
     // 異なるセクション間の移動
     // 移動先のタスク一覧を取得
@@ -147,7 +165,7 @@ export const moveTask = (
         }))
       ),
     ];
-    return updateOrAddTasks(sections, tasks, updatedTasks);
+    return updateTasks(sections, tasks, updatedTasks);
   }
 };
 
@@ -216,7 +234,7 @@ export const moveTasks = (
   );
 
   // 移動したタスクの index を最初の順序に更新
-  return updateOrAddTasks(
+  return updateTasks(
     sections,
     insertedTasks,
     sortedMovingTasks.map((task) => ({
