@@ -183,7 +183,9 @@ const ProjectPage: React.VFC = React.memo(() => {
         return;
       }
       const toTask = selectedTasks.slice(-1)[0];
-      const range = getTasksByRange(sections, tasks, task.id, toTask.id);
+      const range = getTasksByRange(sections, tasks, task.id, toTask.id).filter(
+        (task) => !task.completedAt
+      );
       setSelectedTasks([
         ...selectedTasks.filter(
           (task) => !range.some((rangeTask) => rangeTask.id === task.id)

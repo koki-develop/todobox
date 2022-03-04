@@ -2,6 +2,7 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
+/** タスク一覧を並び替える */
 export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   const tasksClone = tasks.concat();
 
@@ -10,13 +11,8 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
       if (a.completedAt && b.completedAt) {
         return b.completedAt.getTime() - a.completedAt.getTime();
       }
-      if (a.completedAt) {
-        return 1;
-      }
-      if (b.completedAt) {
-        return -1;
-      }
-
+      if (a.completedAt) return 1;
+      if (b.completedAt) return -1;
       return a.index - b.index;
     } else {
       const aSection = sections.find((section) => section.id === a.sectionId);
@@ -28,15 +24,14 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
+/** 単一のタスクを完了する */
 export const completeTask = (
   sections: Section[],
   tasks: Task[],
   taskId: string
 ): Task[] => {
   const completedTask = tasks.find((task) => task.id === taskId);
-  if (!completedTask) {
-    return sortTasks(sections, tasks);
-  }
+  if (!completedTask) return sortTasks(sections, tasks);
   return indexTasks(
     sections,
     updateTasks(sections, tasks, [
@@ -45,6 +40,7 @@ export const completeTask = (
   );
 };
 
+/** 単一のタスクを未完了にする */
 export const incompleteTask = (
   sections: Section[],
   tasks: Task[],
@@ -66,6 +62,7 @@ export const incompleteTask = (
   );
 };
 
+/** タスク一覧を完了済のタスク一覧と未完了のタスク一覧に分ける */
 export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
   return tasks.reduce(
     (result, current) => {
@@ -79,21 +76,55 @@ export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
   );
 };
 
+/** 単一のタスクを更新する */
+export const updateTask = (
+  sections: Section[],
+  tasks: Task[],
+  updatedTask: Task
+): Task[] => {
+  return sortTasks(
+    sections,
+    tasks.map((task) => {
+      if (task.id === updatedTask.id) {
+        return updatedTask;
+      } else {
+        return task;
+      }
+    })
+  );
+};
+
+/** 複数のタスクを更新する */
 export const updateTasks = (
   sections: Section[],
   tasks: Task[],
   updatedTasks: Task[]
 ): Task[] => {
-  return sortTasks(sections, [
-    ...tasks.map((task) => {
+  return sortTasks(
+    sections,
+    tasks.map((task) => {
       const updatedTask = updatedTasks.find(
         (updatedTask) => updatedTask.id === task.id
       );
       return updatedTask ?? task;
-    }),
-  ]);
+    })
+  );
 };
 
+/** 単一のタスクを更新する。タスク一覧に存在しない場合は追加する。 */
+export const updateOrAddTask = (
+  sections: Section[],
+  tasks: Task[],
+  updatedOrAddedTask: Task
+): Task[] => {
+  if (tasks.some((task) => task.id === updatedOrAddedTask.id)) {
+    return sortTasks(sections, updateTask(sections, tasks, updatedOrAddedTask));
+  } else {
+    return sortTasks(sections, [...tasks, updatedOrAddedTask]);
+  }
+};
+
+/** 複数のタスクを更新する。タスク一覧に存在しない場合は追加する。 */
 export const updateOrAddTasks = (
   sections: Section[],
   tasks: Task[],
@@ -117,6 +148,7 @@ export const updateOrAddTasks = (
   ]);
 };
 
+/** タスク一覧から範囲を指定して複数のタスクを取得する */
 export const getTasksByRange = (
   sections: Section[],
   tasks: Task[],
@@ -130,14 +162,13 @@ export const getTasksByRange = (
   const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
   if (index2 === -1) return [];
 
-  const range = sortedTasks.slice(
+  return sortedTasks.slice(
     Math.min(index1, index2),
     Math.max(index1, index2) + 1
   );
-
-  return range.filter((task) => !task.completedAt);
 };
 
+/** タスク一覧からセクション ID を指定して複数のタスクを取得する */
 export const getTasksBySectionId = (
   sections: Section[],
   tasks: Task[],
@@ -149,6 +180,7 @@ export const getTasksBySectionId = (
   );
 };
 
+/** タスク一覧から index を採番しなおしたタスク一覧を返す */
 export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
   type Group = {
     sectionId: string | null;
@@ -198,6 +230,7 @@ export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
   return sortTasks(sections, indexedTasks);
 };
 
+/** 単一のタスクを移動する */
 export const moveTask = (
   sections: Section[],
   tasks: Task[],
@@ -257,6 +290,7 @@ export const moveTask = (
   }
 };
 
+/** 複数のタスクを移動する */
 export const moveTasks = (
   sections: Section[],
   tasks: Task[],
@@ -332,6 +366,7 @@ export const moveTasks = (
   );
 };
 
+/** タスク一覧の特定の位置に複数のタスクを挿入する */
 export const insertTasksToTasks = (
   sections: Section[],
   tasks: Task[],
@@ -355,6 +390,22 @@ export const insertTasksToTasks = (
   return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
 };
 
+/** 単一のタスクを削除する */
+export const removeTask = (
+  sections: Section[],
+  tasks: Task[],
+  taskId: string
+): Task[] => {
+  return sortTasks(
+    sections,
+    indexTasks(
+      sections,
+      tasks.filter((task) => task.id !== taskId)
+    )
+  );
+};
+
+/** 複数のタスクを削除する */
 export const removeTasks = (
   sections: Section[],
   tasks: Task[],
