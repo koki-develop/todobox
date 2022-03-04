@@ -40,7 +40,7 @@ module.exports = {
           "index",
         ],
         pathGroupsExcludedImportTypes: ["builtin"],
-        alphabetize: { order: "asc", caseInsensitive: true },
+        alphabetize: { order: "asc", caseInsensitive: false },
         pathGroups: [
           {
             pattern: "@/components/App/**",
