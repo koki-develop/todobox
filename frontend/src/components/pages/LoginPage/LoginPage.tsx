@@ -5,7 +5,8 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import React, { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { authenticatedUserState } from "@/atoms/userAtoms";
 
 const Field = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -16,15 +17,15 @@ const Field = styled(Box)(({ theme }) => ({
 }));
 
 const LoginPage: React.VFC = React.memo(() => {
-  const navigate = useNavigate();
+  const setAuthenticatedUser = useSetRecoilState(authenticatedUserState);
 
   const handleClickLoginWithGoogle = useCallback(() => {
-    navigate("/projects", { replace: true });
-  }, [navigate]);
+    setAuthenticatedUser({});
+  }, [setAuthenticatedUser]);
 
   const handleClickLoginAnonymously = useCallback(() => {
-    navigate("/projects", { replace: true });
-  }, [navigate]);
+    setAuthenticatedUser({});
+  }, [setAuthenticatedUser]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 20 }}>

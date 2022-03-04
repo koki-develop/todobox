@@ -1,23 +1,15 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import LoginPage from "@/components/pages/LoginPage";
-import NotFoundPage from "@/components/pages/NotFoundPage";
-import ProjectPage from "@/components/pages/ProjectPage";
-import ProjectsPage from "@/components/pages/ProjectsPage";
+import AppRoutes from "./AppRoutes";
 
 const App: React.VFC = React.memo(() => {
   return (
     <RecoilRoot>
       <CssBaseline />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:id" element={<ProjectPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </RecoilRoot>
   );
