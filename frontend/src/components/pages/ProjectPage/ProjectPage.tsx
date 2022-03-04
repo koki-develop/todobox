@@ -1,89 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
-import { ulid } from "ulid";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
-import { Section } from "@/models/section";
+import { Section, dummySections } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
 import {
   completeTask,
   getTasksByRange,
   incompleteTask,
+  listenTasks,
   moveTask,
   moveTasks,
   removeTasks,
   sortTasks,
 } from "@/lib/taskUtils";
-
-const dummySections: Section[] = [
-  { projectId: "dummyprojectid", id: ulid(), index: 0, name: "section 1" },
-  { projectId: "dummyprojectid", id: ulid(), index: 1, name: "section 2" },
-  { projectId: "dummyprojectid", id: ulid(), index: 2, name: "section 3" },
-];
-
-const dummyTasks: Task[] = [
-  { sectionId: null, id: ulid(), index: 0, title: "task 1", completedAt: null },
-  { sectionId: null, id: ulid(), index: 1, title: "task 2", completedAt: null },
-  {
-    sectionId: dummySections[0].id,
-    index: 0,
-    id: ulid(),
-    title: "task 3",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[0].id,
-    index: 1,
-    id: ulid(),
-    title: "task 4",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[1].id,
-    index: 0,
-    id: ulid(),
-    title: "task 5",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[1].id,
-    index: 1,
-    id: ulid(),
-    title: "task 6",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[2].id,
-    index: 0,
-    id: ulid(),
-    title: "task 7",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[2].id,
-    index: 1,
-    id: ulid(),
-    title: "task 8",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[2].id,
-    index: 2,
-    id: ulid(),
-    title: "task 9",
-    completedAt: null,
-  },
-  {
-    sectionId: dummySections[2].id,
-    index: 3,
-    id: ulid(),
-    title: "task 10",
-    completedAt: null,
-  },
-];
 
 const ProjectPage: React.VFC = React.memo(() => {
   const params = useParams();
@@ -277,12 +210,18 @@ const ProjectPage: React.VFC = React.memo(() => {
   );
 
   useEffect(() => {
+    const unsubscribe = listenTasks(projectId, (tasks) => {
+      setTasks(tasks);
+    });
+    return unsubscribe;
+  }, [projectId]);
+
+  useEffect(() => {
     setProjectLoaded(false);
     const timeoutId = setTimeout(() => {
       setProjectLoaded(true);
       setProject({ id: projectId, name: "sample project" });
       setSections(dummySections);
-      setTasks(dummyTasks);
     }, 500);
     return () => {
       clearTimeout(timeoutId);

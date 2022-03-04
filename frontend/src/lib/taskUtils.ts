@@ -1,5 +1,5 @@
 import { Section } from "@/models/section";
-import { Task } from "@/models/task";
+import { Task, dummyTasks } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 
 /** タスク一覧を並び替える */
@@ -418,4 +418,20 @@ export const removeTasks = (
       tasks.filter((task) => !taskIds.includes(task.id))
     )
   );
+};
+
+// TODO: firestore のものを使う予定
+type Unsubscribe = () => void;
+
+/** タスク一覧を subscribe する */
+export const listenTasks = (
+  _projectId: string,
+  callback: (tasks: Task[]) => void
+): Unsubscribe => {
+  setTimeout(() => {
+    callback(dummyTasks);
+  }, 500);
+  return () => {
+    /* */
+  };
 };
