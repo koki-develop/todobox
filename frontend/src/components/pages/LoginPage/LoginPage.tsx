@@ -1,3 +1,4 @@
+import GoogleIcon from "@mui/icons-material/Google";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -37,6 +38,7 @@ const LoginPage: React.VFC = React.memo(() => {
         <Field>
           <Button
             fullWidth
+            startIcon={<GoogleIcon />}
             variant="contained"
             onClick={handleClickLoginWithGoogle}
           >
