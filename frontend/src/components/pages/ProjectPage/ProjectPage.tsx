@@ -19,6 +19,7 @@ import {
 } from "@/lib/sectionUtils";
 import {
   completeTask,
+  createTask,
   getTasksByRange,
   incompleteTask,
   listenTasks,
@@ -89,9 +90,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleCreateTask = useCallback(
     (createdTask: Task) => {
+      createTask(currentUser.uid, createdTask);
       setTasks(sortTasks(sections, [...tasks, createdTask]));
     },
-    [sections, tasks]
+    [currentUser.uid, sections, tasks]
   );
 
   const handleDeleteTask = useCallback(

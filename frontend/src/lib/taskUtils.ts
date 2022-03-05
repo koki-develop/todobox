@@ -1,4 +1,10 @@
-import { collection, onSnapshot, Unsubscribe } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+  Unsubscribe,
+} from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section } from "@/models/section";
 import { Task, CreateTaskInput } from "@/models/task";
@@ -434,6 +440,20 @@ export const buildTask = (input: CreateTaskInput): Task => {
 /*
  * 書き込み
  */
+
+export const createTask = async (userId: string, task: Task): Promise<void> => {
+  const { id, projectId, ...data } = task;
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    id
+  );
+  setDoc(ref, { ...data });
+};
 
 /*
  * 読み取り
