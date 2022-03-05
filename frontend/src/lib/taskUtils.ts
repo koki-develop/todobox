@@ -456,14 +456,15 @@ export const listenTasks = (
     "tasks"
   );
   return onSnapshot(ref, (snapshot) => {
-    const tasks: Task[] = snapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          projectId,
-          ...doc.data(),
-        } as Task)
-    );
+    const tasks: Task[] = snapshot.docs.map((doc) => {
+      const { completedAt, ...data } = doc.data();
+      return {
+        id: doc.id,
+        projectId,
+        completedAt: completedAt?.toDate() ?? null,
+        ...data,
+      } as Task;
+    });
     callback(tasks);
   });
 };
