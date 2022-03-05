@@ -27,7 +27,6 @@ import {
   deleteTaskState,
   getTasksByRange,
   incompleteTaskState,
-  listenTasks,
   moveTaskState,
   moveTasksState,
   deleteTasksState,
@@ -37,6 +36,7 @@ import {
   deleteTasksBatch,
   listenIncompletedTasks,
   listenCompletedTasks,
+  separateTasks,
 } from "@/lib/taskUtils";
 
 export type ProjectPageProps = {
@@ -53,14 +53,14 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [project, setProject] = useState<Project | null>(null);
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
-  const [tasksLoaded, setTasksLoaded] = useState<boolean>(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<{
+    completed: Task[];
+    incompleted: Task[];
+  }>({ completed: [], incompleted: [] });
   const [incompletedTasksLoaded, setIncompletedTasksLoaded] =
     useState<boolean>(false);
-  const [incompletedTasks, setIncompletedTasks] = useState<Task[]>([]);
   const [completedTasksLoaded, setCompletedTasksLoaded] =
     useState<boolean>(false);
-  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
   /*
@@ -143,15 +143,22 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    */
 
   const noSectionTasks = useMemo(() => {
-    return tasks.filter((task) => task.sectionId == null);
-  }, [tasks]);
+    return [...allTasks.completed, ...allTasks.incompleted].filter(
+      (task) => task.sectionId == null
+    );
+  }, [allTasks.completed, allTasks.incompleted]);
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
-      setTasks((prev) => {
-        const next = completeTaskState(sections, prev, completedTask.id);
+      setAllTasks((prev) => {
+        const next = completeTaskState(
+          sections,
+          [...prev.completed, ...prev.incompleted],
+          completedTask.id
+        );
         updateTasks(currentUser.uid, next);
-        return next;
+        const [completed, incompleted] = separateTasks(next);
+        return { completed, incompleted };
       });
       setSelectedTasks(
         selectedTasks.filter(
@@ -164,10 +171,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleIncompleteTask = useCallback(
     (incompletedTask: Task) => {
-      setTasks((prev) => {
-        const next = incompleteTaskState(sections, prev, incompletedTask.id);
+      setAllTasks((prev) => {
+        const next = incompleteTaskState(
+          sections,
+          [...prev.completed, ...prev.incompleted],
+          incompletedTask.id
+        );
         updateTasks(currentUser.uid, next);
-        return next;
+        const [completed, incompleted] = separateTasks(next);
+        return { completed, incompleted };
       });
     },
     [currentUser.uid, sections]
@@ -175,7 +187,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleCreateTask = useCallback(
     (createdTask: Task) => {
-      setTasks((prev) => updateOrAddTaskState(sections, prev, createdTask));
+      setAllTasks((prev) => {
+        const next = updateOrAddTaskState(
+          sections,
+          [...prev.completed, ...prev.incompleted],
+          createdTask
+        );
+        const [completed, incompleted] = separateTasks(next);
+        return { completed, incompleted };
+      });
       createTask(currentUser.uid, createdTask);
     },
     [currentUser.uid, sections]
@@ -183,7 +203,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleDeleteTask = useCallback(
     (deletedTask: Task) => {
-      setTasks((prev) => {
+      setAllTasks((prev) => {
         if (
           selectedTasks.length > 1 &&
           selectedTasks.some(
@@ -194,20 +214,30 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           const deletedTaskIds = selectedTasks.map(
             (selectedTask) => selectedTask.id
           );
-          const next = deleteTasksState(sections, prev, deletedTaskIds);
+          const next = deleteTasksState(
+            sections,
+            [...prev.completed, ...prev.incompleted],
+            deletedTaskIds
+          );
           const batch = writeBatch(firestore);
           updateTasksBatch(batch, currentUser.uid, next);
           deleteTasksBatch(batch, currentUser.uid, projectId, deletedTaskIds);
           batch.commit();
-          return next;
+          const [completed, incompleted] = separateTasks(next);
+          return { completed, incompleted };
         } else {
           // 単一削除
-          const next = deleteTaskState(sections, prev, deletedTask.id);
+          const next = deleteTaskState(
+            sections,
+            [...prev.completed, ...prev.incompleted],
+            deletedTask.id
+          );
           const batch = writeBatch(firestore);
           updateTasksBatch(batch, currentUser.uid, next);
           deleteTaskBatch(batch, currentUser.uid, projectId, deletedTask.id);
           batch.commit();
-          return next;
+          const [completed, incompleted] = separateTasks(next);
+          return { completed, incompleted };
         }
       });
     },
@@ -242,7 +272,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       const toTask = selectedTasks.slice(-1)[0];
       const range = getTasksByRange(
         sections,
-        tasks,
+        allTasks.incompleted,
         selectedTask.id,
         toTask.id
       ).filter((task) => !task.completedAt);
@@ -253,7 +283,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         ...range,
       ]);
     },
-    [sections, selectedTasks, tasks]
+    [allTasks.incompleted, sections, selectedTasks]
   );
 
   const handleDragEndTask = useCallback(
@@ -276,16 +306,17 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        setTasks((prev) => {
+        setAllTasks((prev) => {
           const next = moveTaskState(
             sections,
-            prev,
+            [...prev.completed, ...prev.incompleted],
             taskId,
             toSectionId,
             toIndex
           );
           updateTasks(currentUser.uid, next);
-          return next;
+          const [completed, incompleted] = separateTasks(next);
+          return { completed, incompleted };
         });
       } else {
         // 複数移動
@@ -293,17 +324,18 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         const otherTaskIds = selectedTasks
           .filter((selectedTask) => selectedTask.id !== firstTaskId)
           .map((selectedTask) => selectedTask.id);
-        setTasks((prev) => {
+        setAllTasks((prev) => {
           const next = moveTasksState(
             sections,
-            prev,
+            [...prev.completed, ...prev.incompleted],
             firstTaskId,
             otherTaskIds,
             toSectionId,
             toIndex
           );
           updateTasks(currentUser.uid, next);
-          return next;
+          const [completed, incompleted] = separateTasks(next);
+          return { completed, incompleted };
         });
       }
     },
@@ -312,21 +344,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   useEffect(() => {
     if (!project) return;
-
-    const unsubscribe = listenTasks(currentUser.uid, projectId, (tasks) => {
-      setTasks(tasks);
-      setTasksLoaded(true);
-    });
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
-
-  useEffect(() => {
-    if (!project) return;
     const unsubscribe = listenIncompletedTasks(
       currentUser.uid,
       projectId,
       (tasks) => {
-        setIncompletedTasks(tasks);
+        setAllTasks((prev) => ({ ...prev, incompleted: tasks }));
         setIncompletedTasksLoaded(true);
       }
     );
@@ -339,7 +361,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       currentUser.uid,
       projectId,
       (tasks) => {
-        setCompletedTasks(tasks);
+        setAllTasks((prev) => ({ ...prev, completed: tasks }));
         setCompletedTasksLoaded(true);
       }
     );
@@ -367,7 +389,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   if (
     !projectLoaded ||
     !sectionsLoaded ||
-    !tasksLoaded ||
     !incompletedTasksLoaded ||
     !completedTasksLoaded
   ) {
@@ -402,7 +423,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 sections={sections}
                 onCreateSection={handleCreateSection}
                 onDeleteSection={handleDeleteSection}
-                tasks={tasks}
+                tasks={[...allTasks.completed, ...allTasks.incompleted]}
                 selectedTasks={selectedTasks}
                 onCompleteTask={handleCompleteTask}
                 onIncompleteTask={handleIncompleteTask}
