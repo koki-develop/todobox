@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import { ulid } from "ulid";
-import TaskList from "@/components/model/task/TaskList";
+import SectionListItem from "@/components/model/section/SectionListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
@@ -12,6 +12,7 @@ export type SectionListProps = {
   selectedTasks: Task[];
 
   onCreateSection: (section: Section) => void;
+  onDeleteSection: (section: Section) => void;
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
   onCreateTask: (task: Task) => void;
@@ -28,6 +29,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     tasks,
     selectedTasks,
     onCreateSection,
+    onDeleteSection,
     onCompleteTask,
     onIncompleteTask,
     onCreateTask,
@@ -71,31 +73,20 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
           {sectionsWithTasks
             .sort((a, b) => a.section.index - b.section.index)
             .map((sectionWithTasks) => (
-              <Draggable
+              <SectionListItem
                 key={sectionWithTasks.section.id}
-                draggableId={sectionWithTasks.section.id}
-                index={sectionWithTasks.section.index}
-              >
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.draggableProps}>
-                    <div {...provided.dragHandleProps}>
-                      {sectionWithTasks.section.name}
-                    </div>
-                    <TaskList
-                      sectionId={sectionWithTasks.section.id}
-                      tasks={sectionWithTasks.tasks}
-                      selectedTasks={selectedTasks}
-                      onCompleteTask={onCompleteTask}
-                      onIncompleteTask={onIncompleteTask}
-                      onDeleteTask={onDeleteTask}
-                      onCreateTask={onCreateTask}
-                      onClickTask={onClickTask}
-                      onSelectTask={onSelectTask}
-                      onMultiSelectTask={onMultiSelectTask}
-                    />
-                  </div>
-                )}
-              </Draggable>
+                section={sectionWithTasks.section}
+                tasks={sectionWithTasks.tasks}
+                selectedTasks={selectedTasks}
+                onDelete={onDeleteSection}
+                onCompleteTask={onCompleteTask}
+                onIncompleteTask={onIncompleteTask}
+                onDeleteTask={onDeleteTask}
+                onCreateTask={onCreateTask}
+                onClickTask={onClickTask}
+                onSelectTask={onSelectTask}
+                onMultiSelectTask={onMultiSelectTask}
+              />
             ))}
           {provided.placeholder}
           <div>

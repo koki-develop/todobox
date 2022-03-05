@@ -54,6 +54,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [currentUser.uid]
   );
 
+  const handleDeleteSection = useCallback((section: Section) => {
+    console.log("deleted");
+  }, []);
+
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
       const updatedTasks = completeTask(sections, tasks, completedTask.id);
@@ -282,11 +286,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
               <SectionList
                 projectId={projectId}
                 sections={sections}
+                onCreateSection={handleCreateSection}
+                onDeleteSection={handleDeleteSection}
                 tasks={tasks}
                 selectedTasks={selectedTasks}
                 onCompleteTask={handleCompleteTask}
                 onIncompleteTask={handleIncompleteTask}
-                onCreateSection={handleCreateSection}
                 onCreateTask={handleCreateTask}
                 onDeleteTask={handleDeleteTask}
                 onClickTask={handleClickTask}
