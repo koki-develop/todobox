@@ -110,6 +110,14 @@ export const createProject = async (
   await setDoc(ref, data);
 };
 
+export const deleteProject = async (
+  userId: string,
+  projectId: string
+): Promise<void> => {
+  const ref = doc(firestore, "users", userId, "projects", projectId);
+  await deleteDoc(ref);
+};
+
 export type CreateProjectFn = (input: CreateProjectInput) => Promise<void>;
 
 export const useCreateProjrect = (userId: string) => {
