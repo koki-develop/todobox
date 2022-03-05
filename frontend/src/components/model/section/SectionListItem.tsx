@@ -46,7 +46,10 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <div>
             <span {...provided.dragHandleProps}>handle</span>
-            <span>{section.name}</span>
+            <span>
+              {" "}
+              [{section.index}]{section.name}
+            </span>
             <span>
               <button onClick={handleDelete}>delete</button>
             </span>
