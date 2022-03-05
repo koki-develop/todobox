@@ -247,6 +247,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   return (
     <div>
+      {!project && <div>project not found.</div>}
       {project && (
         <div>
           <div>{project.name}</div>
