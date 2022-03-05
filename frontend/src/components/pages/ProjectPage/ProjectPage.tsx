@@ -1,4 +1,5 @@
 import { User } from "firebase/auth";
+import { writeBatch } from "firebase/firestore";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
@@ -7,15 +8,18 @@ import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
+import { firestore } from "@/lib/firebase";
 import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
   deleteSection,
+  deleteSectionBatch,
   deleteSectionState,
   listenSections,
   moveSectionState,
   updateOrAddSectionState,
   updateSections,
+  updateSectionsBatch,
 } from "@/lib/sectionUtils";
 import {
   completeTask,
@@ -73,8 +77,19 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleDeleteSection = useCallback(
     (deletedSection: Section) => {
-      setSections((prev) => deleteSectionState(prev, deletedSection.id));
-      deleteSection(currentUser.uid, projectId, deletedSection.id);
+      setSections((prev) => {
+        const batch = writeBatch(firestore);
+        const next = deleteSectionState(prev, deletedSection.id);
+        updateSectionsBatch(batch, currentUser.uid, next);
+        deleteSectionBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          deletedSection.id
+        );
+        batch.commit();
+        return next;
+      });
     },
     [currentUser.uid, projectId]
   );
@@ -89,9 +104,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       if (fromIndex === toIndex) return;
 
       setSections((prev) => {
-        const nextSections = moveSectionState(prev, fromIndex, toIndex);
-        updateSections(currentUser.uid, nextSections);
-        return nextSections;
+        const next = moveSectionState(prev, fromIndex, toIndex);
+        updateSections(currentUser.uid, next);
+        return next;
       });
     },
     [currentUser.uid]
