@@ -2,6 +2,9 @@
   "name": "todo-box-firebase",
   "private": true,
   "license": "MIT",
+  "scripts": {
+    "deploy": "firebase deploy"
+  },
   "devDependencies": {
     "firebase-tools": "^10.2.2"
   }
