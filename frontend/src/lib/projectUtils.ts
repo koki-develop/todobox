@@ -6,10 +6,7 @@ import {
   setDoc,
   Unsubscribe,
 } from "firebase/firestore";
-import { useCallback } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { ulid } from "ulid";
-import { projectsState } from "@/atoms/projectAtoms";
 import { Project, CreateProjectInput } from "@/models/project";
 import { firestore } from "@/lib/firebase";
 
@@ -47,22 +44,6 @@ export const deleteProjectState = (
 };
 
 /*
- * ステート管理
- */
-
-export const useProjects = (): Project[] => {
-  return useRecoilValue(projectsState);
-};
-
-export const useSetProjects = () => {
-  return useSetRecoilState(projectsState);
-};
-
-export const useProjectsState = () => {
-  return useRecoilState(projectsState);
-};
-
-/*
  * 読み取り
  */
 
@@ -77,29 +58,6 @@ export const listenProjects = (
     );
     callback(projects);
   });
-};
-
-export type ListenProjectsFn = (callback?: () => void) => Unsubscribe;
-
-export const useListenProjects = (userId: string): ListenProjectsFn => {
-  const setProjects = useSetProjects();
-
-  const listenProjects: ListenProjectsFn = useCallback(
-    (callback?: () => void) => {
-      const ref = collection(firestore, "users", userId, "projects");
-
-      return onSnapshot(ref, (snapshot) => {
-        const projects: Project[] = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Project)
-        );
-        setProjects(projects);
-        callback?.();
-      });
-    },
-    [setProjects, userId]
-  );
-
-  return listenProjects;
 };
 
 /*
@@ -121,46 +79,4 @@ export const deleteProject = async (
 ): Promise<void> => {
   const ref = doc(firestore, "users", userId, "projects", projectId);
   await deleteDoc(ref);
-};
-
-export type CreateProjectFn = (input: CreateProjectInput) => Promise<void>;
-
-export const useCreateProjrect = (userId: string) => {
-  const setProjects = useSetProjects();
-
-  const createProject = useCallback(
-    async (input: CreateProjectInput) => {
-      const project: Project = { id: ulid(), ...input };
-      const { id, ...data } = project;
-
-      const ref = doc(firestore, "users", userId, "projects", id);
-
-      await setDoc(ref, data);
-      setProjects((prev) => {
-        return updateOrAddProjectState(prev, project);
-      });
-    },
-    [setProjects, userId]
-  );
-
-  return createProject;
-};
-
-export type DeleteProjectFn = (id: string) => Promise<void>;
-
-export const useDeleteProject = (userId: string) => {
-  const setProjects = useSetProjects();
-
-  const deleteProject = useCallback(
-    async (projectId: string) => {
-      const ref = doc(firestore, "users", userId, "projects", projectId);
-      await deleteDoc(ref);
-      setProjects((prev) => {
-        return prev.filter((prevProject) => prevProject.id !== projectId);
-      });
-    },
-    [setProjects, userId]
-  );
-
-  return deleteProject;
 };
