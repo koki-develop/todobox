@@ -47,25 +47,77 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
-  const noSectionTasks = useMemo(() => {
-    return tasks.filter((task) => task.sectionId == null);
-  }, [tasks]);
+  /*
+   * project
+   */
+
+  useEffect(() => {
+    const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
+      setProject(project);
+      setProjectLoaded(true);
+    });
+    return unsubscribe;
+  }, [currentUser.uid, projectId]);
+
+  /*
+   * section
+   */
 
   const handleCreateSection = useCallback(
-    (section: Section) => {
-      setSections((prev) => updateOrAddSectionState(prev, section));
-      createSection(currentUser.uid, section);
+    (createdSection: Section) => {
+      setSections((prev) => updateOrAddSectionState(prev, createdSection));
+      createSection(currentUser.uid, createdSection);
     },
     [currentUser.uid]
   );
 
   const handleDeleteSection = useCallback(
-    (section: Section) => {
-      setSections((prev) => deleteSectionState(prev, section.id));
-      deleteSection(currentUser.uid, projectId, section.id);
+    (deletedSection: Section) => {
+      setSections((prev) => deleteSectionState(prev, deletedSection.id));
+      deleteSection(currentUser.uid, projectId, deletedSection.id);
     },
     [currentUser.uid, projectId]
   );
+
+  const handleDragEndSection = useCallback(
+    (result: DropResult) => {
+      const { source, destination } = result;
+      if (!destination) return;
+
+      const fromIndex = source.index;
+      const toIndex = destination.index;
+      if (fromIndex === toIndex) return;
+
+      setSections((prev) => {
+        const nextSections = moveSectionState(prev, fromIndex, toIndex);
+        updateSections(currentUser.uid, nextSections);
+        return nextSections;
+      });
+    },
+    [currentUser.uid]
+  );
+
+  useEffect(() => {
+    if (!project) return;
+
+    const unsubscribe = listenSections(
+      currentUser.uid,
+      project.id,
+      (sections) => {
+        setSections(sections);
+        setSectionsLoaded(true);
+      }
+    );
+    return unsubscribe;
+  }, [currentUser.uid, project]);
+
+  /*
+   * task
+   */
+
+  const noSectionTasks = useMemo(() => {
+    return tasks.filter((task) => task.sectionId == null);
+  }, [tasks]);
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
@@ -115,39 +167,48 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [sections, selectedTasks, tasks]
   );
 
-  const handleClickTask = useCallback((task: Task) => {
-    console.log("clicked:", task);
+  const handleClickTask = useCallback((clickedTask: Task) => {
+    console.log("clicked:", clickedTask);
   }, []);
 
   const handleSelectTask = useCallback(
-    (task: Task) => {
-      if (task.completedAt) {
+    (selectedTask: Task) => {
+      if (selectedTask.completedAt) {
         return;
       }
-      if (selectedTasks.some((selectedTask) => selectedTask.id === task.id)) {
+      if (
+        selectedTasks.some(
+          (selectedTask) => selectedTask.id === selectedTask.id
+        )
+      ) {
         setSelectedTasks(
-          selectedTasks.filter((selectedTask) => selectedTask.id !== task.id)
+          selectedTasks.filter(
+            (selectedTask) => selectedTask.id !== selectedTask.id
+          )
         );
       } else {
-        setSelectedTasks([...selectedTasks, task]);
+        setSelectedTasks([...selectedTasks, selectedTask]);
       }
     },
     [selectedTasks]
   );
 
   const handleMultiSelectTask = useCallback(
-    (task: Task) => {
-      if (task.completedAt) {
+    (selectedTask: Task) => {
+      if (selectedTask.completedAt) {
         return;
       }
       if (selectedTasks.length === 0) {
-        setSelectedTasks([task]);
+        setSelectedTasks([selectedTask]);
         return;
       }
       const toTask = selectedTasks.slice(-1)[0];
-      const range = getTasksByRange(sections, tasks, task.id, toTask.id).filter(
-        (task) => !task.completedAt
-      );
+      const range = getTasksByRange(
+        sections,
+        tasks,
+        selectedTask.id,
+        toTask.id
+      ).filter((task) => !task.completedAt);
       setSelectedTasks([
         ...selectedTasks.filter(
           (task) => !range.some((rangeTask) => rangeTask.id === task.id)
@@ -207,23 +268,19 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [sections, selectedTasks, tasks]
   );
 
-  const handleDragEndSection = useCallback(
-    (result: DropResult) => {
-      const { source, destination } = result;
-      if (!destination) return;
+  useEffect(() => {
+    if (!project) return;
 
-      const fromIndex = source.index;
-      const toIndex = destination.index;
-      if (fromIndex === toIndex) return;
+    const unsubscribe = listenTasks(currentUser.uid, projectId, (tasks) => {
+      setTasks(tasks);
+      setTasksLoaded(true);
+    });
+    return unsubscribe;
+  }, [currentUser.uid, project, projectId]);
 
-      setSections((prev) => {
-        const nextSections = moveSectionState(prev, fromIndex, toIndex);
-        updateSections(currentUser.uid, nextSections);
-        return nextSections;
-      });
-    },
-    [currentUser.uid]
-  );
+  /*
+   * other
+   */
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -238,41 +295,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     },
     [handleDragEndTask, handleDragEndSection]
   );
-
-  // project
-  useEffect(() => {
-    const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
-      setProject(project);
-      setProjectLoaded(true);
-    });
-    return unsubscribe;
-  }, [currentUser.uid, projectId]);
-
-  // section
-  useEffect(() => {
-    if (!project) return;
-
-    const unsubscribe = listenSections(
-      currentUser.uid,
-      project.id,
-      (sections) => {
-        setSections(sections);
-        setSectionsLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project]);
-
-  // task
-  useEffect(() => {
-    if (!project) return;
-
-    const unsubscribe = listenTasks(currentUser.uid, projectId, (tasks) => {
-      setTasks(tasks);
-      setTasksLoaded(true);
-    });
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
 
   if (!projectLoaded || !sectionsLoaded || !tasksLoaded) {
     return <div>loading...</div>;
