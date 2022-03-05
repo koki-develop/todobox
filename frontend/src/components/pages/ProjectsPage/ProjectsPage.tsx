@@ -15,6 +15,7 @@ export type ProjectsPageProps = {
 const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
+  const [creatingProject, setCreatingProject] = useState<boolean>(false);
   const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
 
   const projects = useProjects();
@@ -35,7 +36,10 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     if (trimmedName === "") return;
     setName("");
 
-    createProject({ name: trimmedName });
+    setCreatingProject(true);
+    createProject({ name: trimmedName }).finally(() => {
+      setCreatingProject(false);
+    });
   }, [createProject, name]);
 
   useEffect(() => {
@@ -54,7 +58,9 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       <button onClick={() => signOut(auth)}>signout</button>
       <div>
         <input type="text" value={name} onChange={handleChangeName} />
-        <button onClick={handleCreateProject}>create</button>
+        <button onClick={handleCreateProject} disabled={creatingProject}>
+          create
+        </button>
       </div>
 
       <div>
