@@ -61,6 +61,19 @@ export const useProjectsState = () => {
  * 読み取り
  */
 
+export const listenProjects = (
+  userId: string,
+  callback: (projects: Project[]) => void
+): Unsubscribe => {
+  const ref = collection(firestore, "users", userId, "projects");
+  return onSnapshot(ref, (snapshot) => {
+    const projects: Project[] = snapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as Project)
+    );
+    callback(projects);
+  });
+};
+
 export type ListenProjectsFn = (callback?: () => void) => Unsubscribe;
 
 export const useListenProjects = (userId: string): ListenProjectsFn => {
