@@ -4,6 +4,8 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  orderBy,
+  query,
   setDoc,
   writeBatch,
 } from "firebase/firestore";
@@ -55,10 +57,12 @@ export const moveSectionState = (
   fromIndex: number,
   toIndex: number
 ): Section[] => {
-  return arrayMove(prev, fromIndex, toIndex).map((section, i) => ({
-    ...section,
-    index: i,
-  }));
+  return arrayMove(sortSectionsState(prev), fromIndex, toIndex).map(
+    (section, i) => ({
+      ...section,
+      index: i,
+    })
+  );
 };
 
 /*
@@ -78,7 +82,8 @@ export const listenSections = (
     projectId,
     "sections"
   );
-  return onSnapshot(ref, (snapshot) => {
+  const q = query(ref, orderBy("index"));
+  return onSnapshot(q, (snapshot) => {
     const sections: Section[] = snapshot.docs.map(
       (doc) =>
         ({
