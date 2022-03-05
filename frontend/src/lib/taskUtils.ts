@@ -16,7 +16,10 @@ import { Task, CreateTaskInput } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 import { firestore } from "@/lib/firebase";
 
-/** タスク一覧を並び替える */
+/*
+ * ヘルパー
+ */
+
 export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   const tasksClone = tasks.concat();
 
@@ -38,7 +41,6 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
-/** タスク一覧を完了済のタスク一覧と未完了のタスク一覧に分ける */
 export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
   return tasks.reduce(
     (result, current) => {
@@ -52,7 +54,6 @@ export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
   );
 };
 
-/** 単一のタスクを更新する */
 export const updateTaskState = (
   sections: Section[],
   tasks: Task[],
@@ -70,7 +71,6 @@ export const updateTaskState = (
   );
 };
 
-/** 複数のタスクを更新する */
 export const updateTasksState = (
   sections: Section[],
   tasks: Task[],
@@ -87,16 +87,15 @@ export const updateTasksState = (
   );
 };
 
-/** 複数のタスクを更新する。タスク一覧に存在しない場合は追加する。 */
-export const updateOrAddTasks = (
+export const updateOrAddTasksState = (
   sections: Section[],
-  tasks: Task[],
+  prev: Task[],
   updatedOrAddedTasks: Task[]
 ): Task[] => {
   const [tasksToAdd, tasksToUpdate]: [Task[], Task[]] =
     updatedOrAddedTasks.reduce(
       (result, current) => {
-        if (tasks.some((task) => task.id === current.id)) {
+        if (prev.some((task) => task.id === current.id)) {
           return [result[0], [...result[1], current]];
         } else {
           return [[...result[0], current], result[1]];
@@ -106,12 +105,11 @@ export const updateOrAddTasks = (
     );
 
   return sortTasks(sections, [
-    ...updateTasksState(sections, tasks, tasksToUpdate),
+    ...updateTasksState(sections, prev, tasksToUpdate),
     ...tasksToAdd,
   ]);
 };
 
-/** タスク一覧から範囲を指定して複数のタスクを取得する */
 export const getTasksByRange = (
   sections: Section[],
   tasks: Task[],
@@ -131,7 +129,6 @@ export const getTasksByRange = (
   );
 };
 
-/** タスク一覧からセクション ID を指定して複数のタスクを取得する */
 export const getTasksBySectionId = (
   sections: Section[],
   tasks: Task[],
@@ -143,14 +140,13 @@ export const getTasksBySectionId = (
   );
 };
 
-/** タスク一覧から index を採番しなおしたタスク一覧を返す */
-export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
+export const indexTasksState = (sections: Section[], prev: Task[]): Task[] => {
   type Group = {
     sectionId: string | null;
     completedTasks: Task[];
     incompletedTasks: Task[];
   };
-  const groups: Group[] = tasks.reduce((result, current) => {
+  const groups: Group[] = prev.reduce((result, current) => {
     const group = result.find((group) => group.sectionId === current.sectionId);
     if (!group) {
       if (current.completedAt) {
@@ -193,7 +189,6 @@ export const indexTasks = (sections: Section[], tasks: Task[]): Task[] => {
   return sortTasks(sections, indexedTasks);
 };
 
-/** タスク一覧の特定の位置に複数のタスクを挿入する */
 export const insertTasksToTasks = (
   sections: Section[],
   tasks: Task[],
@@ -213,13 +208,9 @@ export const insertTasksToTasks = (
     0,
     ...tasksToInsertClone.map((task) => ({ ...task, sectionId }))
   );
-  const indexedSectionTasks = indexTasks(sections, sectionTasks);
-  return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
+  const indexedSectionTasks = indexTasksState(sections, sectionTasks);
+  return updateOrAddTasksState(sections, tasksClone, indexedSectionTasks);
 };
-
-/*
- * ヘルパー
- */
 
 export const buildTask = (input: CreateTaskInput): Task => {
   return { id: ulid(), completedAt: null, ...input };
@@ -247,7 +238,7 @@ export const completeTaskState = (
 ): Task[] => {
   const completedTask = prev.find((task) => task.id === taskId);
   if (!completedTask) return sortTasks(sections, prev);
-  return indexTasks(
+  return indexTasksState(
     sections,
     updateTaskState(sections, prev, {
       ...completedTask,
@@ -266,7 +257,7 @@ export const incompleteTaskState = (
   const incompletedTasks = prev.filter((task) => !task.completedAt);
   const index = (incompletedTasks.slice(-1)[0]?.index ?? -1) + 1;
 
-  return indexTasks(
+  return indexTasksState(
     sections,
     updateTaskState(sections, prev, {
       ...incompletedTask,
@@ -281,7 +272,7 @@ export const deleteTaskState = (
   prev: Task[],
   taskId: string
 ): Task[] => {
-  return indexTasks(
+  return indexTasksState(
     sections,
     prev.filter((task) => task.id !== taskId)
   );
@@ -292,7 +283,7 @@ export const deleteTasksState = (
   prev: Task[],
   taskIds: string[]
 ): Task[] => {
-  return indexTasks(
+  return indexTasksState(
     sections,
     prev.filter((task) => !taskIds.includes(task.id))
   );
@@ -322,7 +313,7 @@ export const moveTaskState = (
   if (movingTask.sectionId === toSectionId) {
     // 同一セクション内の移動
     // タスクを移動して index を採番
-    const updatedTasks = indexTasks(
+    const updatedTasks = indexTasksState(
       sections,
       arrayMove(fromSectionTasks, movingTask.index, toIndex)
     );
@@ -344,8 +335,8 @@ export const moveTaskState = (
 
     // index を採番してタスクを更新
     const updatedTasks = [
-      ...indexTasks(sections, updatedFromSectionTasks),
-      ...indexTasks(
+      ...indexTasksState(sections, updatedFromSectionTasks),
+      ...indexTasksState(
         sections,
         updatedToSectionTasks.map((task) => ({
           ...task,
@@ -381,7 +372,7 @@ export const moveTasksState = (
   }, [] as Task[]);
 
   // 全ての移動対象のタスクの順序を保持しておく
-  const sortedMovingTasks = indexTasks(
+  const sortedMovingTasks = indexTasksState(
     sections,
     sortTasks(sections, [firstTask, ...otherTasks]).map((task) => ({
       ...task,
@@ -402,7 +393,7 @@ export const moveTasksState = (
   const filteredTasks = movedTasks.filter(
     (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
   );
-  const indexedFilteredTasks = indexTasks(sections, filteredTasks);
+  const indexedFilteredTasks = indexTasksState(sections, filteredTasks);
 
   // 移動後のタスクを取得
   const movedFirstTask = indexedFilteredTasks.find(
