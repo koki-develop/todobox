@@ -3,6 +3,8 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  orderBy,
+  query,
   setDoc,
   Unsubscribe,
   WriteBatch,
@@ -34,28 +36,6 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
       return aSection.index - bSection.index;
     }
   });
-};
-
-/** 単一のタスクを未完了にする */
-export const incompleteTask = (
-  sections: Section[],
-  tasks: Task[],
-  taskId: string
-): Task[] => {
-  const incompletedTask = tasks.find((task) => task.id === taskId);
-  if (!incompletedTask) {
-    return sortTasks(sections, tasks);
-  }
-
-  const [, incompletedTasks] = separateTasks(tasks);
-  const index = (incompletedTasks.slice(-1)[0]?.index ?? -1) + 1;
-
-  return indexTasks(
-    sections,
-    updateTasksState(sections, tasks, [
-      { ...incompletedTask, index, completedAt: null },
-    ])
-  );
 };
 
 /** タスク一覧を完了済のタスク一覧と未完了のタスク一覧に分ける */
@@ -438,6 +418,24 @@ export const completeTaskState = (
   );
 };
 
+export const incompleteTaskState = (
+  sections: Section[],
+  prev: Task[],
+  taskId: string
+): Task[] => {
+  const incompletedTask = prev.find((task) => task.id === taskId);
+  if (!incompletedTask) return sortTasks(sections, prev);
+  const incompletedTasks = prev.filter((task) => !task.completedAt);
+  const index = (incompletedTasks.slice(-1)[0]?.index ?? -1) + 1;
+
+  return indexTasks(
+    sections,
+    updateTasksState(sections, prev, [
+      { ...incompletedTask, index, completedAt: null },
+    ])
+  );
+};
+
 /*
  * 読み取り
  */
@@ -455,7 +453,8 @@ export const listenTasks = (
     projectId,
     "tasks"
   );
-  return onSnapshot(ref, (snapshot) => {
+  const q = query(ref, orderBy("index"));
+  return onSnapshot(q, (snapshot) => {
     const tasks: Task[] = snapshot.docs.map((doc) => {
       const { completedAt, ...data } = doc.data();
       return {

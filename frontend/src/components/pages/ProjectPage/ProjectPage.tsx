@@ -24,7 +24,7 @@ import {
   completeTaskState,
   createTask,
   getTasksByRange,
-  incompleteTask,
+  incompleteTaskState,
   listenTasks,
   moveTask,
   moveTasks,
@@ -152,10 +152,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleIncompleteTask = useCallback(
     (incompletedTask: Task) => {
-      const updatedTasks = incompleteTask(sections, tasks, incompletedTask.id);
-      setTasks(updatedTasks);
+      setTasks((prev) => {
+        const next = incompleteTaskState(sections, prev, incompletedTask.id);
+        updateTasks(currentUser.uid, next);
+        return next;
+      });
     },
-    [sections, tasks]
+    [currentUser.uid, sections]
   );
 
   const handleCreateTask = useCallback(
