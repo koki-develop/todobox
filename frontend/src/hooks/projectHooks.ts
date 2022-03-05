@@ -101,6 +101,15 @@ export const useListenProjects = (userId: string): ListenProjectsFn => {
  * 書き込み
  */
 
+export const createProject = async (
+  userId: string,
+  project: Project
+): Promise<void> => {
+  const { id, ...data } = project;
+  const ref = doc(firestore, "users", userId, "projects", id);
+  await setDoc(ref, data);
+};
+
 export type CreateProjectFn = (input: CreateProjectInput) => Promise<void>;
 
 export const useCreateProjrect = (userId: string) => {
