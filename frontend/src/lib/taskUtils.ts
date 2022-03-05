@@ -500,7 +500,7 @@ export const listenCompletedTasks = (
   const q = query(
     ref,
     where("completedAt", "!=", null),
-    orderBy("completedAt")
+    orderBy("completedAt", "desc")
   );
   return onSnapshot(q, (snapshot) => {
     const tasks: Task[] = snapshot.docs.map((doc) => {
