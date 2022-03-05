@@ -24,8 +24,8 @@ const AuthProvider: React.VFC<AuthProviderProps> = React.memo((props) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setInitialized(true);
       setCurrentUser(user);
+      setInitialized(true);
     });
     return unsubscribe;
   }, []);
