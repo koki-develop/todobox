@@ -3,6 +3,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "dev": "firebase emulators:start --only auth,functions,firestore,storage",
     "deploy": "firebase deploy"
   },
   "devDependencies": {
