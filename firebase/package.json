@@ -1,5 +1,8 @@
 {
   "name": "todo-box-firebase",
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^10.2.2"
+  }
 }
