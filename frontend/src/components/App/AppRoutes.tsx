@@ -5,6 +5,7 @@ import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Layout from "@/components/Layout";
 
 const AppRoutes: React.VFC = React.memo(() => {
   const { initialized, currentUser } = useAuth();
@@ -22,26 +23,28 @@ const AppRoutes: React.VFC = React.memo(() => {
           currentUser ? <Navigate to="/projects" replace /> : <LoginPage />
         }
       />
-      <Route
-        path="/projects"
-        element={
-          currentUser ? (
-            <ProjectsPage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
-      <Route
-        path="/projects/:id"
-        element={
-          currentUser ? (
-            <ProjectPage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
+      <Route element={<Layout />}>
+        <Route
+          path="/projects"
+          element={
+            currentUser ? (
+              <ProjectsPage currentUser={currentUser} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            currentUser ? (
+              <ProjectPage currentUser={currentUser} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+      </Route>
       <Route
         path="*"
         element={currentUser ? <NotFoundPage /> : <Navigate to="/" replace />}
