@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   setDoc,
+  WriteBatch,
   writeBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
@@ -125,6 +126,15 @@ export const updateSections = async (
   sections: Section[]
 ): Promise<void> => {
   const batch = writeBatch(firestore);
+  updateSectionsBatch(batch, userId, sections);
+  await batch.commit();
+};
+
+export const updateSectionsBatch = (
+  batch: WriteBatch,
+  userId: string,
+  sections: Section[]
+): void => {
   for (const section of sections) {
     const { id, projectId, ...data } = section;
     const ref = doc(
@@ -136,10 +146,8 @@ export const updateSections = async (
       "sections",
       id
     );
-    batch.set(ref, { ...data });
+    batch.update(ref, { ...data });
   }
-
-  await batch.commit();
 };
 
 export const deleteSection = async (
@@ -157,4 +165,22 @@ export const deleteSection = async (
     sectionId
   );
   await deleteDoc(ref);
+};
+
+export const deleteSectionBatch = (
+  batch: WriteBatch,
+  userId: string,
+  projectId: string,
+  sectionId: string
+): void => {
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "sections",
+    sectionId
+  );
+  batch.delete(ref);
 };
