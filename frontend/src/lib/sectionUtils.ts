@@ -1,5 +1,11 @@
 import { Unsubscribe } from "firebase/auth";
-import { collection, doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section, CreateSectionInput } from "@/models/section";
 import { firestore } from "@/lib/firebase";
@@ -33,6 +39,13 @@ export const updateOrAddSectionState = (
   } else {
     return sortSectionsState([...prev, sectionToAddOrUpdate]);
   }
+};
+
+export const deleteSectionState = (
+  prev: Section[],
+  sectionId: string
+): Section[] => {
+  return prev.filter((prevSection) => prevSection.id !== sectionId);
 };
 
 /*
@@ -83,4 +96,21 @@ export const createSection = async (
     id
   );
   await setDoc(ref, data);
+};
+
+export const deleteSection = async (
+  userId: string,
+  projectId: string,
+  sectionId: string
+): Promise<void> => {
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "sections",
+    sectionId
+  );
+  await deleteDoc(ref);
 };

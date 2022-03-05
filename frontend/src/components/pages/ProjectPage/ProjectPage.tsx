@@ -11,6 +11,8 @@ import { arrayMove } from "@/lib/arrayUtils";
 import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
+  deleteSection,
+  deleteSectionState,
   listenSections,
   updateOrAddSectionState,
 } from "@/lib/sectionUtils";
@@ -54,9 +56,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [currentUser.uid]
   );
 
-  const handleDeleteSection = useCallback((section: Section) => {
-    console.log("deleted");
-  }, []);
+  const handleDeleteSection = useCallback(
+    (section: Section) => {
+      setSections((prev) => deleteSectionState(prev, section.id));
+      deleteSection(currentUser.uid, projectId, section.id);
+    },
+    [currentUser.uid, projectId]
+  );
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
