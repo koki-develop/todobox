@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import { moveTask, moveTasks, insertTasksToTasks } from "./taskUtils";
+import { moveTaskState, moveTasksState, insertTasksToTasks } from "./taskUtils";
 
 const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: "SECTION_1", index: 0, name: "section 1" },
@@ -9,8 +9,9 @@ const dummySections: Section[] = [
   { projectId: "dummyprojectid", id: "SECTION_3", index: 2, name: "section 3" },
 ];
 
-const buildTask = (fields: Omit<Task, "completedAt">): Task => {
+const buildTask = (fields: Omit<Task, "projectId" | "completedAt">): Task => {
   return {
+    projectId: "dummyprojectid",
     completedAt: null,
     ...fields,
   };
@@ -631,7 +632,7 @@ describe("moveTask", () => {
       testcase.args[1].toIndex
     }) to equal ${JSON.stringify(testcase.expected)}`, () => {
       expect(
-        moveTask(
+        moveTaskState(
           dummySections,
           testcase.args[0],
           testcase.args[1].taskId,
@@ -1675,7 +1676,7 @@ describe("moveTasks", () => {
       testcase.args[1].toIndex
     }) to equal ${JSON.stringify(testcase.expected)}`, () => {
       expect(
-        moveTasks(
+        moveTasksState(
           dummySections,
           testcase.args[0],
           testcase.args[1].firstTaskId,
