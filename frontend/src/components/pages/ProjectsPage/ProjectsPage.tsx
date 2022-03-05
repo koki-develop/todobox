@@ -1,10 +1,12 @@
 import { signOut, User } from "firebase/auth";
-import { collection, doc, onSnapshot, setDoc } from "firebase/firestore";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ulid } from "ulid";
-import { Project } from "@/models/project";
-import { auth, firestore } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
+import {
+  useProjects,
+  useListenProjects,
+  useCreateProjrect,
+} from "@/hooks/projectHooks";
 
 export type ProjectsPageProps = {
   currentUser: User;
@@ -14,7 +16,10 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
   const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+
+  const projects = useProjects();
+  const listenProjects = useListenProjects(currentUser.uid);
+  const createProject = useCreateProjrect(currentUser.uid);
 
   const [name, setName] = useState<string>("");
 
@@ -29,23 +34,16 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     const trimmedName = name.trim();
     if (trimmedName === "") return;
     setName("");
-    const id = ulid();
-    const project: Omit<Project, "id"> = { name: trimmedName };
 
-    const ref = doc(firestore, "users", currentUser.uid, "projects", id);
-    setDoc(ref, project);
-  }, [currentUser.uid, name]);
+    createProject({ name: trimmedName });
+  }, [createProject, name]);
 
   useEffect(() => {
-    const ref = collection(firestore, "users", currentUser.uid, "projects");
-    const unsubscribe = onSnapshot(ref, (snapshot) => {
+    const unsubscribe = listenProjects(() => {
       setProjectsLoaded(true);
-      setProjects(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Project))
-      );
     });
     return unsubscribe;
-  }, [currentUser.uid]);
+  }, [listenProjects]);
 
   if (!projectsLoaded) {
     return <div>loading...</div>;
