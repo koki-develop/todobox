@@ -17,6 +17,11 @@ import { firestore } from "@/lib/firebase";
  * ヘルパー
  */
 
+export const buildProject = (input: CreateProjectInput): Project => {
+  const id = ulid();
+  return { id, ...input };
+};
+
 const updateOrAddProject = (
   projects: Project[],
   projectToAddOrUpdate: Project
