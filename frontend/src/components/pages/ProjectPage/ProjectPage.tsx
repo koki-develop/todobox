@@ -28,8 +28,8 @@ import {
   getTasksByRange,
   incompleteTaskState,
   listenTasks,
-  moveTask,
-  moveTasks,
+  moveTaskState,
+  moveTasksState,
   deleteTasksState,
   updateOrAddTaskState,
   updateTasks,
@@ -226,9 +226,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleMultiSelectTask = useCallback(
     (selectedTask: Task) => {
-      if (selectedTask.completedAt) {
-        return;
-      }
+      if (selectedTask.completedAt) return;
       if (selectedTasks.length === 0) {
         setSelectedTasks([selectedTask]);
         return;
@@ -250,7 +248,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [sections, selectedTasks, tasks]
   );
 
-  // TODO: リファクタ
   const handleDragEndTask = useCallback(
     (result: DropResult) => {
       const { source, destination } = result;
@@ -271,32 +268,38 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        const movedTasks = moveTask(
-          sections,
-          tasks,
-          taskId,
-          toSectionId,
-          toIndex
-        );
-        setTasks(movedTasks);
+        setTasks((prev) => {
+          const next = moveTaskState(
+            sections,
+            prev,
+            taskId,
+            toSectionId,
+            toIndex
+          );
+          updateTasks(currentUser.uid, next);
+          return next;
+        });
       } else {
         // 複数移動
         const firstTaskId = taskId;
         const otherTaskIds = selectedTasks
           .filter((selectedTask) => selectedTask.id !== firstTaskId)
           .map((selectedTask) => selectedTask.id);
-        const movedTasks = moveTasks(
-          sections,
-          tasks,
-          firstTaskId,
-          otherTaskIds,
-          toSectionId,
-          toIndex
-        );
-        setTasks(movedTasks);
+        setTasks((prev) => {
+          const next = moveTasksState(
+            sections,
+            prev,
+            firstTaskId,
+            otherTaskIds,
+            toSectionId,
+            toIndex
+          );
+          updateTasks(currentUser.uid, next);
+          return next;
+        });
       }
     },
-    [sections, selectedTasks, tasks]
+    [currentUser.uid, sections, selectedTasks]
   );
 
   useEffect(() => {
