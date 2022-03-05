@@ -121,19 +121,6 @@ export const updateTasks = (
   );
 };
 
-/** 単一のタスクを更新する。タスク一覧に存在しない場合は追加する。 */
-export const updateOrAddTask = (
-  sections: Section[],
-  tasks: Task[],
-  updatedOrAddedTask: Task
-): Task[] => {
-  if (tasks.some((task) => task.id === updatedOrAddedTask.id)) {
-    return sortTasks(sections, updateTask(sections, tasks, updatedOrAddedTask));
-  } else {
-    return sortTasks(sections, [...tasks, updatedOrAddedTask]);
-  }
-};
-
 /** 複数のタスクを更新する。タスク一覧に存在しない場合は追加する。 */
 export const updateOrAddTasks = (
   sections: Section[],
@@ -436,6 +423,18 @@ export const removeTasks = (
 
 export const buildTask = (input: CreateTaskInput): Task => {
   return { id: ulid(), completedAt: null, ...input };
+};
+
+export const updateOrAddTaskState = (
+  sections: Section[],
+  prev: Task[],
+  updatedOrAddedTask: Task
+): Task[] => {
+  if (prev.some((task) => task.id === updatedOrAddedTask.id)) {
+    return sortTasks(sections, updateTask(sections, prev, updatedOrAddedTask));
+  } else {
+    return sortTasks(sections, [...prev, updatedOrAddedTask]);
+  }
 };
 
 /*

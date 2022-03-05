@@ -30,6 +30,7 @@ import {
   moveTasks,
   removeTasks,
   sortTasks,
+  updateOrAddTaskState,
 } from "@/lib/taskUtils";
 
 export type ProjectPageProps = {
@@ -156,10 +157,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleCreateTask = useCallback(
     (createdTask: Task) => {
+      setTasks((prev) => updateOrAddTaskState(sections, prev, createdTask));
       createTask(currentUser.uid, createdTask);
-      setTasks(sortTasks(sections, [...tasks, createdTask]));
     },
-    [currentUser.uid, sections, tasks]
+    [currentUser.uid, sections]
   );
 
   const handleDeleteTask = useCallback(
