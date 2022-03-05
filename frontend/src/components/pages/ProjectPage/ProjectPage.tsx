@@ -5,10 +5,15 @@ import { useParams } from "react-router-dom";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
-import { Section, dummySections } from "@/models/section";
+import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
 import { listenProject } from "@/lib/projectUtils";
+import {
+  createSection,
+  listenSections,
+  updateOrAddSectionState,
+} from "@/lib/sectionUtils";
 import {
   completeTask,
   getTasksByRange,
@@ -32,6 +37,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
   const [project, setProject] = useState<Project | null>(null);
+  const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
@@ -42,9 +48,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleCreateSection = useCallback(
     (section: Section) => {
-      setSections([...sections, section]);
+      setSections((prev) => updateOrAddSectionState(prev, section));
+      createSection(currentUser.uid, section);
     },
-    [sections]
+    [currentUser.uid]
   );
 
   const handleCompleteTask = useCallback(
@@ -233,15 +240,20 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   });
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setSections(dummySections);
-    }, 500);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [projectId]);
+    if (!project) return;
 
-  if (!projectLoaded) {
+    const unsubscribe = listenSections(
+      currentUser.uid,
+      projectId,
+      (sections) => {
+        setSections(sections);
+        setSectionsLoaded(true);
+      }
+    );
+    return unsubscribe;
+  }, [currentUser.uid, project, projectId]);
+
+  if (!projectLoaded || !sectionsLoaded) {
     return <div>loading...</div>;
   }
 

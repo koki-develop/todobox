@@ -13,3 +13,5 @@ export type Section = {
   index: number;
   name: string;
 };
+
+export type CreateSectionInput = Omit<Section, "id">;
