@@ -353,36 +353,6 @@ export const insertTasksToTasks = (
   return updateOrAddTasks(sections, tasksClone, indexedSectionTasks);
 };
 
-/** 単一のタスクを削除する */
-export const removeTask = (
-  sections: Section[],
-  tasks: Task[],
-  taskId: string
-): Task[] => {
-  return sortTasks(
-    sections,
-    indexTasks(
-      sections,
-      tasks.filter((task) => task.id !== taskId)
-    )
-  );
-};
-
-/** 複数のタスクを削除する */
-export const removeTasks = (
-  sections: Section[],
-  tasks: Task[],
-  taskIds: string[]
-): Task[] => {
-  return sortTasks(
-    sections,
-    indexTasks(
-      sections,
-      tasks.filter((task) => !taskIds.includes(task.id))
-    )
-  );
-};
-
 /*
  * ヘルパー
  */
@@ -442,6 +412,28 @@ export const incompleteTaskState = (
   );
 };
 
+export const deleteTaskState = (
+  sections: Section[],
+  prev: Task[],
+  taskId: string
+): Task[] => {
+  return indexTasks(
+    sections,
+    prev.filter((task) => task.id !== taskId)
+  );
+};
+
+export const deleteTasksState = (
+  sections: Section[],
+  prev: Task[],
+  taskIds: string[]
+): Task[] => {
+  return indexTasks(
+    sections,
+    prev.filter((task) => !taskIds.includes(task.id))
+  );
+};
+
 /*
  * 読み取り
  */
@@ -497,11 +489,11 @@ export const updateTasks = async (
   tasks: Task[]
 ): Promise<void> => {
   const batch = writeBatch(firestore);
-  updateSectionsBatch(batch, userId, tasks);
+  updateTasksBatch(batch, userId, tasks);
   await batch.commit();
 };
 
-export const updateSectionsBatch = (
+export const updateTasksBatch = (
   batch: WriteBatch,
   userId: string,
   tasks: Task[]
@@ -536,4 +528,33 @@ export const deleteTask = async (
     taskId
   );
   await deleteDoc(ref);
+};
+
+export const deleteTaskBatch = (
+  batch: WriteBatch,
+  userId: string,
+  projectId: string,
+  taskId: string
+): void => {
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    taskId
+  );
+  batch.delete(ref);
+};
+
+export const deleteTasksBatch = (
+  batch: WriteBatch,
+  userId: string,
+  projectId: string,
+  taskIds: string[]
+): void => {
+  for (const taskId of taskIds) {
+    deleteTaskBatch(batch, userId, projectId, taskId);
+  }
 };

@@ -23,14 +23,18 @@ import {
 import {
   completeTaskState,
   createTask,
+  deleteTaskBatch,
+  deleteTaskState,
   getTasksByRange,
   incompleteTaskState,
   listenTasks,
   moveTask,
   moveTasks,
-  removeTasks,
+  deleteTasksState,
   updateOrAddTaskState,
   updateTasks,
+  updateTasksBatch,
+  deleteTasksBatch,
 } from "@/lib/taskUtils";
 
 export type ProjectPageProps = {
@@ -171,21 +175,35 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleDeleteTask = useCallback(
     (deletedTask: Task) => {
-      if (
-        selectedTasks.some((selectedTask) => selectedTask.id === deletedTask.id)
-      ) {
-        setTasks(
-          removeTasks(
-            sections,
-            tasks,
-            selectedTasks.map((selectedTask) => selectedTask.id)
+      setTasks((prev) => {
+        if (
+          selectedTasks.length > 1 &&
+          selectedTasks.some(
+            (selectedTask) => selectedTask.id === deletedTask.id
           )
-        );
-      } else {
-        setTasks(removeTasks(sections, tasks, [deletedTask.id]));
-      }
+        ) {
+          // 複数削除
+          const deletedTaskIds = selectedTasks.map(
+            (selectedTask) => selectedTask.id
+          );
+          const next = deleteTasksState(sections, prev, deletedTaskIds);
+          const batch = writeBatch(firestore);
+          updateTasksBatch(batch, currentUser.uid, next);
+          deleteTasksBatch(batch, currentUser.uid, projectId, deletedTaskIds);
+          batch.commit();
+          return next;
+        } else {
+          // 単一削除
+          const next = deleteTaskState(sections, prev, deletedTask.id);
+          const batch = writeBatch(firestore);
+          updateTasksBatch(batch, currentUser.uid, next);
+          deleteTaskBatch(batch, currentUser.uid, projectId, deletedTask.id);
+          batch.commit();
+          return next;
+        }
+      });
     },
-    [sections, selectedTasks, tasks]
+    [currentUser.uid, projectId, sections, selectedTasks]
   );
 
   const handleClickTask = useCallback((clickedTask: Task) => {
