@@ -12,7 +12,6 @@ import { firestore } from "@/lib/firebase";
 import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
-  deleteSection,
   deleteSectionBatch,
   deleteSectionState,
   listenSections,
