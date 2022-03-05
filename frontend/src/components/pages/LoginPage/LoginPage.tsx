@@ -5,9 +5,13 @@ import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
+import {
+  signInWithRedirect,
+  signInAnonymously,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import React, { useCallback } from "react";
-import { useSetRecoilState } from "recoil";
-import { authenticatedUserState } from "@/atoms/userAtoms";
+import { auth } from "@/lib/firebase";
 
 const Field = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -18,15 +22,13 @@ const Field = styled(Box)(({ theme }) => ({
 }));
 
 const LoginPage: React.VFC = React.memo(() => {
-  const setAuthenticatedUser = useSetRecoilState(authenticatedUserState);
-
   const handleClickLoginWithGoogle = useCallback(() => {
-    setAuthenticatedUser({});
-  }, [setAuthenticatedUser]);
+    signInWithRedirect(auth, new GoogleAuthProvider());
+  }, []);
 
   const handleClickLoginAnonymously = useCallback(() => {
-    setAuthenticatedUser({});
-  }, [setAuthenticatedUser]);
+    signInAnonymously(auth);
+  }, []);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 20 }}>
