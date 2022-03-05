@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   setDoc,
@@ -438,24 +439,6 @@ export const buildTask = (input: CreateTaskInput): Task => {
 };
 
 /*
- * 書き込み
- */
-
-export const createTask = async (userId: string, task: Task): Promise<void> => {
-  const { id, projectId, ...data } = task;
-  const ref = doc(
-    firestore,
-    "users",
-    userId,
-    "projects",
-    projectId,
-    "tasks",
-    id
-  );
-  setDoc(ref, { ...data });
-};
-
-/*
  * 読み取り
  */
 
@@ -483,4 +466,39 @@ export const listenTasks = (
     );
     callback(tasks);
   });
+};
+
+/*
+ * 書き込み
+ */
+
+export const createTask = async (userId: string, task: Task): Promise<void> => {
+  const { id: taskId, projectId, ...data } = task;
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    taskId
+  );
+  await setDoc(ref, { ...data });
+};
+
+export const deleteTask = async (
+  userId: string,
+  projectId: string,
+  taskId: string
+): Promise<void> => {
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    taskId
+  );
+  await deleteDoc(ref);
 };
