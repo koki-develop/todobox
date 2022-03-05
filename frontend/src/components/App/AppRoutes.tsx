@@ -1,16 +1,15 @@
 import React from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "@/components/pages/LoginPage";
 import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
-import { auth } from "@/lib/firebase";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const AppRoutes: React.VFC = React.memo(() => {
-  const [currentUser, loading] = useAuthState(auth);
+  const { initialized, currentUser } = useAuth();
 
-  if (loading) {
+  if (!initialized) {
     return <div>loading...</div>;
   }
 
