@@ -1,12 +1,15 @@
 import { signOut, User } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Project } from "@/models/project";
 import { auth } from "@/lib/firebase";
 import {
-  useProjects,
-  useListenProjects,
-  useCreateProjrect,
-  useDeleteProject,
+  buildProject,
+  createProject,
+  deleteProject,
+  deleteProjectState,
+  listenProjects,
+  updateOrAddProjectState,
 } from "@/hooks/projectHooks";
 
 export type ProjectsPageProps = {
@@ -18,11 +21,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
 
   const [creatingProject, setCreatingProject] = useState<boolean>(false);
   const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
-
-  const projects = useProjects();
-  const listenProjects = useListenProjects(currentUser.uid);
-  const createProject = useCreateProjrect(currentUser.uid);
-  const deleteProject = useDeleteProject(currentUser.uid);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   const [name, setName] = useState<string>("");
 
@@ -33,30 +32,43 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     []
   );
 
-  const handleCreateProject = useCallback(() => {
+  const handleCreateProject = useCallback(async () => {
     const trimmedName = name.trim();
     if (trimmedName === "") return;
-    setName("");
 
     setCreatingProject(true);
-    createProject({ name: trimmedName }).finally(() => {
-      setCreatingProject(false);
-    });
-  }, [createProject, name]);
+    const project = buildProject({ name: trimmedName });
+
+    createProject(currentUser.uid, project)
+      .then(() => {
+        setName("");
+        setProjects((prev) => {
+          return updateOrAddProjectState(prev, project);
+        });
+      })
+      .finally(() => {
+        setCreatingProject(false);
+      });
+  }, [currentUser.uid, name]);
 
   const handleDeleteProject = useCallback(
     (projectId: string) => {
-      deleteProject(projectId);
+      deleteProject(currentUser.uid, projectId).then(() => {
+        setProjects((prev) => {
+          return deleteProjectState(prev, projectId);
+        });
+      });
     },
-    [deleteProject]
+    [currentUser.uid]
   );
 
   useEffect(() => {
-    const unsubscribe = listenProjects(() => {
+    const unsubscribe = listenProjects(currentUser.uid, (projects) => {
       setProjectsLoaded(true);
+      setProjects(projects);
     });
     return unsubscribe;
-  }, [listenProjects]);
+  }, [currentUser.uid]);
 
   if (!projectsLoaded) {
     return <div>loading...</div>;

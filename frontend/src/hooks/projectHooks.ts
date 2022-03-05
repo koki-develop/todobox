@@ -22,14 +22,12 @@ export const buildProject = (input: CreateProjectInput): Project => {
   return { id, ...input };
 };
 
-const updateOrAddProject = (
-  projects: Project[],
+export const updateOrAddProjectState = (
+  prev: Project[],
   projectToAddOrUpdate: Project
 ): Project[] => {
-  if (
-    projects.some((prevProject) => prevProject.id === projectToAddOrUpdate.id)
-  ) {
-    return projects.map((prevProject) => {
+  if (prev.some((prevProject) => prevProject.id === projectToAddOrUpdate.id)) {
+    return prev.map((prevProject) => {
       if (prevProject.id === projectToAddOrUpdate.id) {
         return projectToAddOrUpdate;
       } else {
@@ -37,8 +35,15 @@ const updateOrAddProject = (
       }
     });
   } else {
-    return [...projects, projectToAddOrUpdate];
+    return [...prev, projectToAddOrUpdate];
   }
+};
+
+export const deleteProjectState = (
+  prev: Project[],
+  projectId: string
+): Project[] => {
+  return prev.filter((prevProject) => prevProject.id !== projectId);
 };
 
 /*
@@ -132,7 +137,7 @@ export const useCreateProjrect = (userId: string) => {
 
       await setDoc(ref, data);
       setProjects((prev) => {
-        return updateOrAddProject(prev, project);
+        return updateOrAddProjectState(prev, project);
       });
     },
     [setProjects, userId]
