@@ -1,14 +1,17 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useRecoilValue } from "recoil";
 import LoginPage from "@/components/pages/LoginPage";
 import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
-import { authenticatedUserState } from "@/atoms/userAtoms";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const AppRoutes: React.VFC = React.memo(() => {
-  const authenticatedUser = useRecoilValue(authenticatedUserState);
+  const { initialized, currentUser } = useAuth();
+
+  if (!initialized) {
+    return <div>loading...</div>;
+  }
 
   // TODO: リファクタ
   return (
@@ -16,30 +19,20 @@ const AppRoutes: React.VFC = React.memo(() => {
       <Route
         path="/"
         element={
-          authenticatedUser ? (
-            <Navigate to="/projects" replace />
-          ) : (
-            <LoginPage />
-          )
+          currentUser ? <Navigate to="/projects" replace /> : <LoginPage />
         }
       />
       <Route
         path="/projects"
-        element={
-          authenticatedUser ? <ProjectsPage /> : <Navigate to="/" replace />
-        }
+        element={currentUser ? <ProjectsPage /> : <Navigate to="/" replace />}
       />
       <Route
         path="/projects/:id"
-        element={
-          authenticatedUser ? <ProjectPage /> : <Navigate to="/" replace />
-        }
+        element={currentUser ? <ProjectPage /> : <Navigate to="/" replace />}
       />
       <Route
         path="*"
-        element={
-          authenticatedUser ? <NotFoundPage /> : <Navigate to="/" replace />
-        }
+        element={currentUser ? <NotFoundPage /> : <Navigate to="/" replace />}
       />
     </Routes>
   );
