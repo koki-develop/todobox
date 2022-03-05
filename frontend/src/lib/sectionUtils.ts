@@ -5,9 +5,11 @@ import {
   doc,
   onSnapshot,
   setDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section, CreateSectionInput } from "@/models/section";
+import { arrayMove } from "@/lib/arrayUtils";
 import { firestore } from "@/lib/firebase";
 
 /*
@@ -48,6 +50,17 @@ export const deleteSectionState = (
   return prev.filter((prevSection) => prevSection.id !== sectionId);
 };
 
+export const moveSectionState = (
+  prev: Section[],
+  fromIndex: number,
+  toIndex: number
+): Section[] => {
+  return arrayMove(prev, fromIndex, toIndex).map((section, i) => ({
+    ...section,
+    index: i,
+  }));
+};
+
 /*
  * 読み取り
  */
@@ -70,6 +83,7 @@ export const listenSections = (
       (doc) =>
         ({
           id: doc.id,
+          projectId: projectId,
           ...doc.data(),
         } as Section)
     );
@@ -96,6 +110,28 @@ export const createSection = async (
     id
   );
   await setDoc(ref, data);
+};
+
+export const updateSections = async (
+  userId: string,
+  sections: Section[]
+): Promise<void> => {
+  const batch = writeBatch(firestore);
+  for (const section of sections) {
+    const { id, projectId, ...data } = section;
+    const ref = doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "sections",
+      id
+    );
+    batch.set(ref, { ...data });
+  }
+
+  await batch.commit();
 };
 
 export const deleteSection = async (

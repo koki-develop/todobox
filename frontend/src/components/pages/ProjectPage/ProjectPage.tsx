@@ -7,14 +7,15 @@ import TaskList from "@/components/model/task/TaskList";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import { arrayMove } from "@/lib/arrayUtils";
 import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
   deleteSection,
   deleteSectionState,
   listenSections,
+  moveSectionState,
   updateOrAddSectionState,
+  updateSections,
 } from "@/lib/sectionUtils";
 import {
   completeTask,
@@ -208,16 +209,17 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       const { source, destination } = result;
       if (!destination) return;
 
-      const srcIndex = source.index;
-      const destIndex = destination.index;
-      if (srcIndex === destIndex) return;
+      const fromIndex = source.index;
+      const toIndex = destination.index;
+      if (fromIndex === toIndex) return;
 
-      const nextSections = arrayMove(sections, srcIndex, destIndex).map(
-        (section, i) => ({ ...section, index: i })
-      );
-      setSections(nextSections);
+      setSections((prev) => {
+        const nextSections = moveSectionState(prev, fromIndex, toIndex);
+        updateSections(currentUser.uid, nextSections);
+        return nextSections;
+      });
     },
-    [sections]
+    [currentUser.uid]
   );
 
   const handleDragEnd = useCallback(
@@ -247,21 +249,21 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       setProjectLoaded(true);
     });
     return unsubscribe;
-  });
+  }, [currentUser.uid, projectId]);
 
   useEffect(() => {
     if (!project) return;
 
     const unsubscribe = listenSections(
       currentUser.uid,
-      projectId,
+      project.id,
       (sections) => {
         setSections(sections);
         setSectionsLoaded(true);
       }
     );
     return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
+  }, [currentUser.uid, project]);
 
   if (!projectLoaded || !sectionsLoaded) {
     return <div>loading...</div>;
