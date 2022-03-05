@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { ulid } from "ulid";
 import SectionListItem from "@/components/model/section/SectionListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
+import { buildSection } from "@/lib/sectionUtils";
 
 export type SectionListProps = {
   projectId: string;
@@ -62,8 +62,10 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     const trimmedName = name.trim();
     if (trimmedName === "") return;
     setName("");
+
     const index = sections.length === 0 ? 0 : sections.slice(-1)[0].index + 1;
-    onCreateSection({ projectId, id: ulid(), name: trimmedName, index });
+    const section = buildSection({ projectId, name: trimmedName, index });
+    onCreateSection(section);
   }, [name, onCreateSection, projectId, sections]);
 
   return (
