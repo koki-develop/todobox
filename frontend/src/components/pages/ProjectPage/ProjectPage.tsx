@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
@@ -7,6 +8,7 @@ import { Project } from "@/models/project";
 import { Section, dummySections } from "@/models/section";
 import { Task } from "@/models/task";
 import { arrayMove } from "@/lib/arrayUtils";
+import { listenProject } from "@/lib/projectUtils";
 import {
   completeTask,
   getTasksByRange,
@@ -18,7 +20,13 @@ import {
   sortTasks,
 } from "@/lib/taskUtils";
 
-const ProjectPage: React.VFC = React.memo(() => {
+export type ProjectPageProps = {
+  currentUser: User;
+};
+
+const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
+  const { currentUser } = props;
+
   const params = useParams();
   const projectId = params.id as string;
 
@@ -217,10 +225,15 @@ const ProjectPage: React.VFC = React.memo(() => {
   }, [projectId]);
 
   useEffect(() => {
-    setProjectLoaded(false);
-    const timeoutId = setTimeout(() => {
+    const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
+      setProject(project);
       setProjectLoaded(true);
-      setProject({ id: projectId, name: "sample project" });
+    });
+    return unsubscribe;
+  });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
       setSections(dummySections);
     }, 500);
     return () => {
