@@ -10,7 +10,7 @@ import {
   deleteProjectState,
   listenProjects,
   updateOrAddProjectState,
-} from "@/hooks/projectHooks";
+} from "@/lib/projectUtils";
 
 export type ProjectsPageProps = {
   currentUser: User;
