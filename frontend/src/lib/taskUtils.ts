@@ -1,6 +1,8 @@
+import { collection, onSnapshot, Unsubscribe } from "firebase/firestore";
 import { Section } from "@/models/section";
-import { Task, dummyTasks } from "@/models/task";
+import { Task } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
+import { firestore } from "@/lib/firebase";
 
 /** タスク一覧を並び替える */
 export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
@@ -420,18 +422,36 @@ export const removeTasks = (
   );
 };
 
-// TODO: firestore のものを使う予定
-type Unsubscribe = () => void;
+/*
+ * 書き込み
+ */
 
-/** タスク一覧を subscribe する */
+/*
+ * 読み取り
+ */
+
 export const listenTasks = (
-  _projectId: string,
+  userId: string,
+  projectId: string,
   callback: (tasks: Task[]) => void
 ): Unsubscribe => {
-  setTimeout(() => {
-    callback(dummyTasks);
-  }, 500);
-  return () => {
-    /* */
-  };
+  const ref = collection(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks"
+  );
+  return onSnapshot(ref, (snapshot) => {
+    const tasks: Task[] = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          projectId,
+          ...doc.data(),
+        } as Task)
+    );
+    callback(tasks);
+  });
 };

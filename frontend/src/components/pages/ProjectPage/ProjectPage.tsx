@@ -42,6 +42,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [project, setProject] = useState<Project | null>(null);
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
+  const [tasksLoaded, setTasksLoaded] = useState<boolean>(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
@@ -236,13 +237,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [handleDragEndTask, handleDragEndSection]
   );
 
-  useEffect(() => {
-    const unsubscribe = listenTasks(projectId, (tasks) => {
-      setTasks(tasks);
-    });
-    return unsubscribe;
-  }, [projectId]);
-
+  // project
   useEffect(() => {
     const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
       setProject(project);
@@ -251,6 +246,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     return unsubscribe;
   }, [currentUser.uid, projectId]);
 
+  // section
   useEffect(() => {
     if (!project) return;
 
@@ -265,7 +261,18 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     return unsubscribe;
   }, [currentUser.uid, project]);
 
-  if (!projectLoaded || !sectionsLoaded) {
+  // task
+  useEffect(() => {
+    if (!project) return;
+
+    const unsubscribe = listenTasks(currentUser.uid, projectId, (tasks) => {
+      setTasks(tasks);
+      setTasksLoaded(true);
+    });
+    return unsubscribe;
+  }, [currentUser.uid, project, projectId]);
+
+  if (!projectLoaded || !sectionsLoaded || !tasksLoaded) {
     return <div>loading...</div>;
   }
 
