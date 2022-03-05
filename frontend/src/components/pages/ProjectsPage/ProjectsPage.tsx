@@ -1,4 +1,4 @@
-import { signOut } from "firebase/auth";
+import { signOut, User } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ulid } from "ulid";
@@ -10,7 +10,11 @@ const dummyProjects: Project[] = [
   { id: ulid(), name: "project 2" },
 ];
 
-const ProjectsPage: React.VFC = React.memo(() => {
+export type ProjectsPageProps = {
+  currentUser: User;
+};
+
+const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
   const [projects, setProjects] = useState<Project[]>([]);
 

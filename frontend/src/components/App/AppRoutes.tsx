@@ -25,7 +25,13 @@ const AppRoutes: React.VFC = React.memo(() => {
       />
       <Route
         path="/projects"
-        element={currentUser ? <ProjectsPage /> : <Navigate to="/" replace />}
+        element={
+          currentUser ? (
+            <ProjectsPage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route
         path="/projects/:id"
