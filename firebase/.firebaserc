@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "koki-todo-box"
-  }
+    "default": "koki-todo-box",
+    "stg": "todo-box-stg"
+  },
+  "targets": {}
 }
