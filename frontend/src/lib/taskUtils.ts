@@ -53,7 +53,7 @@ export const separateTasks = (tasks: Task[]): [Task[], Task[]] => {
 };
 
 /** 単一のタスクを更新する */
-export const updateTask = (
+export const updateTaskState = (
   sections: Section[],
   tasks: Task[],
   updatedTask: Task
@@ -397,7 +397,10 @@ export const updateOrAddTaskState = (
   updatedOrAddedTask: Task
 ): Task[] => {
   if (prev.some((task) => task.id === updatedOrAddedTask.id)) {
-    return sortTasks(sections, updateTask(sections, prev, updatedOrAddedTask));
+    return sortTasks(
+      sections,
+      updateTaskState(sections, prev, updatedOrAddedTask)
+    );
   } else {
     return sortTasks(sections, [...prev, updatedOrAddedTask]);
   }
@@ -412,9 +415,10 @@ export const completeTaskState = (
   if (!completedTask) return sortTasks(sections, prev);
   return indexTasks(
     sections,
-    updateTasksState(sections, prev, [
-      { ...completedTask, completedAt: new Date() },
-    ])
+    updateTaskState(sections, prev, {
+      ...completedTask,
+      completedAt: new Date(),
+    })
   );
 };
 
@@ -430,9 +434,11 @@ export const incompleteTaskState = (
 
   return indexTasks(
     sections,
-    updateTasksState(sections, prev, [
-      { ...incompletedTask, index, completedAt: null },
-    ])
+    updateTaskState(sections, prev, {
+      ...incompletedTask,
+      index,
+      completedAt: null,
+    })
   );
 };
 
