@@ -63,6 +63,11 @@ module.exports = {
             position: "before",
           },
           {
+            pattern: "@/atoms/**",
+            group: "internal",
+            position: "before",
+          },
+          {
             pattern: "@/models/**",
             group: "internal",
             position: "before",
