@@ -53,6 +53,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [project, setProject] = useState<Project | null>(null);
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
+  const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
   const [allTasks, setAllTasks] = useState<{
     completed: Task[];
     incompleted: Task[];
@@ -147,6 +148,22 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       (task) => task.sectionId == null
     );
   }, [allTasks.completed, allTasks.incompleted]);
+
+  const completedTasks = useMemo(() => {
+    if (!showCompletedTasks) return [];
+    return allTasks.completed;
+  }, [allTasks.completed, showCompletedTasks]);
+
+  const incompletedTasks = useMemo(() => {
+    return allTasks.incompleted;
+  }, [allTasks.incompleted]);
+
+  const handleChangeShowCompletedTasks = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setShowCompletedTasks(e.currentTarget.checked);
+    },
+    []
+  );
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
@@ -272,7 +289,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       const toTask = selectedTasks.slice(-1)[0];
       const range = getTasksByRange(
         sections,
-        allTasks.incompleted,
+        incompletedTasks,
         selectedTask.id,
         toTask.id
       ).filter((task) => !task.completedAt);
@@ -283,7 +300,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         ...range,
       ]);
     },
-    [allTasks.incompleted, sections, selectedTasks]
+    [incompletedTasks, sections, selectedTasks]
   );
 
   const handleDragEndTask = useCallback(
@@ -357,6 +374,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   useEffect(() => {
     if (!project) return;
+    if (!showCompletedTasks) {
+      setCompletedTasksLoaded(true);
+      return;
+    }
     const unsubscribe = listenCompletedTasks(
       currentUser.uid,
       projectId,
@@ -366,7 +387,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       }
     );
     return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
+  }, [currentUser.uid, project, projectId, showCompletedTasks]);
 
   /*
    * other
@@ -401,6 +422,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       {project && (
         <div>
           <div>{project.name}</div>
+          <div>
+            <input
+              type="checkbox"
+              checked={showCompletedTasks}
+              onChange={handleChangeShowCompletedTasks}
+            />
+          </div>
           <DragDropContext onDragEnd={handleDragEnd}>
             <div>
               <div>
@@ -423,7 +451,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 sections={sections}
                 onCreateSection={handleCreateSection}
                 onDeleteSection={handleDeleteSection}
-                tasks={[...allTasks.completed, ...allTasks.incompleted]}
+                tasks={[...completedTasks, ...incompletedTasks]}
                 selectedTasks={selectedTasks}
                 onCompleteTask={handleCompleteTask}
                 onIncompleteTask={handleIncompleteTask}
