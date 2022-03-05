@@ -48,6 +48,11 @@ module.exports = {
             position: "before",
           },
           {
+            pattern: "@/components/Layout/**",
+            group: "internal",
+            position: "before",
+          },
+          {
             pattern: "@/components/pages/**",
             group: "internal",
             position: "before",
