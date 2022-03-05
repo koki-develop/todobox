@@ -5,6 +5,8 @@ import {
   onSnapshot,
   setDoc,
   Unsubscribe,
+  WriteBatch,
+  writeBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section } from "@/models/section";
@@ -34,22 +36,6 @@ export const sortTasks = (sections: Section[], tasks: Task[]): Task[] => {
   });
 };
 
-/** 単一のタスクを完了する */
-export const completeTask = (
-  sections: Section[],
-  tasks: Task[],
-  taskId: string
-): Task[] => {
-  const completedTask = tasks.find((task) => task.id === taskId);
-  if (!completedTask) return sortTasks(sections, tasks);
-  return indexTasks(
-    sections,
-    updateTasks(sections, tasks, [
-      { ...completedTask, completedAt: new Date() },
-    ])
-  );
-};
-
 /** 単一のタスクを未完了にする */
 export const incompleteTask = (
   sections: Section[],
@@ -66,7 +52,7 @@ export const incompleteTask = (
 
   return indexTasks(
     sections,
-    updateTasks(sections, tasks, [
+    updateTasksState(sections, tasks, [
       { ...incompletedTask, index, completedAt: null },
     ])
   );
@@ -105,7 +91,7 @@ export const updateTask = (
 };
 
 /** 複数のタスクを更新する */
-export const updateTasks = (
+export const updateTasksState = (
   sections: Section[],
   tasks: Task[],
   updatedTasks: Task[]
@@ -140,7 +126,7 @@ export const updateOrAddTasks = (
     );
 
   return sortTasks(sections, [
-    ...updateTasks(sections, tasks, tasksToUpdate),
+    ...updateTasksState(sections, tasks, tasksToUpdate),
     ...tasksToAdd,
   ]);
 };
@@ -258,7 +244,7 @@ export const moveTask = (
     );
 
     // タスクを更新
-    return updateTasks(sections, tasks, updatedTasks);
+    return updateTasksState(sections, tasks, updatedTasks);
   } else {
     // 異なるセクション間の移動
     // 移動先のタスク一覧を取得
@@ -283,7 +269,7 @@ export const moveTask = (
         }))
       ),
     ];
-    return updateTasks(sections, tasks, updatedTasks);
+    return updateTasksState(sections, tasks, updatedTasks);
   }
 };
 
@@ -353,7 +339,7 @@ export const moveTasks = (
   );
 
   // 移動したタスクの index を最初の順序に更新
-  return updateTasks(
+  return updateTasksState(
     sections,
     insertedTasks,
     sortedMovingTasks.map((task) => ({
@@ -437,6 +423,21 @@ export const updateOrAddTaskState = (
   }
 };
 
+export const completeTaskState = (
+  sections: Section[],
+  prev: Task[],
+  taskId: string
+): Task[] => {
+  const completedTask = prev.find((task) => task.id === taskId);
+  if (!completedTask) return sortTasks(sections, prev);
+  return indexTasks(
+    sections,
+    updateTasksState(sections, prev, [
+      { ...completedTask, completedAt: new Date() },
+    ])
+  );
+};
+
 /*
  * 読み取り
  */
@@ -483,6 +484,35 @@ export const createTask = async (userId: string, task: Task): Promise<void> => {
     taskId
   );
   await setDoc(ref, { ...data });
+};
+
+export const updateTasks = async (
+  userId: string,
+  tasks: Task[]
+): Promise<void> => {
+  const batch = writeBatch(firestore);
+  updateSectionsBatch(batch, userId, tasks);
+  await batch.commit();
+};
+
+export const updateSectionsBatch = (
+  batch: WriteBatch,
+  userId: string,
+  tasks: Task[]
+): void => {
+  for (const task of tasks) {
+    const { id, projectId, ...data } = task;
+    const ref = doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "tasks",
+      id
+    );
+    batch.update(ref, { ...data });
+  }
 };
 
 export const deleteTask = async (

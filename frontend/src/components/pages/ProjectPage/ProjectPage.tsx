@@ -21,7 +21,7 @@ import {
   updateSectionsBatch,
 } from "@/lib/sectionUtils";
 import {
-  completeTask,
+  completeTaskState,
   createTask,
   getTasksByRange,
   incompleteTask,
@@ -29,8 +29,8 @@ import {
   moveTask,
   moveTasks,
   removeTasks,
-  sortTasks,
   updateOrAddTaskState,
+  updateTasks,
 } from "@/lib/taskUtils";
 
 export type ProjectPageProps = {
@@ -136,15 +136,18 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
-      const updatedTasks = completeTask(sections, tasks, completedTask.id);
-      setTasks(updatedTasks);
+      setTasks((prev) => {
+        const next = completeTaskState(sections, prev, completedTask.id);
+        updateTasks(currentUser.uid, next);
+        return next;
+      });
       setSelectedTasks(
         selectedTasks.filter(
           (selectedTask) => selectedTask.id !== completedTask.id
         )
       );
     },
-    [sections, selectedTasks, tasks]
+    [currentUser.uid, sections, selectedTasks]
   );
 
   const handleIncompleteTask = useCallback(
