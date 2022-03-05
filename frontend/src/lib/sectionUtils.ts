@@ -26,6 +26,10 @@ export const sortSectionsState = (prev: Section[]): Section[] => {
   return prev.concat().sort((a, b) => a.index - b.index);
 };
 
+export const indexSectionsState = (prev: Section[]): Section[] => {
+  return prev.map((prevSection, i) => ({ ...prevSection, index: i }));
+};
+
 export const updateOrAddSectionState = (
   prev: Section[],
   sectionToAddOrUpdate: Section
@@ -49,7 +53,9 @@ export const deleteSectionState = (
   prev: Section[],
   sectionId: string
 ): Section[] => {
-  return prev.filter((prevSection) => prevSection.id !== sectionId);
+  return indexSectionsState(
+    prev.filter((prevSection) => prevSection.id !== sectionId)
+  );
 };
 
 export const moveSectionState = (
@@ -57,11 +63,8 @@ export const moveSectionState = (
   fromIndex: number,
   toIndex: number
 ): Section[] => {
-  return arrayMove(sortSectionsState(prev), fromIndex, toIndex).map(
-    (section, i) => ({
-      ...section,
-      index: i,
-    })
+  return indexSectionsState(
+    arrayMove(sortSectionsState(prev), fromIndex, toIndex)
   );
 };
 
