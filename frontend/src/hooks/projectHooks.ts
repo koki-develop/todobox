@@ -56,12 +56,12 @@ export const useProjectsState = () => {
  * 読み取り
  */
 
-export type ListenProjectFn = (callback?: () => void) => Unsubscribe;
+export type ListenProjectsFn = (callback?: () => void) => Unsubscribe;
 
-export const useListenProjects = (userId: string): ListenProjectFn => {
+export const useListenProjects = (userId: string): ListenProjectsFn => {
   const setProjects = useSetProjects();
 
-  const listenProjects: ListenProjectFn = useCallback(
+  const listenProjects: ListenProjectsFn = useCallback(
     (callback?: () => void) => {
       const ref = collection(firestore, "users", userId, "projects");
 
