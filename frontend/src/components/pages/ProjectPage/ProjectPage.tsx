@@ -35,6 +35,8 @@ import {
   updateTasks,
   updateTasksBatch,
   deleteTasksBatch,
+  listenIncompletedTasks,
+  listenCompletedTasks,
 } from "@/lib/taskUtils";
 
 export type ProjectPageProps = {
@@ -53,6 +55,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [tasksLoaded, setTasksLoaded] = useState<boolean>(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [incompletedTasksLoaded, setIncompletedTasksLoaded] =
+    useState<boolean>(false);
+  const [incompletedTasks, setIncompletedTasks] = useState<Task[]>([]);
+  const [completedTasksLoaded, setCompletedTasksLoaded] =
+    useState<boolean>(false);
+  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
   /*
@@ -312,6 +320,32 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     return unsubscribe;
   }, [currentUser.uid, project, projectId]);
 
+  useEffect(() => {
+    if (!project) return;
+    const unsubscribe = listenIncompletedTasks(
+      currentUser.uid,
+      projectId,
+      (tasks) => {
+        setIncompletedTasks(tasks);
+        setIncompletedTasksLoaded(true);
+      }
+    );
+    return unsubscribe;
+  }, [currentUser.uid, project, projectId]);
+
+  useEffect(() => {
+    if (!project) return;
+    const unsubscribe = listenCompletedTasks(
+      currentUser.uid,
+      projectId,
+      (tasks) => {
+        setCompletedTasks(tasks);
+        setCompletedTasksLoaded(true);
+      }
+    );
+    return unsubscribe;
+  }, [currentUser.uid, project, projectId]);
+
   /*
    * other
    */
@@ -330,7 +364,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [handleDragEndTask, handleDragEndSection]
   );
 
-  if (!projectLoaded || !sectionsLoaded || !tasksLoaded) {
+  if (
+    !projectLoaded ||
+    !sectionsLoaded ||
+    !tasksLoaded ||
+    !incompletedTasksLoaded ||
+    !completedTasksLoaded
+  ) {
     return <div>loading...</div>;
   }
 
