@@ -47,6 +47,21 @@ export const deleteProjectState = (
  * 読み取り
  */
 
+export const listenProject = (
+  userId: string,
+  projectId: string,
+  callback: (project: Project | null) => void
+): Unsubscribe => {
+  const ref = doc(firestore, "users", userId, "projects", projectId);
+  return onSnapshot(ref, (snapshot) => {
+    if (snapshot.exists()) {
+      callback({ id: snapshot.id, ...snapshot.data() } as Project);
+    } else {
+      callback(null);
+    }
+  });
+};
+
 export const listenProjects = (
   userId: string,
   callback: (projects: Project[]) => void
