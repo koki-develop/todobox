@@ -5,6 +5,7 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
 export type SectionListItemProps = {
+  projectId: string;
   section: Section;
   tasks: Task[];
   selectedTasks: Task[];
@@ -21,6 +22,7 @@ export type SectionListItemProps = {
 
 const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const {
+    projectId,
     section,
     tasks,
     selectedTasks,
@@ -50,6 +52,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
             </span>
           </div>
           <TaskList
+            projectId={projectId}
             sectionId={section.id}
             tasks={tasks}
             selectedTasks={selectedTasks}

@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { ulid } from "ulid";
 import TaskListItem from "@/components/model/task/TaskListItem";
 import { Task } from "@/models/task";
-import { separateTasks } from "@/lib/taskUtils";
+import { buildTask, separateTasks } from "@/lib/taskUtils";
 
 export type TaskListProps = {
+  projectId: string;
   sectionId: string | null;
   tasks: Task[];
   selectedTasks: Task[];
@@ -21,6 +21,7 @@ export type TaskListProps = {
 
 const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   const {
+    projectId,
     sectionId,
     tasks,
     selectedTasks,
@@ -58,14 +59,14 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
       incompletedTasks.length === 0
         ? 0
         : incompletedTasks.slice(-1)[0].index + 1;
-    onCreateTask({
-      id: ulid(),
+    const task = buildTask({
+      projectId,
       sectionId,
       title: trimmedTitle,
       index,
-      completedAt: null,
     });
-  }, [onCreateTask, sectionId, incompletedTasks, title]);
+    onCreateTask(task);
+  }, [incompletedTasks, onCreateTask, projectId, sectionId, title]);
 
   return (
     <Droppable droppableId={droppableId} type="tasks">

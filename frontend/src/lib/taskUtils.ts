@@ -1,6 +1,7 @@
 import { collection, onSnapshot, Unsubscribe } from "firebase/firestore";
+import { ulid } from "ulid";
 import { Section } from "@/models/section";
-import { Task } from "@/models/task";
+import { Task, CreateTaskInput } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 import { firestore } from "@/lib/firebase";
 
@@ -420,6 +421,14 @@ export const removeTasks = (
       tasks.filter((task) => !taskIds.includes(task.id))
     )
   );
+};
+
+/*
+ * ヘルパー
+ */
+
+export const buildTask = (input: CreateTaskInput): Task => {
+  return { id: ulid(), completedAt: null, ...input };
 };
 
 /*

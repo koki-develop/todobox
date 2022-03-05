@@ -77,6 +77,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
             .map((sectionWithTasks) => (
               <SectionListItem
                 key={sectionWithTasks.section.id}
+                projectId={projectId}
                 section={sectionWithTasks.section}
                 tasks={sectionWithTasks.tasks}
                 selectedTasks={selectedTasks}

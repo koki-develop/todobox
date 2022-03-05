@@ -8,3 +8,5 @@ export type Task = {
 
   completedAt: Date | null;
 };
+
+export type CreateTaskInput = Omit<Task, "id" | "completedAt">;

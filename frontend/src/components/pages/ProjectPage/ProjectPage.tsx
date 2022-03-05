@@ -286,6 +286,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             <div>
               <div>
                 <TaskList
+                  projectId={projectId}
                   sectionId={null}
                   tasks={noSectionTasks}
                   selectedTasks={selectedTasks}
