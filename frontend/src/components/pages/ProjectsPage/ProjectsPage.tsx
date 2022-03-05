@@ -1,7 +1,9 @@
+import { signOut } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ulid } from "ulid";
 import { Project } from "@/models/project";
+import { auth } from "@/lib/firebase";
 
 const dummyProjects: Project[] = [
   { id: ulid(), name: "project 1" },
@@ -47,6 +49,7 @@ const ProjectsPage: React.VFC = React.memo(() => {
 
   return (
     <div>
+      <button onClick={() => signOut(auth)}>signout</button>
       <div>
         <input type="text" value={name} onChange={handleChangeName} />
         <button onClick={handleCreateProject}>create</button>
