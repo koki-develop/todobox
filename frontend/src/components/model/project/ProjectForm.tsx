@@ -1,5 +1,6 @@
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Container from "@mui/material/Container";
 import Fade from "@mui/material/Fade";
@@ -64,28 +65,38 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
       <Fade in={open} timeout={200}>
         <Container maxWidth="md" sx={{ outline: "none" }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ pb: 0 }}>
               <Form onSubmit={handleCreate}>
                 <Field>
                   <TextField
                     fullWidth
+                    required
                     label="プロジェクト名"
                     value={name}
                     onChange={handleChangeName}
                   />
                 </Field>
-                <Field>
-                  <Button
-                    fullWidth
-                    type="submit"
-                    disabled={loading}
-                    variant="contained"
-                  >
-                    作成
-                  </Button>
-                </Field>
+                <Field></Field>
               </Form>
             </CardContent>
+            <CardActions>
+              <Button
+                fullWidth
+                disabled={loading}
+                onClick={onClose}
+                variant="contained"
+              >
+                キャンセル
+              </Button>
+              <Button
+                fullWidth
+                type="submit"
+                disabled={loading}
+                variant="contained"
+              >
+                作成
+              </Button>
+            </CardActions>
           </Card>
         </Container>
       </Fade>
