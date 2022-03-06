@@ -18,7 +18,7 @@ const withAuth = (options?: WithAuthOptions) => {
     const { initialized, currentUser } = useAuth();
 
     if (!initialized) {
-      return <Loading text="ログイン情報を読み込んでいます" />;
+      return <Loading />;
     }
 
     if (options?.loginPage) {
@@ -41,8 +41,8 @@ const withAuth = (options?: WithAuthOptions) => {
 const AppRoutes: React.VFC = React.memo(() => {
   return (
     <Routes>
+      <Route path="/" element={withAuth({ loginPage: true })(LoginPage)} />
       <Route element={<Layout />}>
-        <Route path="/" element={withAuth({ loginPage: true })(LoginPage)} />
         <Route path="/projects" element={withAuth()(ProjectsPage)} />
         <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
         <Route path="*" element={<NotFoundPage />} />
