@@ -1,10 +1,9 @@
-import { signOut, User } from "firebase/auth";
+import { User } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
+import ProjectForm from "@/components/model/project/ProjectForm";
 import ProjectList from "@/components/model/project/ProjectList";
 import { Project } from "@/models/project";
-import { auth } from "@/lib/firebase";
 import {
-  buildProject,
   createProject,
   deleteProject,
   deleteProjectState,
@@ -22,34 +21,32 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const [creatingProject, setCreatingProject] = useState<boolean>(false);
   const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
-  const [name, setName] = useState<string>("");
+  const handleOpenProjectForm = useCallback(() => {
+    setOpenProjectForm(true);
+  }, []);
 
-  const handleChangeName = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setName(e.currentTarget.value);
-    },
-    []
-  );
+  const handleCloseProjectForm = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
 
-  const handleCreateProject = useCallback(async () => {
-    const trimmedName = name.trim();
-    if (trimmedName === "") return;
-
-    setCreatingProject(true);
-    const project = buildProject({ name: trimmedName });
-
-    createProject(currentUser.uid, project)
-      .then(() => {
-        setName("");
-        setProjects((prev) => {
-          return updateOrAddProjectState(prev, project);
+  const handleCreateProject = useCallback(
+    async (project: Project) => {
+      setCreatingProject(true);
+      createProject(currentUser.uid, project)
+        .then(() => {
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, project);
+          });
+          setOpenProjectForm(false);
+        })
+        .finally(() => {
+          setCreatingProject(false);
         });
-      })
-      .finally(() => {
-        setCreatingProject(false);
-      });
-  }, [currentUser.uid, name]);
+    },
+    [currentUser.uid]
+  );
 
   const handleDeleteProject = useCallback(
     (project: Project) => {
@@ -76,13 +73,13 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
 
   return (
     <div>
-      <button onClick={() => signOut(auth)}>signout</button>
-      <div>
-        <input type="text" value={name} onChange={handleChangeName} />
-        <button onClick={handleCreateProject} disabled={creatingProject}>
-          create
-        </button>
-      </div>
+      <ProjectForm
+        loading={creatingProject}
+        open={openProjectForm}
+        onClose={handleCloseProjectForm}
+        onCreate={handleCreateProject}
+      />
+      <button onClick={handleOpenProjectForm}>create</button>
 
       <div>
         <ProjectList
