@@ -7,48 +7,45 @@ import ProjectsPage from "@/components/pages/ProjectsPage";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Layout from "@/components/Layout";
 
+type WithAuthOptions = {
+  loginPage?: boolean;
+};
+
+const withAuth = (options?: WithAuthOptions) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const WithAuth = (Component: React.VFC<any>) => {
+    const { initialized, currentUser } = useAuth();
+
+    if (!initialized) {
+      return <div>loading...</div>;
+    }
+
+    if (options?.loginPage) {
+      if (currentUser) {
+        return <Navigate to="/projects" />;
+      } else {
+        return React.createElement(Component);
+      }
+    }
+
+    if (currentUser) {
+      return React.createElement(Component, { currentUser });
+    } else {
+      return <Navigate to="/" />;
+    }
+  };
+  return WithAuth;
+};
+
 const AppRoutes: React.VFC = React.memo(() => {
-  const { initialized, currentUser } = useAuth();
-
-  if (!initialized) {
-    return <div>loading...</div>;
-  }
-
-  // TODO: リファクタ
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          currentUser ? <Navigate to="/projects" replace /> : <LoginPage />
-        }
-      />
+      <Route path="/" element={withAuth({ loginPage: true })(LoginPage)} />
       <Route element={<Layout />}>
-        <Route
-          path="/projects"
-          element={
-            currentUser ? (
-              <ProjectsPage currentUser={currentUser} />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/projects/:id"
-          element={
-            currentUser ? (
-              <ProjectPage currentUser={currentUser} />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
+        <Route path="/projects" element={withAuth()(ProjectsPage)} />
+        <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
       </Route>
-      <Route
-        path="*"
-        element={currentUser ? <NotFoundPage /> : <Navigate to="/" replace />}
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 });
