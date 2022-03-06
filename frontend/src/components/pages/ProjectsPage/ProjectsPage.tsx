@@ -14,6 +14,7 @@ import {
   listenProjects,
   updateOrAddProjectState,
 } from "@/lib/projectUtils";
+import Loading from "@/components/utils/Loading";
 
 export type ProjectsPageProps = {
   currentUser: User;
@@ -71,31 +72,32 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     return unsubscribe;
   }, [currentUser.uid]);
 
-  if (!projectsLoaded) {
-    return <div>loading...</div>;
-  }
-
   return (
     <Box>
-      <ProjectForm
-        loading={creatingProject}
-        open={openProjectForm}
-        onClose={handleCloseProjectForm}
-        onCreate={handleCreateProject}
-      />
+      {!projectsLoaded && <Loading text="プロジェクトを読み込んでいます" />}
+      {projectsLoaded && (
+        <>
+          <ProjectForm
+            loading={creatingProject}
+            open={openProjectForm}
+            onClose={handleCloseProjectForm}
+            onCreate={handleCreateProject}
+          />
 
-      <Field sx={{ display: "flex", justifyContent: "center" }}>
-        <Button startIcon={<AddIcon />} onClick={handleOpenProjectForm}>
-          プロジェクトを作成
-        </Button>
-      </Field>
+          <Field sx={{ display: "flex", justifyContent: "center" }}>
+            <Button startIcon={<AddIcon />} onClick={handleOpenProjectForm}>
+              プロジェクトを作成
+            </Button>
+          </Field>
 
-      <Field>
-        <ProjectList
-          projects={projects}
-          onDeleteProject={handleDeleteProject}
-        />
-      </Field>
+          <Field>
+            <ProjectList
+              projects={projects}
+              onDeleteProject={handleDeleteProject}
+            />
+          </Field>
+        </>
+      )}
     </Box>
   );
 });
