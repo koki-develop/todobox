@@ -25,7 +25,9 @@ const LoginPage: React.VFC = React.memo(() => {
     <Container maxWidth="sm" sx={{ mt: 20 }}>
       <Paper sx={{ p: 4 }} elevation={10}>
         <Field>
-          <Typography>TODO BOX</Typography>
+          <Typography sx={{ textAlign: "center" }} variant="h5">
+            TODO BOX
+          </Typography>
         </Field>
 
         <Field>
