@@ -24,10 +24,31 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
   const { open, loading, onClose, onCreate } = props;
 
   const [name, setName] = useState<string>("");
+  const [nameError, setNameError] = useState<string | null>(null);
 
   const clearForm = useCallback(() => {
     setName("");
   }, []);
+
+  const validateName = useCallback((): boolean => {
+    const trimmedName = name.trim();
+    if (trimmedName === "") {
+      setNameError("プロジェクト名を入力してください");
+      return false;
+    }
+    if (trimmedName.length > 30) {
+      setNameError("プロジェクト名は30文字以内で入力してください");
+      return false;
+    }
+    setNameError(null);
+    return true;
+  }, [name]);
+
+  const validateForm = useCallback((): boolean => {
+    let valid = true;
+    if (!validateName()) valid = false;
+    return valid;
+  }, [validateName]);
 
   const handleChangeName = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,11 +58,13 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
   );
 
   const handleCreate = useCallback(() => {
+    console.log("hoge");
+    if (!validateForm()) return;
+    console.log("fuga");
     const trimmedName = name.trim();
-    if (trimmedName === "") return;
     const project = buildProject({ name: trimmedName });
     onCreate(project);
-  }, [name, onCreate]);
+  }, [name, onCreate, validateForm]);
 
   useEffect(() => {
     if (!open) {
@@ -70,9 +93,10 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
                 <Field>
                   <TextField
                     fullWidth
-                    required
-                    label="プロジェクト名"
+                    label="プロジェクト名 *"
                     value={name}
+                    error={Boolean(nameError)}
+                    helperText={nameError}
                     onChange={handleChangeName}
                   />
                 </Field>
@@ -90,8 +114,8 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
               </Button>
               <Button
                 fullWidth
-                type="submit"
                 disabled={loading}
+                onClick={handleCreate}
                 variant="contained"
               >
                 作成
