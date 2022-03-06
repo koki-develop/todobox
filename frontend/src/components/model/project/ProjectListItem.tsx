@@ -1,4 +1,8 @@
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardHeader from "@mui/material/CardHeader";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -6,7 +10,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import React, { useCallback, useState } from "react";
-import ListItemLink from "@/components/utils/ListItemLink";
+import Link from "@/components/utils/Link";
 import Popper from "@/components/utils/Popper";
 import { Project } from "@/models/project";
 
@@ -52,21 +56,47 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
   );
 
   return (
-    <ListItem disablePadding>
-      <ListItemLink to={`/projects/${project.id}`}>
-        <ListItemText
-          primary={project.name}
-          primaryTypographyProps={{ sx: { wordBreak: "break-all" } }}
-          secondary="12件のタスク"
-        />
-        <IconButton
-          onMouseDown={handleMouseDownMenu}
-          onTouchStart={handleMouseDownMenu}
-          onClick={handleClickMenu}
+    <Grid item xs={12} sm={6}>
+      <Card elevation={2}>
+        <Link
+          to={`/projects/${project.id}`}
+          sx={{
+            color: (theme) => theme.palette.primary.main,
+            textDecoration: "none",
+          }}
         >
-          <MoreHorizIcon />
-        </IconButton>
-      </ListItemLink>
+          <CardActionArea component="div">
+            <CardHeader
+              title={project.name}
+              titleTypographyProps={{
+                variant: "h6",
+                sx: {
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                },
+              }}
+              // FIXME: 仮実装
+              subheader="12件のタスク"
+              sx={{
+                "& .MuiCardHeader-content": {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                },
+              }}
+              action={
+                <IconButton
+                  onMouseDown={handleMouseDownMenu}
+                  onTouchStart={handleMouseDownMenu}
+                  onClick={handleClickMenu}
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              }
+            />
+          </CardActionArea>
+        </Link>
+      </Card>
       <Popper
         open={Boolean(menuButtonEl)}
         onClose={handleCloseMenu}
@@ -82,7 +112,7 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
           </List>
         </Paper>
       </Popper>
-    </ListItem>
+    </Grid>
   );
 });
 
