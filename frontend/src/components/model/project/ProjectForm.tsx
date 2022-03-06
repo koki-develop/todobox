@@ -29,6 +29,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
 
   const clearForm = useCallback(() => {
     setName("");
+    setNameError(null);
   }, []);
 
   const validateName = useCallback((): boolean => {
@@ -44,10 +45,6 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
     setNameError(null);
     return true;
   }, [name]);
-
-  const handleBlurName = useCallback(() => {
-    validateName();
-  }, [validateName]);
 
   const validateForm = useCallback((): boolean => {
     let valid = true;
@@ -95,6 +92,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
               <Form onSubmit={handleCreate}>
                 <Field>
                   <TextField
+                    autoFocus
                     fullWidth
                     disabled={loading}
                     label="プロジェクト名 *"
@@ -102,7 +100,6 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
                     error={Boolean(nameError)}
                     helperText={nameError}
                     onChange={handleChangeName}
-                    onBlur={handleBlurName}
                   />
                 </Field>
                 <Field></Field>
