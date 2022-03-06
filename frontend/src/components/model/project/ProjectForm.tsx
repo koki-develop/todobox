@@ -62,9 +62,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
   );
 
   const handleCreate = useCallback(() => {
-    console.log("hoge");
     if (!validateForm()) return;
-    console.log("fuga");
     const trimmedName = name.trim();
     const project = buildProject({ name: trimmedName });
     onCreate(project);
@@ -97,6 +95,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
                 <Field>
                   <TextField
                     fullWidth
+                    disabled={loading}
                     label="プロジェクト名 *"
                     value={name}
                     error={Boolean(nameError)}
