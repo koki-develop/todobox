@@ -7,6 +7,7 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useState } from "react";
 import Field from "@/components/utils/Field";
+import Form from "@/components/utils/Form";
 import { Project } from "@/models/project";
 import { buildProject } from "@/lib/projectUtils";
 
@@ -64,24 +65,26 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
         <Container maxWidth="md">
           <Card>
             <CardContent>
-              <Field>
-                <TextField
-                  fullWidth
-                  label="プロジェクト名"
-                  value={name}
-                  onChange={handleChangeName}
-                />
-              </Field>
-              <Field>
-                <Button
-                  fullWidth
-                  disabled={loading}
-                  variant="contained"
-                  onClick={handleCreate}
-                >
-                  作成
-                </Button>
-              </Field>
+              <Form onSubmit={handleCreate}>
+                <Field>
+                  <TextField
+                    fullWidth
+                    label="プロジェクト名"
+                    value={name}
+                    onChange={handleChangeName}
+                  />
+                </Field>
+                <Field>
+                  <Button
+                    fullWidth
+                    type="submit"
+                    disabled={loading}
+                    variant="contained"
+                  >
+                    作成
+                  </Button>
+                </Field>
+              </Form>
             </CardContent>
           </Card>
         </Container>
