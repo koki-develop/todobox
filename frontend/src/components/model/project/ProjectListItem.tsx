@@ -54,7 +54,11 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
   return (
     <ListItem disablePadding>
       <ListItemLink to={`/projects/${project.id}`}>
-        <ListItemText primary={project.name} />
+        <ListItemText
+          primary={project.name}
+          primaryTypographyProps={{ sx: { wordBreak: "break-all" } }}
+          secondary="12件のタスク"
+        />
         <IconButton
           onMouseDown={handleMouseDownMenu}
           onTouchStart={handleMouseDownMenu}
