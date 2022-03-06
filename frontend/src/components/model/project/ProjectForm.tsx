@@ -86,7 +86,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
       }}
     >
       <Fade in={open} timeout={200}>
-        <Container maxWidth="md" sx={{ outline: "none" }}>
+        <Container maxWidth="sm" sx={{ outline: "none" }}>
           <Card>
             <CardContent sx={{ pb: 0 }}>
               <Form onSubmit={handleCreate}>
