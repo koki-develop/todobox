@@ -1,3 +1,5 @@
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -5,6 +7,8 @@ import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
+import Link from "@/components/utils/Link";
+import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
@@ -126,7 +130,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   useEffect(() => {
-    if (!project) return;
+    if (!project) {
+      setSectionsLoaded(true);
+      return;
+    }
 
     const unsubscribe = listenSections(
       currentUser.uid,
@@ -360,7 +367,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   useEffect(() => {
-    if (!project) return;
+    if (!project) {
+      setIncompletedTasksLoaded(true);
+      return;
+    }
     const unsubscribe = listenIncompletedTasks(
       currentUser.uid,
       projectId,
@@ -373,7 +383,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   }, [currentUser.uid, project, projectId]);
 
   useEffect(() => {
-    if (!project) return;
+    if (!project) {
+      setCompletedTasksLoaded(true);
+      return;
+    }
     if (!showCompletedTasks) {
       setCompletedTasksLoaded(true);
       return;
@@ -393,6 +406,20 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    * other
    */
 
+  const loaded = useMemo(() => {
+    return (
+      projectLoaded &&
+      sectionsLoaded &&
+      incompletedTasksLoaded &&
+      completedTasksLoaded
+    );
+  }, [
+    completedTasksLoaded,
+    incompletedTasksLoaded,
+    projectLoaded,
+    sectionsLoaded,
+  ]);
+
   const handleDragEnd = useCallback(
     (result: DropResult) => {
       switch (result.type) {
@@ -407,31 +434,36 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [handleDragEndTask, handleDragEndSection]
   );
 
-  if (
-    !projectLoaded ||
-    !sectionsLoaded ||
-    !incompletedTasksLoaded ||
-    !completedTasksLoaded
-  ) {
-    return <div>loading...</div>;
-  }
-
   return (
-    <div>
-      {!project && <div>project not found.</div>}
-      {project && (
-        <div>
-          <div>{project.name}</div>
-          <div>
+    <Box>
+      {!loaded ? (
+        <Loading text="プロジェクトを読み込んでいます" />
+      ) : !project ? (
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Typography sx={{ mb: 1 }}>
+            プロジェクトが見つかりませんでした
+          </Typography>
+          <Link to="/projects">プロジェクト一覧へ</Link>
+        </Box>
+      ) : (
+        <Box>
+          <Box>{project.name}</Box>
+          <Box>
             <input
               type="checkbox"
               checked={showCompletedTasks}
               onChange={handleChangeShowCompletedTasks}
             />
-          </div>
+          </Box>
           <DragDropContext onDragEnd={handleDragEnd}>
-            <div>
-              <div>
+            <Box>
+              <Box>
                 <TaskList
                   projectId={projectId}
                   sectionId={null}
@@ -445,7 +477,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}
                 />
-              </div>
+              </Box>
               <SectionList
                 projectId={projectId}
                 sections={sections}
@@ -461,11 +493,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 onSelectTask={handleSelectTask}
                 onMultiSelectTask={handleMultiSelectTask}
               />
-            </div>
+            </Box>
           </DragDropContext>
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 });
 
