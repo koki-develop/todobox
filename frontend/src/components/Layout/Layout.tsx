@@ -41,8 +41,14 @@ const Layout: React.VFC = React.memo(() => {
   }, []);
 
   return (
-    <Box>
-      <AppBar position="sticky">
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <AppBar position="static">
         <Toolbar>
           <Box sx={{ flexGrow: 1 }}>
             <Link to={currentUser ? "/projects" : "/"}>Todo Box</Link>
@@ -74,9 +80,11 @@ const Layout: React.VFC = React.memo(() => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="md" component="main" sx={{ py: 2 }}>
-        <Outlet />
-      </Container>
+      <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+        <Container maxWidth="md" component="main" sx={{ py: 2 }}>
+          <Outlet />
+        </Container>
+      </Box>
     </Box>
   );
 });
