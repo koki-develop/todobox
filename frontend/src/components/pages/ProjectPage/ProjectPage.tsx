@@ -1,4 +1,13 @@
+import CheckIcon from "@mui/icons-material/Check";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
@@ -7,8 +16,10 @@ import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
+import Field from "@/components/utils/Field";
 import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
+import Popper from "@/components/utils/Popper";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
@@ -67,6 +78,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [completedTasksLoaded, setCompletedTasksLoaded] =
     useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+  const [showCompletedTasksButtonEl, setShowCompletedTasksButtonEl] =
+    useState<HTMLButtonElement | null>(null);
 
   /*
    * project
@@ -151,10 +164,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    */
 
   const noSectionTasks = useMemo(() => {
-    return [...allTasks.completed, ...allTasks.incompleted].filter(
-      (task) => task.sectionId == null
-    );
-  }, [allTasks.completed, allTasks.incompleted]);
+    return [
+      ...(showCompletedTasks ? allTasks.completed : []),
+      ...allTasks.incompleted,
+    ].filter((task) => task.sectionId == null);
+  }, [allTasks.completed, allTasks.incompleted, showCompletedTasks]);
 
   const completedTasks = useMemo(() => {
     if (!showCompletedTasks) return [];
@@ -165,12 +179,26 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     return allTasks.incompleted;
   }, [allTasks.incompleted]);
 
-  const handleChangeShowCompletedTasks = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setShowCompletedTasks(e.currentTarget.checked);
+  const handleSelectAllTasks = useCallback(() => {
+    setShowCompletedTasks(true);
+    setShowCompletedTasksButtonEl(null);
+  }, []);
+
+  const handleSelectIncompletedTasks = useCallback(() => {
+    setShowCompletedTasks(false);
+    setShowCompletedTasksButtonEl(null);
+  }, []);
+
+  const handleClickChangeShowCompletedTasks = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      setShowCompletedTasksButtonEl(e.currentTarget);
     },
     []
   );
+
+  const handleCloseShowCompletedTasks = useCallback(() => {
+    setShowCompletedTasksButtonEl(null);
+  }, []);
 
   const handleCompleteTask = useCallback(
     (completedTask: Task) => {
@@ -453,14 +481,53 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         </Box>
       ) : (
         <Box>
-          <Box>{project.name}</Box>
-          <Box>
-            <input
-              type="checkbox"
-              checked={showCompletedTasks}
-              onChange={handleChangeShowCompletedTasks}
-            />
-          </Box>
+          <Field
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              mb: 2,
+              position: "sticky",
+              top: 0,
+            }}
+          >
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="h4">{project.name}</Typography>
+            </Box>
+            <Box>
+              <Button
+                onClick={handleClickChangeShowCompletedTasks}
+                startIcon={<CheckCircleOutlineIcon />}
+              >
+                {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
+              </Button>
+              <Popper
+                open={Boolean(showCompletedTasksButtonEl)}
+                anchorEl={showCompletedTasksButtonEl}
+                onClose={handleCloseShowCompletedTasks}
+              >
+                <Paper>
+                  <List disablePadding>
+                    <ListItem disablePadding>
+                      <ListItemButton onClick={handleSelectAllTasks}>
+                        <ListItemIcon sx={{ minWidth: 30 }}>
+                          {showCompletedTasks && <CheckIcon />}
+                        </ListItemIcon>
+                        <ListItemText primary="すべてのタスク" />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                      <ListItemButton onClick={handleSelectIncompletedTasks}>
+                        <ListItemIcon sx={{ minWidth: 30 }}>
+                          {!showCompletedTasks && <CheckIcon />}
+                        </ListItemIcon>
+                        <ListItemText primary="未完了のタスク" />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                </Paper>
+              </Popper>
+            </Box>
+          </Field>
           <DragDropContext onDragEnd={handleDragEnd}>
             <Box>
               <Box>
