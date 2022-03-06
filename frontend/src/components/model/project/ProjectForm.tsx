@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useState } from "react";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
+import LoadableButton from "@/components/utils/LoadableButton";
 import { Project } from "@/models/project";
 import { buildProject } from "@/lib/projectUtils";
 
@@ -116,14 +117,14 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
               >
                 キャンセル
               </Button>
-              <Button
+              <LoadableButton
                 fullWidth
-                disabled={loading}
+                loading={loading}
                 onClick={handleCreate}
                 variant="contained"
               >
                 作成
-              </Button>
+              </LoadableButton>
             </CardActions>
           </Card>
         </Container>
