@@ -1,6 +1,6 @@
 import { signOut, User } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import ProjectList from "@/components/model/project/ProjectList";
 import { Project } from "@/models/project";
 import { auth } from "@/lib/firebase";
 import {
@@ -52,10 +52,10 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   }, [currentUser.uid, name]);
 
   const handleDeleteProject = useCallback(
-    (projectId: string) => {
-      deleteProject(currentUser.uid, projectId).then(() => {
+    (project: Project) => {
+      deleteProject(currentUser.uid, project.id).then(() => {
         setProjects((prev) => {
-          return deleteProjectState(prev, projectId);
+          return deleteProjectState(prev, project.id);
         });
       });
     },
@@ -85,20 +85,10 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       </div>
 
       <div>
-        <ul>
-          {projects.map((project) => (
-            <li key={project.id}>
-              <span>
-                <Link to={`/projects/${project.id}`}>{project.name}</Link>
-              </span>
-              <span>
-                <button onClick={() => handleDeleteProject(project.id)}>
-                  delete
-                </button>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ProjectList
+          projects={projects}
+          onDeleteProject={handleDeleteProject}
+        />
       </div>
     </div>
   );
