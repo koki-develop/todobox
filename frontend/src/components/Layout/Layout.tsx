@@ -87,16 +87,16 @@ const Layout: React.VFC = React.memo(() => {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
+        paddingTop: `${headerHeight}px`,
       }}
     >
-      <AppBar position="static" sx={{ ...drawerTransitionStyles }}>
-        <Box
+      <AppBar sx={{ ...drawerTransitionStyles }}>
+        <Container
+          maxWidth="lg"
           sx={{
             alignItems: "center",
             display: "flex",
             height: headerHeight,
-            minHeight: headerHeight,
-            px: 2,
           }}
         >
           <Box sx={{ flexGrow: 1 }}>
@@ -135,7 +135,7 @@ const Layout: React.VFC = React.memo(() => {
               </Popper>
             </Box>
           )}
-        </Box>
+        </Container>
       </AppBar>
 
       {currentUser && (
@@ -170,9 +170,9 @@ const Layout: React.VFC = React.memo(() => {
           ...drawerTransitionStyles,
         }}
       >
-        <Container maxWidth="md" component="main" sx={{ py: 2 }}>
+        <Box component="main">
           <Outlet />
-        </Container>
+        </Box>
       </Box>
     </Box>
   );

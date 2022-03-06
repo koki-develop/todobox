@@ -2,6 +2,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -434,6 +436,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    * other
    */
 
+  const layoutHeaderHeight = 48;
+  const headerHeight = 56;
+
   const loaded = useMemo(() => {
     return (
       projectLoaded &&
@@ -481,87 +486,103 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         </Box>
       ) : (
         <Box>
-          <Field
+          <Container maxWidth="lg">
+            <Field
+              sx={{
+                alignItems: "center",
+                backgroundColor: "white",
+                display: "flex",
+                height: headerHeight,
+                position: "sticky",
+                py: 1,
+                top: 0,
+              }}
+            >
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="h4">{project.name}</Typography>
+              </Box>
+              <Box>
+                <Button
+                  onClick={handleClickChangeShowCompletedTasks}
+                  startIcon={<CheckCircleOutlineIcon />}
+                >
+                  {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
+                </Button>
+                <Popper
+                  open={Boolean(showCompletedTasksButtonEl)}
+                  anchorEl={showCompletedTasksButtonEl}
+                  onClose={handleCloseShowCompletedTasks}
+                >
+                  <Paper>
+                    <List disablePadding>
+                      <ListItem disablePadding>
+                        <ListItemButton onClick={handleSelectAllTasks}>
+                          <ListItemIcon sx={{ minWidth: 30 }}>
+                            {showCompletedTasks && <CheckIcon />}
+                          </ListItemIcon>
+                          <ListItemText primary="すべてのタスク" />
+                        </ListItemButton>
+                      </ListItem>
+                      <ListItem disablePadding>
+                        <ListItemButton onClick={handleSelectIncompletedTasks}>
+                          <ListItemIcon sx={{ minWidth: 30 }}>
+                            {!showCompletedTasks && <CheckIcon />}
+                          </ListItemIcon>
+                          <ListItemText primary="未完了のタスク" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                  </Paper>
+                </Popper>
+              </Box>
+            </Field>
+          </Container>
+          <Divider />
+          <Box
             sx={{
-              alignItems: "center",
-              display: "flex",
-              mb: 2,
-              position: "sticky",
-              top: 0,
+              // TODO: もうちょっとうまいやり方があると思いたい
+              height: `calc(100vh - 1px - ${headerHeight}px - ${layoutHeaderHeight}px)`,
+              overflowY: "auto",
+              pb: 2,
             }}
           >
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h4">{project.name}</Typography>
-            </Box>
-            <Box>
-              <Button
-                onClick={handleClickChangeShowCompletedTasks}
-                startIcon={<CheckCircleOutlineIcon />}
-              >
-                {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
-              </Button>
-              <Popper
-                open={Boolean(showCompletedTasksButtonEl)}
-                anchorEl={showCompletedTasksButtonEl}
-                onClose={handleCloseShowCompletedTasks}
-              >
-                <Paper>
-                  <List disablePadding>
-                    <ListItem disablePadding>
-                      <ListItemButton onClick={handleSelectAllTasks}>
-                        <ListItemIcon sx={{ minWidth: 30 }}>
-                          {showCompletedTasks && <CheckIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary="すべてのタスク" />
-                      </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                      <ListItemButton onClick={handleSelectIncompletedTasks}>
-                        <ListItemIcon sx={{ minWidth: 30 }}>
-                          {!showCompletedTasks && <CheckIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary="未完了のタスク" />
-                      </ListItemButton>
-                    </ListItem>
-                  </List>
-                </Paper>
-              </Popper>
-            </Box>
-          </Field>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Box>
-              <Box>
-                <TaskList
-                  projectId={projectId}
-                  sectionId={null}
-                  tasks={noSectionTasks}
-                  selectedTasks={selectedTasks}
-                  onCompleteTask={handleCompleteTask}
-                  onIncompleteTask={handleIncompleteTask}
-                  onCreateTask={handleCreateTask}
-                  onDeleteTask={handleDeleteTask}
-                  onClickTask={handleClickTask}
-                  onSelectTask={handleSelectTask}
-                  onMultiSelectTask={handleMultiSelectTask}
-                />
-              </Box>
-              <SectionList
-                projectId={projectId}
-                sections={sections}
-                onCreateSection={handleCreateSection}
-                onDeleteSection={handleDeleteSection}
-                tasks={[...completedTasks, ...incompletedTasks]}
-                selectedTasks={selectedTasks}
-                onCompleteTask={handleCompleteTask}
-                onIncompleteTask={handleIncompleteTask}
-                onCreateTask={handleCreateTask}
-                onDeleteTask={handleDeleteTask}
-                onClickTask={handleClickTask}
-                onSelectTask={handleSelectTask}
-                onMultiSelectTask={handleMultiSelectTask}
-              />
-            </Box>
-          </DragDropContext>
+            <Container maxWidth="lg">
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Box>
+                  <Box>
+                    <TaskList
+                      projectId={projectId}
+                      sectionId={null}
+                      tasks={noSectionTasks}
+                      selectedTasks={selectedTasks}
+                      onCompleteTask={handleCompleteTask}
+                      onIncompleteTask={handleIncompleteTask}
+                      onCreateTask={handleCreateTask}
+                      onDeleteTask={handleDeleteTask}
+                      onClickTask={handleClickTask}
+                      onSelectTask={handleSelectTask}
+                      onMultiSelectTask={handleMultiSelectTask}
+                    />
+                  </Box>
+                  <SectionList
+                    projectId={projectId}
+                    sections={sections}
+                    onCreateSection={handleCreateSection}
+                    onDeleteSection={handleDeleteSection}
+                    tasks={[...completedTasks, ...incompletedTasks]}
+                    selectedTasks={selectedTasks}
+                    onCompleteTask={handleCompleteTask}
+                    onIncompleteTask={handleIncompleteTask}
+                    onCreateTask={handleCreateTask}
+                    onDeleteTask={handleDeleteTask}
+                    onClickTask={handleClickTask}
+                    onSelectTask={handleSelectTask}
+                    onMultiSelectTask={handleMultiSelectTask}
+                  />
+                </Box>
+              </DragDropContext>
+            </Container>
+          </Box>
         </Box>
       )}
     </Box>

@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import { useProjects } from "@/components/providers/ProjectsProvider";
@@ -64,7 +65,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   );
 
   return (
-    <Box>
+    <Container sx={{ pt: 2 }} maxWidth="md">
       {!projectsLoaded && <Loading text="プロジェクトを読み込んでいます" />}
       {projectsLoaded && (
         <>
@@ -89,7 +90,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           </Field>
         </>
       )}
-    </Box>
+    </Container>
   );
 });
 
