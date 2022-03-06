@@ -100,9 +100,15 @@ const Layout: React.VFC = React.memo(() => {
           }}
         >
           <Box sx={{ flexGrow: 1 }}>
-            <IconButton size="small" sx={{ mr: 1 }} onClick={handleOpenDrawer}>
-              <MenuIcon />
-            </IconButton>
+            {currentUser && !openDrawer && (
+              <IconButton
+                size="small"
+                sx={{ mr: 1 }}
+                onClick={handleOpenDrawer}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
             <Link to={currentUser ? "/projects" : "/"}>Todo Box</Link>
           </Box>
           {currentUser && (
