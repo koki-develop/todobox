@@ -1,28 +1,57 @@
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
-import Toolbar from "@mui/material/Toolbar";
-import { useTheme } from "@mui/material/styles";
+import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Popper from "@/components/utils/Popper";
 import { auth } from "@/lib/firebase";
 
 const Layout: React.VFC = React.memo(() => {
-  const { currentUser } = useAuth();
+  const { currentUser, initialized } = useAuth();
   const theme = useTheme();
 
   const [avatarButtonEl, setAvatarButtonEl] =
     useState<HTMLButtonElement | null>(null);
+  const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+
+  const headerHeight = 48;
+  const drawerWidth = 200;
+
+  const drawerTransitionStyles: SxProps<Theme> = useMemo(() => {
+    if (!currentUser) {
+      return {};
+    }
+    return {
+      transition: (theme) =>
+        theme.transitions.create(["margin", "width"], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+      ...(openDrawer && {
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: `${drawerWidth}px`,
+        transition: (theme) =>
+          theme.transitions.create(["margin", "width"], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+      }),
+    };
+  }, [currentUser, openDrawer]);
 
   const handleClickAvatar = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,6 +59,14 @@ const Layout: React.VFC = React.memo(() => {
     },
     []
   );
+
+  const handleOpenDrawer = useCallback(() => {
+    setOpenDrawer(true);
+  }, []);
+
+  const handleCloseDrawer = useCallback(() => {
+    setOpenDrawer(false);
+  }, []);
 
   const handleCloseMenu = useCallback(() => {
     setAvatarButtonEl(null);
@@ -40,6 +77,10 @@ const Layout: React.VFC = React.memo(() => {
     signOut(auth);
   }, []);
 
+  if (!initialized) {
+    return <Outlet />;
+  }
+
   return (
     <Box
       sx={{
@@ -48,15 +89,26 @@ const Layout: React.VFC = React.memo(() => {
         height: "100vh",
       }}
     >
-      <AppBar position="static">
-        <Toolbar>
+      <AppBar position="static" sx={{ ...drawerTransitionStyles }}>
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            height: headerHeight,
+            minHeight: headerHeight,
+            px: 2,
+          }}
+        >
           <Box sx={{ flexGrow: 1 }}>
+            <IconButton size="small" sx={{ mr: 1 }} onClick={handleOpenDrawer}>
+              <MenuIcon />
+            </IconButton>
             <Link to={currentUser ? "/projects" : "/"}>Todo Box</Link>
           </Box>
           {currentUser && (
             <Box>
               <IconButton onClick={handleClickAvatar}>
-                <Avatar />
+                <Avatar sx={{ height: 32, width: 32 }} />
               </IconButton>
               <Popper
                 open={Boolean(avatarButtonEl)}
@@ -77,10 +129,41 @@ const Layout: React.VFC = React.memo(() => {
               </Popper>
             </Box>
           )}
-        </Toolbar>
+        </Box>
       </AppBar>
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+      {currentUser && (
+        <Drawer
+          open={openDrawer}
+          anchor="left"
+          variant="persistent"
+          sx={{ width: drawerWidth }}
+        >
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "flex-end",
+              height: headerHeight,
+              pr: 1,
+            }}
+          >
+            <IconButton size="small" onClick={handleCloseDrawer}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Box>
+          <Divider />
+          <Box sx={{ width: drawerWidth }}>hogefuga</Box>
+        </Drawer>
+      )}
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          ...drawerTransitionStyles,
+        }}
+      >
         <Container maxWidth="md" component="main" sx={{ py: 2 }}>
           <Outlet />
         </Container>
