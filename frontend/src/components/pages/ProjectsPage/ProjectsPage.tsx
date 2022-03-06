@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ProjectForm from "@/components/model/project/ProjectForm";
 import ProjectList from "@/components/model/project/ProjectList";
 import Field from "@/components/utils/Field";
+import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
 import {
   createProject,
@@ -14,7 +15,6 @@ import {
   listenProjects,
   updateOrAddProjectState,
 } from "@/lib/projectUtils";
-import Loading from "@/components/utils/Loading";
 
 export type ProjectsPageProps = {
   currentUser: User;
