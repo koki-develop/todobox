@@ -5,6 +5,7 @@ import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Loading from "@/components/utils/Loading";
 import Layout from "@/components/Layout";
 
 type WithAuthOptions = {
@@ -17,7 +18,7 @@ const withAuth = (options?: WithAuthOptions) => {
     const { initialized, currentUser } = useAuth();
 
     if (!initialized) {
-      return <div>loading...</div>;
+      return <Loading text="ログイン情報を読み込んでいます" />;
     }
 
     if (options?.loginPage) {
