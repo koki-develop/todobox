@@ -1,25 +1,16 @@
 import GoogleIcon from "@mui/icons-material/Google";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material/styles";
 import {
   signInWithRedirect,
   signInAnonymously,
   GoogleAuthProvider,
 } from "firebase/auth";
 import React, { useCallback } from "react";
+import Field from "@/components/utils/Field";
 import { auth } from "@/lib/firebase";
-
-const Field = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  ":not(:last-child)": {
-    marginBottom: theme.spacing(2),
-  },
-}));
 
 const LoginPage: React.VFC = React.memo(() => {
   const handleClickLoginWithGoogle = useCallback(() => {
