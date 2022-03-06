@@ -74,7 +74,7 @@ const Layout: React.VFC = React.memo(() => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="md" component="main" sx={{ pt: 2 }}>
+      <Container maxWidth="md" component="main" sx={{ py: 2 }}>
         <Outlet />
       </Container>
     </Box>
