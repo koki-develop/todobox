@@ -1,20 +1,19 @@
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
 import Toolbar from "@mui/material/Toolbar";
 import { useTheme } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import React, { useState, useCallback } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Popper from "@/components/utils/Popper";
 import { auth } from "@/lib/firebase";
 
 const Layout: React.VFC = React.memo(() => {
@@ -54,24 +53,20 @@ const Layout: React.VFC = React.memo(() => {
               </IconButton>
               <Popper
                 open={Boolean(avatarButtonEl)}
+                onClose={handleCloseMenu}
                 anchorEl={avatarButtonEl}
                 placement="bottom-start"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
-                <ClickAwayListener
-                  touchEvent={false}
-                  onClickAway={handleCloseMenu}
-                >
-                  <Paper>
-                    <List>
-                      <ListItem disablePadding>
-                        <ListItemButton onClick={handleClickLogout}>
-                          <ListItemText primary="ログアウト" />
-                        </ListItemButton>
-                      </ListItem>
-                    </List>
-                  </Paper>
-                </ClickAwayListener>
+                <Paper>
+                  <List>
+                    <ListItem disablePadding>
+                      <ListItemButton onClick={handleClickLogout}>
+                        <ListItemText primary="ログアウト" />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                </Paper>
               </Popper>
             </Box>
           )}
