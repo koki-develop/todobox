@@ -1,7 +1,11 @@
+import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { User } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
 import ProjectForm from "@/components/model/project/ProjectForm";
 import ProjectList from "@/components/model/project/ProjectList";
+import Field from "@/components/utils/Field";
 import { Project } from "@/models/project";
 import {
   createProject,
@@ -72,22 +76,27 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   }
 
   return (
-    <div>
+    <Box>
       <ProjectForm
         loading={creatingProject}
         open={openProjectForm}
         onClose={handleCloseProjectForm}
         onCreate={handleCreateProject}
       />
-      <button onClick={handleOpenProjectForm}>create</button>
 
-      <div>
+      <Field sx={{ display: "flex", justifyContent: "center" }}>
+        <Button startIcon={<AddIcon />} onClick={handleOpenProjectForm}>
+          プロジェクトを作成
+        </Button>
+      </Field>
+
+      <Field>
         <ProjectList
           projects={projects}
           onDeleteProject={handleDeleteProject}
         />
-      </div>
-    </div>
+      </Field>
+    </Box>
   );
 });
 
