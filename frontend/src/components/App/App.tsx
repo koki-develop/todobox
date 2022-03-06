@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { theme } from "@/components/Layout/theme";
 import AuthProvider from "@/components/providers/AuthProvider";
+import ProjectsProvider from "@/components/providers/ProjectsProvider";
 import AppRoutes from "./AppRoutes";
 
 const App: React.VFC = React.memo(() => {
@@ -12,10 +13,12 @@ const App: React.VFC = React.memo(() => {
     <ThemeProvider theme={theme}>
       <RecoilRoot>
         <AuthProvider>
-          <CssBaseline />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <ProjectsProvider>
+            <CssBaseline />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </ProjectsProvider>
         </AuthProvider>
       </RecoilRoot>
     </ThemeProvider>

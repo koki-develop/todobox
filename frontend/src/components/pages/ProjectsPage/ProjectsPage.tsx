@@ -2,7 +2,8 @@ import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { User } from "firebase/auth";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useProjects } from "@/components/providers/ProjectsProvider";
 import ProjectForm from "@/components/model/project/ProjectForm";
 import ProjectList from "@/components/model/project/ProjectList";
 import Field from "@/components/utils/Field";
@@ -12,7 +13,6 @@ import {
   createProject,
   deleteProject,
   deleteProjectState,
-  listenProjects,
   updateOrAddProjectState,
 } from "@/lib/projectUtils";
 
@@ -24,8 +24,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
   const [creatingProject, setCreatingProject] = useState<boolean>(false);
-  const [projectsLoaded, setProjectsLoaded] = useState<boolean>(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { initialized: projectsLoaded, projects, setProjects } = useProjects();
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
   const handleOpenProjectForm = useCallback(() => {
@@ -50,7 +49,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           setCreatingProject(false);
         });
     },
-    [currentUser.uid]
+    [currentUser.uid, setProjects]
   );
 
   const handleDeleteProject = useCallback(
@@ -61,16 +60,8 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
         });
       });
     },
-    [currentUser.uid]
+    [currentUser.uid, setProjects]
   );
-
-  useEffect(() => {
-    const unsubscribe = listenProjects(currentUser.uid, (projects) => {
-      setProjectsLoaded(true);
-      setProjects(projects);
-    });
-    return unsubscribe;
-  }, [currentUser.uid]);
 
   return (
     <Box>
