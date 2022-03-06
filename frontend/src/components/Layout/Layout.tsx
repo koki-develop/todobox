@@ -1,6 +1,7 @@
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -73,7 +74,9 @@ const Layout: React.VFC = React.memo(() => {
         </Toolbar>
       </AppBar>
 
-      <Outlet />
+      <Container maxWidth="md" component="main">
+        <Outlet />
+      </Container>
     </Box>
   );
 });
