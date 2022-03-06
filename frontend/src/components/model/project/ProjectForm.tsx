@@ -44,6 +44,10 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
     return true;
   }, [name]);
 
+  const handleBlurName = useCallback(() => {
+    validateName();
+  }, [validateName]);
+
   const validateForm = useCallback((): boolean => {
     let valid = true;
     if (!validateName()) valid = false;
@@ -98,6 +102,7 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
                     error={Boolean(nameError)}
                     helperText={nameError}
                     onChange={handleChangeName}
+                    onBlur={handleBlurName}
                   />
                 </Field>
                 <Field></Field>
