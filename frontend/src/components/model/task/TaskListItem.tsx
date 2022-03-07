@@ -1,3 +1,9 @@
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import IconButton from "@mui/material/IconButton";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
 import React, { useCallback, useMemo } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { Task } from "@/models/task";
@@ -45,20 +51,21 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
     [onClick, onMultiSelect, onSelect, task]
   );
 
-  const handleChangeCompleted = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.currentTarget.checked) {
-        onComplete(task);
-      } else {
-        onIncomplete(task);
-      }
-    },
-    [onComplete, onIncomplete, task]
-  );
+  const handleIncomplete = useCallback(() => {
+    onIncomplete(task);
+  }, [onIncomplete, task]);
 
-  const handleDelete = useCallback(() => {
-    onDelete(task);
-  }, [onDelete, task]);
+  const handleComplete = useCallback(() => {
+    onComplete(task);
+  }, [onComplete, task]);
+
+  const handleDelete = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      onDelete(task);
+    },
+    [onDelete, task]
+  );
 
   return (
     <Draggable
@@ -67,22 +74,36 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
       index={task.index}
     >
       {(provided) => (
-        <li ref={provided.innerRef} {...provided.draggableProps}>
-          <span {...provided.dragHandleProps}>handle</span>
-          <input
-            type="checkbox"
-            checked={Boolean(task.completedAt)}
-            onChange={handleChangeCompleted}
-          />
-          <span>[{task.index}]</span>
-          <span
-            style={{ fontWeight: selected ? "bold" : undefined }}
+        <ListItem
+          ref={provided.innerRef}
+          disablePadding
+          sx={{
+            backgroundColor: (theme) => theme.palette.background.paper,
+            marginTop: "-1px",
+            border: "1px solid",
+            borderColor: "divider",
+          }}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <ListItemButton
+            selected={selected}
             onClick={handleClick}
+            sx={{ height: 38 }}
           >
-            {task.title}
-          </span>
-          <button onClick={handleDelete}>delete</button>
-        </li>
+            {task.completedAt ? (
+              <IconButton size="small" onClick={handleIncomplete}>
+                <CheckCircleIcon fontSize="small" color="success" />
+              </IconButton>
+            ) : (
+              <IconButton size="small" onClick={handleComplete}>
+                <CheckCircleOutlineIcon fontSize="small" />
+              </IconButton>
+            )}
+            <ListItemText primary={`[${task.index}] ${task.title}`} />
+            <button onClick={handleDelete}>delete</button>
+          </ListItemButton>
+        </ListItem>
       )}
     </Draggable>
   );

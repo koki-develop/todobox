@@ -65,7 +65,12 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
           {...provided.draggableProps}
           sx={{ mb: 2 }}
         >
-          <Card square sx={{ height: 50 }} {...provided.dragHandleProps}>
+          <Card
+            square
+            variant="outlined"
+            sx={{ height: 50 }}
+            {...provided.dragHandleProps}
+          >
             <CardHeader
               sx={{ p: 1, pr: 2 }}
               avatar={

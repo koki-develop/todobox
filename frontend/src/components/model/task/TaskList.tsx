@@ -1,3 +1,4 @@
+import List from "@mui/material/List";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import TaskListItem from "@/components/model/task/TaskListItem";
@@ -71,7 +72,12 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   return (
     <Droppable droppableId={droppableId} type="tasks">
       {(provided) => (
-        <ul ref={provided.innerRef} {...provided.droppableProps}>
+        <List
+          ref={provided.innerRef}
+          disablePadding
+          sx={{ mb: 2 }}
+          {...provided.droppableProps}
+        >
           {incompletedTasks.map((task) => (
             <TaskListItem
               key={task.id}
@@ -86,10 +92,10 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             />
           ))}
           {provided.placeholder}
-          <li>
+          {/* <li>
             <input type="text" value={title} onChange={handleChangeTitle} />
             <button onClick={handleCreate}>create</button>
-          </li>
+          </li> */}
           {completedTasks.map((task) => (
             <TaskListItem
               key={task.id}
@@ -103,7 +109,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
               onMultiSelect={onMultiSelectTask}
             />
           ))}
-        </ul>
+        </List>
       )}
     </Droppable>
   );
