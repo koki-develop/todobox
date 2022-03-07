@@ -1,9 +1,11 @@
+import AddIcon from "@mui/icons-material/Add";
+import Button from "@mui/material/Button";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import SectionListItem from "@/components/model/section/SectionListItem";
+import SectionNewListItem from "@/components/model/section/SectionNewListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import { buildSection } from "@/lib/sectionUtils";
 
 export type SectionListProps = {
   projectId: string;
@@ -39,7 +41,8 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     onMultiSelectTask,
   } = props;
 
-  const [name, setName] = useState<string>("");
+  const [inputtingNewSection, setInputtingNewSection] =
+    useState<boolean>(false);
 
   const sectionsWithTasks: { section: Section; tasks: Task[] }[] =
     useMemo(() => {
@@ -51,22 +54,21 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
       });
     }, [sections, tasks]);
 
-  const handleChangeName = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setName(e.currentTarget.value);
+  const handleStartCreateSection = useCallback(() => {
+    setInputtingNewSection(true);
+  }, []);
+
+  const handleCancelCreateSection = useCallback(() => {
+    setInputtingNewSection(false);
+  }, []);
+
+  const handleCreateSection = useCallback(
+    (section: Section) => {
+      setInputtingNewSection(false);
+      onCreateSection(section);
     },
-    []
+    [onCreateSection]
   );
-
-  const handleCreate = useCallback(() => {
-    const trimmedName = name.trim();
-    if (trimmedName === "") return;
-    setName("");
-
-    const index = sections.length === 0 ? 0 : sections.slice(-1)[0].index + 1;
-    const section = buildSection({ projectId, name: trimmedName, index });
-    onCreateSection(section);
-  }, [name, onCreateSection, projectId, sections]);
 
   return (
     <Droppable droppableId="sections" type="sections">
@@ -92,10 +94,18 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
               />
             ))}
           {provided.placeholder}
-          <div>
-            <input type="text" value={name} onChange={handleChangeName} />
-            <button onClick={handleCreate}>create</button>
-          </div>
+          {inputtingNewSection ? (
+            <SectionNewListItem
+              projectId={projectId}
+              sections={sections}
+              onCreate={handleCreateSection}
+              onCancel={handleCancelCreateSection}
+            />
+          ) : (
+            <Button startIcon={<AddIcon />} onClick={handleStartCreateSection}>
+              セクションを追加
+            </Button>
+          )}
         </div>
       )}
     </Droppable>
