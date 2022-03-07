@@ -31,9 +31,9 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setMenuButtonEl((prev) => (prev ? null : e.currentTarget));
+      setMenuButtonEl(menuButtonEl ? null : e.currentTarget);
     },
-    []
+    [menuButtonEl]
   );
 
   const handleCloseMenu = useCallback(() => {
@@ -43,17 +43,6 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
   const handleDelete = useCallback(() => {
     onDelete(project);
   }, [onDelete, project]);
-
-  const handleMouseDownMenu = useCallback(
-    (
-      e:
-        | React.MouseEvent<HTMLButtonElement>
-        | React.TouchEvent<HTMLButtonElement>
-    ) => {
-      e.stopPropagation();
-    },
-    []
-  );
 
   return (
     <Grid item xs={12} sm={6}>
@@ -85,11 +74,7 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
                 },
               }}
               action={
-                <IconButton
-                  onMouseDown={handleMouseDownMenu}
-                  onTouchStart={handleMouseDownMenu}
-                  onClick={handleClickMenu}
-                >
+                <IconButton onClick={handleClickMenu}>
                   <MoreHorizIcon />
                 </IconButton>
               }
