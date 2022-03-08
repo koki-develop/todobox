@@ -5,6 +5,7 @@ import {
   onSnapshot,
   setDoc,
   Unsubscribe,
+  updateDoc,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Project, CreateProjectInput } from "@/models/project";
@@ -86,6 +87,15 @@ export const createProject = async (
   const { id, ...data } = project;
   const ref = doc(firestore, "users", userId, "projects", id);
   await setDoc(ref, data);
+};
+
+export const updateProject = async (
+  userId: string,
+  project: Project
+): Promise<void> => {
+  const { id, ...data } = project;
+  const ref = doc(firestore, "users", userId, "projects", id);
+  await updateDoc(ref, { ...data });
 };
 
 export const deleteProject = async (
