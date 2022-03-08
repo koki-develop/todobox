@@ -100,7 +100,7 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         open={openMenu}
         onClose={handleCloseMenu}
         anchorEl={menuButtonEl.current}
-        placement="left-start"
+        placement="bottom-end"
       >
         <Paper elevation={3}>
           <List dense>
