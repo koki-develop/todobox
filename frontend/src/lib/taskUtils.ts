@@ -428,6 +428,35 @@ export const moveTasksState = (
  * 読み取り
  */
 
+export const listenTask = (
+  userId: string,
+  projectId: string,
+  taskId: string,
+  callback: (task: Task | null) => void
+): Unsubscribe => {
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    taskId
+  );
+  return onSnapshot(ref, async (snapshot) => {
+    if (snapshot.exists()) {
+      const task: Task = {
+        id: snapshot.id,
+        projectId,
+        ...snapshot.data(),
+      } as Task;
+      callback(task);
+    } else {
+      callback(null);
+    }
+  });
+};
+
 export const listenIncompletedTasks = (
   userId: string,
   projectId: string,
