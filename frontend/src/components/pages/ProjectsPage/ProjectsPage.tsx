@@ -23,6 +23,7 @@ import {
   updateOrAddProjectState,
   updateProject,
 } from "@/lib/projectUtils";
+import { useToast } from "@/hooks/useToast";
 
 export type ProjectsPageProps = {
   currentUser: User;
@@ -41,6 +42,8 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const [loadingForm, setLoadingForm] = useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
+  const { showToast } = useToast();
+
   const handleClickAddProject = useCallback(() => {
     setEditingProject(null);
     setOpenProjectForm(true);
@@ -49,40 +52,6 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const handleCloseProjectForm = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
-
-  const handleCreateProject = useCallback(
-    (createdProject: Project) => {
-      setLoadingForm(true);
-      createProject(currentUser.uid, createdProject)
-        .then(() => {
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, createdProject);
-          });
-          setOpenProjectForm(false);
-        })
-        .finally(() => {
-          setLoadingForm(false);
-        });
-    },
-    [currentUser.uid, setProjects]
-  );
-
-  const handleUpdateProject = useCallback(
-    (updatedProject: Project) => {
-      setLoadingForm(true);
-      updateProject(currentUser.uid, updatedProject)
-        .then(() => {
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, updatedProject);
-          });
-          setOpenProjectForm(false);
-        })
-        .finally(() => {
-          setLoadingForm(false);
-        });
-    },
-    [currentUser.uid, setProjects]
-  );
 
   const handleEditProject = useCallback((project: Project) => {
     setEditingProject(project);
@@ -98,11 +67,48 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     setOpenDeleteConfirmDialog(false);
   }, []);
 
+  const handleCreateProject = useCallback(
+    (createdProject: Project) => {
+      setLoadingForm(true);
+      createProject(currentUser.uid, createdProject)
+        .then(() => {
+          showToast("プロジェクトを作成しました。", "success");
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, createdProject);
+          });
+          setOpenProjectForm(false);
+        })
+        .finally(() => {
+          setLoadingForm(false);
+        });
+    },
+    [currentUser.uid, setProjects, showToast]
+  );
+
+  const handleUpdateProject = useCallback(
+    (updatedProject: Project) => {
+      setLoadingForm(true);
+      updateProject(currentUser.uid, updatedProject)
+        .then(() => {
+          showToast("プロジェクトを更新しました。", "success");
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, updatedProject);
+          });
+          setOpenProjectForm(false);
+        })
+        .finally(() => {
+          setLoadingForm(false);
+        });
+    },
+    [currentUser.uid, setProjects, showToast]
+  );
+
   const handleConfirmDeleteProject = useCallback(() => {
     if (!deletingProject) return;
     setLoadingDeleteConfirmDialog(true);
     deleteProject(currentUser.uid, deletingProject.id)
       .then(() => {
+        showToast("プロジェクトを削除しました。", "success");
         setProjects((prev) => {
           return deleteProjectState(prev, deletingProject.id);
         });
@@ -111,7 +117,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       .finally(() => {
         setLoadingDeleteConfirmDialog(false);
       });
-  }, [currentUser.uid, deletingProject, setProjects]);
+  }, [currentUser.uid, deletingProject, setProjects, showToast]);
 
   return (
     <Container sx={{ pt: 2 }} maxWidth="md">
