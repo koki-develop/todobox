@@ -2,7 +2,6 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
-import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -46,7 +45,7 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   }, [onDelete, project]);
 
   return (
-    <Grid item xs={12} sm={6}>
+    <>
       <Card elevation={2}>
         <Link
           to={`/projects/${project.id}`}
@@ -98,7 +97,7 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
           </List>
         </Paper>
       </Popper>
-    </Grid>
+    </>
   );
 });
 

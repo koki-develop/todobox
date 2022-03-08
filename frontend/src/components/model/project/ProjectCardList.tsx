@@ -27,14 +27,15 @@ const ProjectCardList: React.VFC<ProjectCardListProps> = React.memo((props) => {
   return (
     <Grid container spacing={2}>
       {projects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          openMenu={project.id === menuOpenProjectId}
-          project={project}
-          onOpenMenu={handleOpenProjectMenu}
-          onCloseMenu={handleCloseProjectMenu}
-          onDelete={onDeleteProject}
-        />
+        <Grid key={project.id} item xs={12} sm={6}>
+          <ProjectCard
+            openMenu={project.id === menuOpenProjectId}
+            project={project}
+            onOpenMenu={handleOpenProjectMenu}
+            onCloseMenu={handleCloseProjectMenu}
+            onDelete={onDeleteProject}
+          />
+        </Grid>
       ))}
     </Grid>
   );
