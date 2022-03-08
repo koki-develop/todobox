@@ -82,12 +82,11 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
         alignItems: "center",
         display: "flex",
         justifyContent: "center",
-        overflowY: "scroll",
       }}
     >
       <Fade in={open} timeout={200}>
         <Container maxWidth="sm" sx={{ outline: "none" }}>
-          <Card>
+          <Card sx={{ maxHeight: "calc(100vh - 48px)", overflowY: "auto" }}>
             <CardContent sx={{ pb: 1 }}>
               <Form onSubmit={handleCreate}>
                 <Field>
