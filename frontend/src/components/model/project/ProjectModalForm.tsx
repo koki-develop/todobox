@@ -1,6 +1,7 @@
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Field from "@/components/utils/Field";
@@ -89,7 +90,12 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
 
     return (
       <ModalCard open={open} onClose={onClose}>
-        <CardContent sx={{ pb: 1 }}>
+        <CardHeader
+          title={`プロジェクトを${project ? "編集" : "作成"}`}
+          titleTypographyProps={{ variant: "h6" }}
+          sx={{ py: 1 }}
+        />
+        <CardContent sx={{ py: 1 }}>
           <Form onSubmit={handleSubmit}>
             <Field>
               <TextField
@@ -105,17 +111,11 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
             </Field>
           </Form>
         </CardContent>
-        <CardActions>
-          <Button
-            fullWidth
-            disabled={loading}
-            onClick={onClose}
-            variant="contained"
-          >
+        <CardActions sx={{ justifyContent: "flex-end" }}>
+          <Button disabled={loading} onClick={onClose}>
             キャンセル
           </Button>
           <LoadableButton
-            fullWidth
             loading={loading}
             onClick={handleSubmit}
             variant="contained"
