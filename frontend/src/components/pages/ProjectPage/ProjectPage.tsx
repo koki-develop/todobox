@@ -13,11 +13,13 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
+import qs from "query-string";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
+import TaskModalCard from "@/components/model/task/TaskModalCard";
 import Field from "@/components/utils/Field";
 import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
@@ -82,6 +84,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
   const [showCompletedTasksButtonEl, setShowCompletedTasksButtonEl] =
     useState<HTMLButtonElement | null>(null);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   /*
    * project
@@ -164,6 +169,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   /*
    * task
    */
+
+  const showingTaskId = useMemo(() => {
+    const query = qs.parse(location.search);
+    return (query.task as string) ?? undefined;
+  }, [location.search]);
 
   const noSectionTasks = useMemo(() => {
     return [
@@ -298,9 +308,16 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [currentUser.uid, projectId, sections, selectedTasks]
   );
 
-  const handleClickTask = useCallback((clickedTask: Task) => {
-    console.log("clicked:", clickedTask);
-  }, []);
+  const handleClickTask = useCallback(
+    (clickedTask: Task) => {
+      navigate(`?task=${clickedTask.id}`);
+    },
+    [navigate]
+  );
+
+  const handleCloseTaskModal = useCallback(() => {
+    navigate("");
+  }, [navigate]);
 
   const handleSelectTask = useCallback(
     (selectedTask: Task) => {
@@ -486,6 +503,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         </Box>
       ) : (
         <Box>
+          <TaskModalCard
+            projectId={projectId}
+            taskId={showingTaskId}
+            open={Boolean(showingTaskId)}
+            onClose={handleCloseTaskModal}
+          />
           <Container maxWidth="lg">
             <Field
               sx={{
