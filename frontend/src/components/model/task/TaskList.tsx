@@ -1,4 +1,5 @@
-import Box from "@mui/material/Box";
+import AddIcon from "@mui/icons-material/Add";
+import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
@@ -94,11 +95,18 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 onMultiSelect={onMultiSelectTask}
               />
             ))}
+            {provided.placeholder}
+            <Button
+              fullWidth
+              startIcon={<AddIcon />}
+              sx={{ justifyContent: "flex-start" }}
+            >
+              タスクを追加
+            </Button>
             {/* <li>
             <input type="text" value={title} onChange={handleChangeTitle} />
             <button onClick={handleCreate}>create</button>
           </li> */}
-            {provided.placeholder}
           </List>
         )}
       </Droppable>
