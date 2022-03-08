@@ -3,13 +3,13 @@ import React from "react";
 import ProjectListItem from "@/components/model/project/ProjectListItem";
 import { Project } from "@/models/project";
 
-export type ProjectListProps = {
+export type ProjectCardListProps = {
   projects: Project[];
 
   onDeleteProject: (project: Project) => void;
 };
 
-const ProjectList: React.VFC<ProjectListProps> = React.memo((props) => {
+const ProjectCardList: React.VFC<ProjectCardListProps> = React.memo((props) => {
   const { projects, onDeleteProject } = props;
 
   return (
@@ -25,6 +25,6 @@ const ProjectList: React.VFC<ProjectListProps> = React.memo((props) => {
   );
 });
 
-ProjectList.displayName = "ProjectList";
+ProjectCardList.displayName = "ProjectCardList";
 
-export default ProjectList;
+export default ProjectCardList;

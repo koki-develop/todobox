@@ -5,8 +5,8 @@ import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import { useProjects } from "@/components/providers/ProjectsProvider";
+import ProjectCardList from "@/components/model/project/ProjectCardList";
 import ProjectForm from "@/components/model/project/ProjectForm";
-import ProjectList from "@/components/model/project/ProjectList";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
@@ -83,7 +83,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           </Field>
 
           <Field>
-            <ProjectList
+            <ProjectCardList
               projects={projects}
               onDeleteProject={handleDeleteProject}
             />
