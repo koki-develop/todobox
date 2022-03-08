@@ -11,6 +11,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
+import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef } from "react";
 import Link from "@/components/utils/Link";
 import Popper from "@/components/utils/Popper";
@@ -30,6 +31,8 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   const { project, openMenu, onOpenMenu, onCloseMenu, onEdit, onDelete } =
     props;
 
+  const theme = useTheme();
+
   const menuButtonEl = useRef<HTMLButtonElement | null>(null);
 
   const handleOpenMenu = useCallback(
@@ -46,12 +49,14 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   }, [onCloseMenu, project]);
 
   const handleEdit = useCallback(() => {
+    onCloseMenu(project);
     onEdit(project);
-  }, [onEdit, project]);
+  }, [onCloseMenu, onEdit, project]);
 
   const handleDelete = useCallback(() => {
+    onCloseMenu(project);
     onDelete(project);
-  }, [onDelete, project]);
+  }, [onCloseMenu, onDelete, project]);
 
   return (
     <>
@@ -97,22 +102,25 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         anchorEl={menuButtonEl.current}
         placement="left-start"
       >
-        <Paper>
-          <List disablePadding>
+        <Paper elevation={3}>
+          <List dense>
             <ListItem disablePadding>
               <ListItemButton onClick={handleEdit}>
                 <ListItemIcon>
                   <EditIcon />
                 </ListItemIcon>
-                <ListItemText primary="編集" />
+                <ListItemText primary="プロジェクトを編集" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={handleDelete}>
+              <ListItemButton
+                onClick={handleDelete}
+                sx={{ color: theme.palette.error.main }}
+              >
                 <ListItemIcon>
-                  <DeleteIcon />
+                  <DeleteIcon color="error" />
                 </ListItemIcon>
-                <ListItemText primary="削除" />
+                <ListItemText primary="プロジェクトを削除" />
               </ListItemButton>
             </ListItem>
           </List>
