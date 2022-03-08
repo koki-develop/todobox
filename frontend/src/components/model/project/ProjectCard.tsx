@@ -14,13 +14,13 @@ import Link from "@/components/utils/Link";
 import Popper from "@/components/utils/Popper";
 import { Project } from "@/models/project";
 
-export type ProjectListItemProps = {
+export type ProjectCardProps = {
   project: Project;
 
   onDelete: (project: Project) => void;
 };
 
-const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
+const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   const { project, onDelete } = props;
 
   const [menuButtonEl, setMenuButtonEl] = useState<HTMLButtonElement | null>(
@@ -101,6 +101,6 @@ const ProjectListItem: React.VFC<ProjectListItemProps> = React.memo((props) => {
   );
 });
 
-ProjectListItem.displayName = "ProjectListItem";
+ProjectCard.displayName = "ProjectCard";
 
-export default ProjectListItem;
+export default ProjectCard;

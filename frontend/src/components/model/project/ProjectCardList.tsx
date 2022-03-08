@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import React from "react";
-import ProjectListItem from "@/components/model/project/ProjectListItem";
+import ProjectCard from "@/components/model/project/ProjectCard";
 import { Project } from "@/models/project";
 
 export type ProjectCardListProps = {
@@ -15,7 +15,7 @@ const ProjectCardList: React.VFC<ProjectCardListProps> = React.memo((props) => {
   return (
     <Grid container spacing={2}>
       {projects.map((project) => (
-        <ProjectListItem
+        <ProjectCard
           key={project.id}
           project={project}
           onDelete={onDeleteProject}
