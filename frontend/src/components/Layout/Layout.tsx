@@ -1,4 +1,5 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
@@ -10,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
@@ -120,13 +122,16 @@ const Layout: React.VFC = React.memo(() => {
                 open={Boolean(avatarButtonEl)}
                 onClose={handleCloseMenu}
                 anchorEl={avatarButtonEl}
-                placement="bottom-start"
+                placement="bottom-end"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
                 <Paper>
-                  <List>
+                  <List dense>
                     <ListItem disablePadding>
                       <ListItemButton onClick={handleClickLogout}>
+                        <ListItemIcon>
+                          <LogoutIcon />
+                        </ListItemIcon>
                         <ListItemText primary="ログアウト" />
                       </ListItemButton>
                     </ListItem>
