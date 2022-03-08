@@ -1,4 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
@@ -67,7 +68,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     <Container sx={{ pt: 2 }} maxWidth="md">
       {!projectsLoaded && <Loading text="プロジェクトを読み込んでいます" />}
       {projectsLoaded && (
-        <>
+        <Box>
           <ProjectForm
             loading={creatingProject}
             open={openProjectForm}
@@ -87,7 +88,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
               onDeleteProject={handleDeleteProject}
             />
           </Field>
-        </>
+        </Box>
       )}
     </Container>
   );
