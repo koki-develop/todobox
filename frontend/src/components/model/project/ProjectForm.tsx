@@ -102,7 +102,6 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
                     onChange={handleChangeName}
                   />
                 </Field>
-                <Field></Field>
               </Form>
             </CardContent>
             <CardActions>
