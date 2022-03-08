@@ -12,7 +12,11 @@ const Popper: React.VFC<PopperProps> = React.memo((props) => {
 
   return (
     <MuiPopper {...popperProps}>
-      <ClickAwayListener touchEvent={false} onClickAway={onClose}>
+      <ClickAwayListener
+        mouseEvent="onMouseDown"
+        touchEvent={false}
+        onClickAway={onClose}
+      >
         {children}
       </ClickAwayListener>
     </MuiPopper>
