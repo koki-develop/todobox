@@ -9,36 +9,37 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import Link from "@/components/utils/Link";
 import Popper from "@/components/utils/Popper";
 import { Project } from "@/models/project";
 
 export type ProjectCardProps = {
   project: Project;
+  openMenu: boolean;
 
+  onOpenMenu: (project: Project) => void;
+  onCloseMenu: (project: Project) => void;
   onDelete: (project: Project) => void;
 };
 
 const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
-  const { project, onDelete } = props;
+  const { project, openMenu, onOpenMenu, onCloseMenu, onDelete } = props;
 
-  const [menuButtonEl, setMenuButtonEl] = useState<HTMLButtonElement | null>(
-    null
-  );
+  const menuButtonEl = useRef<HTMLButtonElement | null>(null);
 
-  const handleClickMenu = useCallback(
+  const handleOpenMenu = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setMenuButtonEl(menuButtonEl ? null : e.currentTarget);
+      onOpenMenu(project);
     },
-    [menuButtonEl]
+    [onOpenMenu, project]
   );
 
   const handleCloseMenu = useCallback(() => {
-    setMenuButtonEl(null);
-  }, []);
+    onCloseMenu(project);
+  }, [onCloseMenu, project]);
 
   const handleDelete = useCallback(() => {
     onDelete(project);
@@ -74,7 +75,7 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
                 },
               }}
               action={
-                <IconButton onClick={handleClickMenu}>
+                <IconButton ref={menuButtonEl} onClick={handleOpenMenu}>
                   <MoreHorizIcon />
                 </IconButton>
               }
@@ -83,9 +84,9 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         </Link>
       </Card>
       <Popper
-        open={Boolean(menuButtonEl)}
+        open={openMenu}
         onClose={handleCloseMenu}
-        anchorEl={menuButtonEl}
+        anchorEl={menuButtonEl.current}
       >
         <Paper>
           <List>
