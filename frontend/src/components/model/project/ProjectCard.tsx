@@ -1,3 +1,5 @@
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
@@ -6,6 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import React, { useCallback, useRef } from "react";
@@ -92,16 +95,23 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         open={openMenu}
         onClose={handleCloseMenu}
         anchorEl={menuButtonEl.current}
+        placement="left-start"
       >
         <Paper>
-          <List>
+          <List disablePadding>
             <ListItem disablePadding>
               <ListItemButton onClick={handleEdit}>
+                <ListItemIcon>
+                  <EditIcon />
+                </ListItemIcon>
                 <ListItemText primary="編集" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton onClick={handleDelete}>
+                <ListItemIcon>
+                  <DeleteIcon />
+                </ListItemIcon>
                 <ListItemText primary="削除" />
               </ListItemButton>
             </ListItem>
