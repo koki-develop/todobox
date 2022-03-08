@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
@@ -13,13 +13,15 @@ import { buildProject } from "@/lib/projectUtils";
 export type ProjectFormProps = {
   open: boolean;
   loading: boolean;
+  project: Project | null;
 
   onClose: () => void;
   onCreate: (project: Project) => void;
+  onUpdate: (project: Project) => void;
 };
 
 const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
-  const { open, loading, onClose, onCreate } = props;
+  const { open, loading, project, onClose, onCreate, onUpdate } = props;
 
   const [name, setName] = useState<string>("");
   const [nameError, setNameError] = useState<string | null>(null);
@@ -63,16 +65,31 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
     onCreate(project);
   }, [name, onCreate, validateForm]);
 
+  const handleUpdate = useCallback(() => {
+    if (!project) return;
+    if (!validateForm()) return;
+    const trimmedName = name.trim();
+    const updatedProject = { ...project, name: trimmedName };
+    onUpdate(updatedProject);
+  }, [name, onUpdate, project, validateForm]);
+
+  const handleSubmit = useMemo(() => {
+    return project ? handleUpdate : handleCreate;
+  }, [handleCreate, handleUpdate, project]);
+
   useEffect(() => {
-    if (!open) {
+    if (!open) return;
+    if (project) {
+      setName(project.name);
+    } else {
       clearForm();
     }
-  }, [clearForm, open]);
+  }, [clearForm, open, project]);
 
   return (
     <ModalCard open={open} onClose={onClose}>
       <CardContent sx={{ pb: 1 }}>
-        <Form onSubmit={handleCreate}>
+        <Form onSubmit={handleSubmit}>
           <Field>
             <TextField
               autoFocus
@@ -99,10 +116,10 @@ const ProjectForm: React.VFC<ProjectFormProps> = React.memo((props) => {
         <LoadableButton
           fullWidth
           loading={loading}
-          onClick={handleCreate}
+          onClick={handleSubmit}
           variant="contained"
         >
-          作成
+          {project ? "更新" : "作成"}
         </LoadableButton>
       </CardActions>
     </ModalCard>

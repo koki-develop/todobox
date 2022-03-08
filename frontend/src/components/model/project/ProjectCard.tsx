@@ -19,11 +19,13 @@ export type ProjectCardProps = {
 
   onOpenMenu: (project: Project) => void;
   onCloseMenu: (project: Project) => void;
+  onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
 };
 
 const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
-  const { project, openMenu, onOpenMenu, onCloseMenu, onDelete } = props;
+  const { project, openMenu, onOpenMenu, onCloseMenu, onEdit, onDelete } =
+    props;
 
   const menuButtonEl = useRef<HTMLButtonElement | null>(null);
 
@@ -39,6 +41,10 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   const handleCloseMenu = useCallback(() => {
     onCloseMenu(project);
   }, [onCloseMenu, project]);
+
+  const handleEdit = useCallback(() => {
+    onEdit(project);
+  }, [onEdit, project]);
 
   const handleDelete = useCallback(() => {
     onDelete(project);
@@ -89,6 +95,11 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
       >
         <Paper>
           <List>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleEdit}>
+                <ListItemText primary="編集" />
+              </ListItemButton>
+            </ListItem>
             <ListItem disablePadding>
               <ListItemButton onClick={handleDelete}>
                 <ListItemText primary="削除" />

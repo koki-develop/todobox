@@ -15,6 +15,7 @@ import {
   deleteProject,
   deleteProjectState,
   updateOrAddProjectState,
+  updateProject,
 } from "@/lib/projectUtils";
 
 export type ProjectsPageProps = {
@@ -24,11 +25,13 @@ export type ProjectsPageProps = {
 const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
-  const [creatingProject, setCreatingProject] = useState<boolean>(false);
   const { initialized: projectsLoaded, projects, setProjects } = useProjects();
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [loadingForm, setLoadingForm] = useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
-  const handleOpenProjectForm = useCallback(() => {
+  const handleClickAddProject = useCallback(() => {
+    setEditingProject(null);
     setOpenProjectForm(true);
   }, []);
 
@@ -37,21 +40,43 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   }, []);
 
   const handleCreateProject = useCallback(
-    async (project: Project) => {
-      setCreatingProject(true);
-      createProject(currentUser.uid, project)
+    (createdProject: Project) => {
+      setLoadingForm(true);
+      createProject(currentUser.uid, createdProject)
         .then(() => {
           setProjects((prev) => {
-            return updateOrAddProjectState(prev, project);
+            return updateOrAddProjectState(prev, createdProject);
           });
           setOpenProjectForm(false);
         })
         .finally(() => {
-          setCreatingProject(false);
+          setLoadingForm(false);
         });
     },
     [currentUser.uid, setProjects]
   );
+
+  const handleUpdateProject = useCallback(
+    (updatedProject: Project) => {
+      setLoadingForm(true);
+      updateProject(currentUser.uid, updatedProject)
+        .then(() => {
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, updatedProject);
+          });
+          setOpenProjectForm(false);
+        })
+        .finally(() => {
+          setLoadingForm(false);
+        });
+    },
+    [currentUser.uid, setProjects]
+  );
+
+  const handleEditProject = useCallback((project: Project) => {
+    setEditingProject(project);
+    setOpenProjectForm(true);
+  }, []);
 
   const handleDeleteProject = useCallback(
     (project: Project) => {
@@ -70,14 +95,16 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       {projectsLoaded && (
         <Box>
           <ProjectForm
-            loading={creatingProject}
+            loading={loadingForm}
             open={openProjectForm}
+            project={editingProject}
             onClose={handleCloseProjectForm}
             onCreate={handleCreateProject}
+            onUpdate={handleUpdateProject}
           />
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
-            <Button startIcon={<AddIcon />} onClick={handleOpenProjectForm}>
+            <Button startIcon={<AddIcon />} onClick={handleClickAddProject}>
               プロジェクトを作成
             </Button>
           </Field>
@@ -85,6 +112,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           <Field>
             <ProjectCardList
               projects={projects}
+              onEditProject={handleEditProject}
               onDeleteProject={handleDeleteProject}
             />
           </Field>

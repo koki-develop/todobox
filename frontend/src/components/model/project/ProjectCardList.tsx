@@ -6,11 +6,12 @@ import { Project } from "@/models/project";
 export type ProjectCardListProps = {
   projects: Project[];
 
+  onEditProject: (project: Project) => void;
   onDeleteProject: (project: Project) => void;
 };
 
 const ProjectCardList: React.VFC<ProjectCardListProps> = React.memo((props) => {
-  const { projects, onDeleteProject } = props;
+  const { projects, onEditProject, onDeleteProject } = props;
 
   const [menuOpenProjectId, setMenuOpenProjectId] = useState<string | null>(
     null
@@ -33,6 +34,7 @@ const ProjectCardList: React.VFC<ProjectCardListProps> = React.memo((props) => {
             project={project}
             onOpenMenu={handleOpenProjectMenu}
             onCloseMenu={handleCloseProjectMenu}
+            onEdit={onEditProject}
             onDelete={onDeleteProject}
           />
         </Grid>
