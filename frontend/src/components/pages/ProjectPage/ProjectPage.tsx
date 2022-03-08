@@ -504,6 +504,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       ) : (
         <Box>
           <TaskModalCard
+            userId={currentUser.uid}
             projectId={projectId}
             taskId={showingTaskId}
             open={Boolean(showingTaskId)}
