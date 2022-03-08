@@ -8,6 +8,13 @@ export const theme = responsiveFontSizes(
           disableRipple: true,
         },
       },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            minWidth: 38,
+          },
+        },
+      },
     },
   })
 );
