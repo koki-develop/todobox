@@ -1,5 +1,6 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
+import { SnackbarProvider } from "notistack";
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
@@ -11,16 +12,22 @@ import AppRoutes from "./AppRoutes";
 const App: React.VFC = React.memo(() => {
   return (
     <ThemeProvider theme={theme}>
-      <RecoilRoot>
-        <AuthProvider>
-          <ProjectsProvider>
-            <CssBaseline />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </ProjectsProvider>
-        </AuthProvider>
-      </RecoilRoot>
+      <SnackbarProvider
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
+        maxSnack={3}
+        autoHideDuration={3000}
+      >
+        <RecoilRoot>
+          <AuthProvider>
+            <ProjectsProvider>
+              <CssBaseline />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </ProjectsProvider>
+          </AuthProvider>
+        </RecoilRoot>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 });
