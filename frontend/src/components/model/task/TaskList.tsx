@@ -4,6 +4,7 @@ import List from "@mui/material/List";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import TaskListItem from "@/components/model/task/TaskListItem";
+import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
 import { buildTask, separateTasks } from "@/lib/taskUtils";
 
@@ -37,7 +38,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     onMultiSelectTask,
   } = props;
 
-  const [title, setTitle] = useState<string>("");
+  const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
@@ -47,29 +48,31 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     return separateTasks(tasks);
   }, [tasks]);
 
-  const handleChangeTitle = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTitle(e.currentTarget.value);
-    },
-    []
-  );
+  const handleStartCreateTask = useCallback(() => {
+    setInputtingTask(true);
+  }, []);
 
-  const handleCreate = useCallback(() => {
-    const trimmedTitle = title.trim();
-    if (trimmedTitle === "") return;
-    setTitle("");
-    const index =
-      incompletedTasks.length === 0
-        ? 0
-        : incompletedTasks.slice(-1)[0].index + 1;
-    const task = buildTask({
-      projectId,
-      sectionId,
-      title: trimmedTitle,
-      index,
-    });
-    onCreateTask(task);
-  }, [incompletedTasks, onCreateTask, projectId, sectionId, title]);
+  const handleCancelCreateTask = useCallback(() => {
+    setInputtingTask(false);
+  }, []);
+
+  const handleCreateTask = useCallback(
+    (title: string) => {
+      setInputtingTask(false);
+      const index =
+        incompletedTasks.length === 0
+          ? 0
+          : incompletedTasks.slice(-1)[0].index + 1;
+      const task = buildTask({
+        projectId,
+        sectionId,
+        title,
+        index,
+      });
+      onCreateTask(task);
+    },
+    [incompletedTasks, onCreateTask, projectId, sectionId]
+  );
 
   // TODO: リファクタ
   return (
@@ -96,17 +99,21 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
               />
             ))}
             {provided.placeholder}
-            <Button
-              fullWidth
-              startIcon={<AddIcon />}
-              sx={{ justifyContent: "flex-start" }}
-            >
-              タスクを追加
-            </Button>
-            {/* <li>
-            <input type="text" value={title} onChange={handleChangeTitle} />
-            <button onClick={handleCreate}>create</button>
-          </li> */}
+            {inputtingTask ? (
+              <TaskNewListItem
+                onCreate={handleCreateTask}
+                onCancel={handleCancelCreateTask}
+              />
+            ) : (
+              <Button
+                fullWidth
+                startIcon={<AddIcon />}
+                sx={{ justifyContent: "flex-start" }}
+                onClick={handleStartCreateTask}
+              >
+                タスクを追加
+              </Button>
+            )}
           </List>
         )}
       </Droppable>

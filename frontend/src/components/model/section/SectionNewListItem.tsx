@@ -29,6 +29,7 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
     );
 
     const handleSubmit = useCallback(() => {
+      setName("");
       const trimmedName = name.trim();
       if (trimmedName === "") {
         onCancel();
