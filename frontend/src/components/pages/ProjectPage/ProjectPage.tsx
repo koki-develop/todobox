@@ -541,7 +541,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                     <List disablePadding>
                       <ListItem disablePadding>
                         <ListItemButton onClick={handleSelectAllTasks}>
-                          <ListItemIcon sx={{ minWidth: 30 }}>
+                          <ListItemIcon>
                             {showCompletedTasks && <CheckIcon />}
                           </ListItemIcon>
                           <ListItemText primary="すべてのタスク" />
@@ -549,7 +549,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                       </ListItem>
                       <ListItem disablePadding>
                         <ListItemButton onClick={handleSelectIncompletedTasks}>
-                          <ListItemIcon sx={{ minWidth: 30 }}>
+                          <ListItemIcon>
                             {!showCompletedTasks && <CheckIcon />}
                           </ListItemIcon>
                           <ListItemText primary="未完了のタスク" />
