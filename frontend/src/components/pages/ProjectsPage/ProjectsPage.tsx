@@ -11,7 +11,7 @@ import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import { useProjects } from "@/components/providers/ProjectsProvider";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
-import ProjectForm from "@/components/model/project/ProjectForm";
+import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import LoadableButton from "@/components/utils/LoadableButton";
 import Loading from "@/components/utils/Loading";
@@ -118,7 +118,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       {!projectsLoaded && <Loading text="プロジェクトを読み込んでいます" />}
       {projectsLoaded && (
         <Box>
-          <ProjectForm
+          <ProjectModalForm
             loading={loadingForm}
             open={openProjectForm}
             project={editingProject}
