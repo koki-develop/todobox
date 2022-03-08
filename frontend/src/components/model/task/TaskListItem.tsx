@@ -67,7 +67,36 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
     [onDelete, task]
   );
 
-  return (
+  // TODO: リファクタ
+  return task.completedAt ? (
+    <ListItem
+      disablePadding
+      sx={{
+        backgroundColor: (theme) => theme.palette.background.paper,
+        marginTop: "-1px",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <ListItemButton
+        selected={selected}
+        onClick={handleClick}
+        sx={{ height: 38 }}
+      >
+        {task.completedAt ? (
+          <IconButton size="small" onClick={handleIncomplete}>
+            <CheckCircleIcon fontSize="small" color="success" />
+          </IconButton>
+        ) : (
+          <IconButton size="small" onClick={handleComplete}>
+            <CheckCircleOutlineIcon fontSize="small" />
+          </IconButton>
+        )}
+        <ListItemText primary={`[${task.index}] ${task.title}`} />
+        <button onClick={handleDelete}>delete</button>
+      </ListItemButton>
+    </ListItem>
+  ) : (
     <Draggable
       isDragDisabled={Boolean(task.completedAt)}
       draggableId={task.id}

@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
@@ -69,49 +70,54 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     onCreateTask(task);
   }, [incompletedTasks, onCreateTask, projectId, sectionId, title]);
 
+  // TODO: リファクタ
   return (
-    <Droppable droppableId={droppableId} type="tasks">
-      {(provided) => (
-        <List
-          ref={provided.innerRef}
-          disablePadding
-          sx={{ mb: 2 }}
-          {...provided.droppableProps}
-        >
-          {incompletedTasks.map((task) => (
-            <TaskListItem
-              key={task.id}
-              task={task}
-              selectedTasks={selectedTasks}
-              onComplete={onCompleteTask}
-              onIncomplete={onIncompleteTask}
-              onDelete={onDeleteTask}
-              onClick={onClickTask}
-              onSelect={onSelectTask}
-              onMultiSelect={onMultiSelectTask}
-            />
-          ))}
-          {provided.placeholder}
-          {/* <li>
+    <>
+      <Droppable droppableId={droppableId} type="tasks">
+        {(provided) => (
+          <List
+            ref={provided.innerRef}
+            disablePadding
+            sx={{ mb: 2 }}
+            {...provided.droppableProps}
+          >
+            {incompletedTasks.map((task) => (
+              <TaskListItem
+                key={task.id}
+                task={task}
+                selectedTasks={selectedTasks}
+                onComplete={onCompleteTask}
+                onIncomplete={onIncompleteTask}
+                onDelete={onDeleteTask}
+                onClick={onClickTask}
+                onSelect={onSelectTask}
+                onMultiSelect={onMultiSelectTask}
+              />
+            ))}
+            {/* <li>
             <input type="text" value={title} onChange={handleChangeTitle} />
             <button onClick={handleCreate}>create</button>
           </li> */}
-          {completedTasks.map((task) => (
-            <TaskListItem
-              key={task.id}
-              task={task}
-              selectedTasks={selectedTasks}
-              onComplete={onCompleteTask}
-              onIncomplete={onIncompleteTask}
-              onDelete={onDeleteTask}
-              onClick={onClickTask}
-              onSelect={onSelectTask}
-              onMultiSelect={onMultiSelectTask}
-            />
-          ))}
-        </List>
-      )}
-    </Droppable>
+            {provided.placeholder}
+          </List>
+        )}
+      </Droppable>
+      <List disablePadding sx={{ mb: 2 }}>
+        {completedTasks.map((task) => (
+          <TaskListItem
+            key={task.id}
+            task={task}
+            selectedTasks={selectedTasks}
+            onComplete={onCompleteTask}
+            onIncomplete={onIncompleteTask}
+            onDelete={onDeleteTask}
+            onClick={onClickTask}
+            onSelect={onSelectTask}
+            onMultiSelect={onMultiSelectTask}
+          />
+        ))}
+      </List>
+    </>
   );
 });
 
