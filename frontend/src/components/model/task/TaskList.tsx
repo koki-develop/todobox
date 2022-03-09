@@ -1,10 +1,12 @@
-import AddIcon from "@mui/icons-material/Add";
-import Button from "@mui/material/Button";
 import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem";
 import TaskListItem from "@/components/model/task/TaskListItem";
+import TaskListItemContainer from "@/components/model/task/TaskListItemContainer";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
 import { buildTask, separateTasks } from "@/lib/taskUtils";
@@ -38,6 +40,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     onSelectTask,
     onMultiSelectTask,
   } = props;
+
+  const theme = useTheme();
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
@@ -79,7 +83,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   return (
     <>
       <Droppable droppableId={droppableId} type="tasks">
-        {(provided) => (
+        {(provided, snapshot) => (
           <List
             ref={provided.innerRef}
             disablePadding
@@ -106,14 +110,22 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 onCancel={handleCancelCreateTask}
               />
             ) : (
-              <Button
-                fullWidth
-                startIcon={<AddIcon />}
-                sx={{ justifyContent: "flex-start" }}
-                onClick={handleStartCreateTask}
-              >
-                タスクを追加
-              </Button>
+              <TaskListItemContainer>
+                <ListItemButton
+                  sx={{
+                    height: "100%",
+                    color: theme.palette.text.secondary,
+                    ":hover": {
+                      backgroundColor: snapshot.isDraggingOver
+                        ? theme.palette.background.paper
+                        : undefined,
+                    },
+                  }}
+                  onClick={handleStartCreateTask}
+                >
+                  <ListItemText secondary="タスクを追加" />
+                </ListItemButton>
+              </TaskListItemContainer>
             )}
           </List>
         )}

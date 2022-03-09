@@ -93,9 +93,9 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
             onClick={task.completedAt ? handleIncomplete : handleComplete}
           >
             {task.completedAt ? (
-              <CheckCircleIcon fontSize="small" color="success" />
+              <CheckCircleIcon color="success" />
             ) : (
-              <CheckCircleOutlineIcon fontSize="small" />
+              <CheckCircleOutlineIcon />
             )}
           </IconButton>
           <ListItemText primary={`[${task.index}] ${task.title}`} />
