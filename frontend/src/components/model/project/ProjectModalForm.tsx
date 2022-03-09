@@ -93,9 +93,8 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
         <CardHeader
           title={`プロジェクトを${project ? "編集" : "作成"}`}
           titleTypographyProps={{ variant: "h6" }}
-          sx={{ py: 1 }}
         />
-        <CardContent sx={{ py: 1 }}>
+        <CardContent sx={{ pt: 0 }}>
           <Form onSubmit={handleSubmit}>
             <Field>
               <TextField
