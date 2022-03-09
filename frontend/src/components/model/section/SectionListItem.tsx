@@ -94,7 +94,15 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
             >
               {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
             </IconButton>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                flexGrow: 1,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               [{section.index}] {section.name}
             </Typography>
             <IconButton ref={menuButtonRef} onClick={handleOpenMenu}>
