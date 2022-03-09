@@ -12,51 +12,45 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import { useTheme } from "@mui/material/styles";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Link from "@/components/utils/Link";
 import Popper from "@/components/utils/Popper";
 import { Project } from "@/models/project";
 
 export type ProjectCardProps = {
   project: Project;
-  openMenu: boolean;
 
-  onOpenMenu: (project: Project) => void;
-  onCloseMenu: (project: Project) => void;
   onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
 };
 
 const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
-  const { project, openMenu, onOpenMenu, onCloseMenu, onEdit, onDelete } =
-    props;
+  const { project, onEdit, onDelete } = props;
 
   const theme = useTheme();
 
   const menuButtonEl = useRef<HTMLButtonElement | null>(null);
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
 
   const handleOpenMenu = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      e.stopPropagation();
-      onOpenMenu(project);
+      setOpenMenu(true);
     },
-    [onOpenMenu, project]
+    []
   );
 
   const handleCloseMenu = useCallback(() => {
-    onCloseMenu(project);
-  }, [onCloseMenu, project]);
+    setOpenMenu(false);
+  }, []);
 
   const handleEdit = useCallback(() => {
-    onCloseMenu(project);
     onEdit(project);
-  }, [onCloseMenu, onEdit, project]);
+  }, [onEdit, project]);
 
   const handleDelete = useCallback(() => {
-    onCloseMenu(project);
     onDelete(project);
-  }, [onCloseMenu, onDelete, project]);
+  }, [onDelete, project]);
 
   return (
     <>
