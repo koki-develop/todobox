@@ -1,13 +1,22 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
 import IconButton from "@mui/material/IconButton";
-import React, { useCallback, useState } from "react";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
+import React, { useCallback, useRef, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import TaskList from "@/components/model/task/TaskList";
+import Popper from "@/components/utils/Popper";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
@@ -44,6 +53,18 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   } = props;
 
   const [expanded, setExpanded] = useState<boolean>(true);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
+
+  const theme = useTheme();
+
+  const handleOpenMenu = useCallback(() => {
+    setOpenMenu(true);
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setOpenMenu(false);
+  }, []);
 
   const handleExpand = useCallback(() => {
     setExpanded(true);
@@ -65,34 +86,47 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
           {...provided.draggableProps}
           sx={{ mb: 2 }}
         >
-          <Card
-            square
-            variant="outlined"
-            sx={{ height: 50 }}
-            {...provided.dragHandleProps}
-          >
-            <CardHeader
-              sx={{ p: 1, pr: 2 }}
-              avatar={
-                expanded ? (
-                  <IconButton size="small" onClick={handleCollapse}>
-                    <ArrowDropDownIcon />
-                  </IconButton>
-                ) : (
-                  <IconButton size="small" onClick={handleExpand}>
-                    <ArrowRightIcon />
-                  </IconButton>
-                )
-              }
-              action={
-                <IconButton onClick={handleDelete}>
-                  <DeleteIcon />
-                </IconButton>
-              }
-              title={`[${section.index}] ${section.name}`}
-              titleTypographyProps={{ variant: "h6" }}
-            />
-          </Card>
+          <SectionListItemCard {...provided.dragHandleProps}>
+            <IconButton
+              size="small"
+              sx={{ mr: 1 }}
+              onClick={expanded ? handleCollapse : handleExpand}
+            >
+              {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+            </IconButton>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              [{section.index}] {section.name}
+            </Typography>
+            <IconButton ref={menuButtonRef} onClick={handleOpenMenu}>
+              <MoreHorizIcon />
+            </IconButton>
+            <Popper
+              anchorEl={menuButtonRef.current}
+              open={openMenu}
+              onClose={handleCloseMenu}
+              placement="bottom-end"
+            >
+              <Paper>
+                <List dense>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={handleDelete}>
+                      <ListItemIcon>
+                        <DeleteIcon color="error" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="セクションを削除"
+                        primaryTypographyProps={{
+                          sx: {
+                            color: theme.palette.error.main,
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              </Paper>
+            </Popper>
+          </SectionListItemCard>
           {expanded && (
             <TaskList
               projectId={projectId}
