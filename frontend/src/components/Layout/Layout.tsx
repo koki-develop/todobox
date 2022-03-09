@@ -8,18 +8,15 @@ import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
-import Popper from "@/components/utils/Popper";
+import PopperList from "@/components/utils/PopperList";
+import PopperListItem from "@/components/utils/PopperListItem";
 import { auth } from "@/lib/firebase";
 
 const Layout: React.VFC = React.memo(() => {
@@ -118,26 +115,20 @@ const Layout: React.VFC = React.memo(() => {
               <IconButton onClick={handleClickAvatar}>
                 <Avatar sx={{ height: 32, width: 32 }} />
               </IconButton>
-              <Popper
+              <PopperList
                 open={Boolean(avatarButtonEl)}
                 onClose={handleCloseMenu}
                 anchorEl={avatarButtonEl}
                 placement="bottom-end"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
-                <Paper>
-                  <List dense>
-                    <ListItem disablePadding>
-                      <ListItemButton onClick={handleClickLogout}>
-                        <ListItemIcon>
-                          <LogoutIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="ログアウト" />
-                      </ListItemButton>
-                    </ListItem>
-                  </List>
-                </Paper>
-              </Popper>
+                <PopperListItem onClick={handleClickLogout}>
+                  <ListItemIcon>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="ログアウト" />
+                </PopperListItem>
+              </PopperList>
             </Box>
           )}
         </Container>
