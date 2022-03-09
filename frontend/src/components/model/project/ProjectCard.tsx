@@ -5,14 +5,13 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import IconButton from "@mui/material/IconButton";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef, useState } from "react";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
+import PopperListItem from "@/components/utils/PopperListItem";
 import { Project } from "@/models/project";
 
 export type ProjectCardProps = {
@@ -98,25 +97,21 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         onClose={handleCloseMenu}
         anchorEl={menuButtonEl.current}
       >
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleEdit}>
-            <ListItemIcon>
-              <EditIcon />
-            </ListItemIcon>
-            <ListItemText primary="プロジェクトを編集" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleDelete}
-            sx={{ color: theme.palette.error.main }}
-          >
-            <ListItemIcon>
-              <DeleteIcon color="error" />
-            </ListItemIcon>
-            <ListItemText primary="プロジェクトを削除" />
-          </ListItemButton>
-        </ListItem>
+        <PopperListItem onClick={handleEdit}>
+          <ListItemIcon>
+            <EditIcon />
+          </ListItemIcon>
+          <ListItemText primary="プロジェクトを編集" />
+        </PopperListItem>
+        <PopperListItem
+          onClick={handleDelete}
+          sx={{ color: theme.palette.error.main }}
+        >
+          <ListItemIcon>
+            <DeleteIcon color="error" />
+          </ListItemIcon>
+          <ListItemText primary="プロジェクトを削除" />
+        </PopperListItem>
       </PopperList>
     </>
   );
