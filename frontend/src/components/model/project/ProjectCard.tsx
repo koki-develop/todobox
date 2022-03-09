@@ -45,10 +45,12 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   }, []);
 
   const handleEdit = useCallback(() => {
+    setOpenMenu(false);
     onEdit(project);
   }, [onEdit, project]);
 
   const handleDelete = useCallback(() => {
+    setOpenMenu(false);
     onDelete(project);
   }, [onDelete, project]);
 
