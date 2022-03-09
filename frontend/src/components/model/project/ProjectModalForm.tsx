@@ -1,13 +1,13 @@
 import Button from "@mui/material/Button";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
-import ModalCard from "@/components/utils/ModalCard";
 import { Project } from "@/models/project";
 import { buildProject } from "@/lib/projectUtils";
 
@@ -89,12 +89,11 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
     }, [clearForm, open, project]);
 
     return (
-      <ModalCard open={open} onClose={onClose}>
-        <CardHeader
-          title={`プロジェクトを${project ? "編集" : "作成"}`}
-          titleTypographyProps={{ variant: "h6" }}
-        />
-        <CardContent sx={{ pt: 0 }}>
+      <Dialog open={open} onClose={onClose} fullWidth>
+        <DialogTitle sx={{ pb: 0 }}>
+          プロジェクトを{project ? "編集" : "作成"}
+        </DialogTitle>
+        <DialogContent style={{ paddingTop: 16 }}>
           <Form onSubmit={handleSubmit}>
             <Field>
               <TextField
@@ -110,8 +109,8 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
               />
             </Field>
           </Form>
-        </CardContent>
-        <CardActions sx={{ justifyContent: "flex-end" }}>
+        </DialogContent>
+        <DialogActions>
           <Button disabled={loading} onClick={onClose}>
             キャンセル
           </Button>
@@ -122,8 +121,8 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
           >
             {project ? "更新" : "作成"}
           </LoadableButton>
-        </CardActions>
-      </ModalCard>
+        </DialogActions>
+      </Dialog>
     );
   }
 );
