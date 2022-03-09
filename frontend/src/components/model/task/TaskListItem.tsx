@@ -6,6 +6,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import React, { useCallback, useMemo } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import TaskListItemContainer from "@/components/model/task/TaskListItemContainer";
 import { Task } from "@/models/task";
 
 export type TaskListItemProps = {
@@ -69,19 +70,11 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
 
   // TODO: リファクタ
   return task.completedAt ? (
-    <ListItem
-      disablePadding
-      sx={{
-        backgroundColor: (theme) => theme.palette.background.paper,
-        marginTop: "-1px",
-        border: "1px solid",
-        borderColor: "divider",
-      }}
-    >
+    <TaskListItemContainer>
       <ListItemButton
         selected={selected}
         onClick={handleClick}
-        sx={{ height: 38 }}
+        sx={{ height: "100%" }}
       >
         {task.completedAt ? (
           <IconButton size="small" onClick={handleIncomplete}>
@@ -95,7 +88,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
         <ListItemText primary={`[${task.index}] ${task.title}`} />
         <button onClick={handleDelete}>delete</button>
       </ListItemButton>
-    </ListItem>
+    </TaskListItemContainer>
   ) : (
     <Draggable
       isDragDisabled={Boolean(task.completedAt)}
@@ -103,22 +96,15 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
       index={task.index}
     >
       {(provided) => (
-        <ListItem
+        <TaskListItemContainer
           ref={provided.innerRef}
-          disablePadding
-          sx={{
-            backgroundColor: (theme) => theme.palette.background.paper,
-            marginTop: "-1px",
-            border: "1px solid",
-            borderColor: "divider",
-          }}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
           <ListItemButton
             selected={selected}
             onClick={handleClick}
-            sx={{ height: 38 }}
+            sx={{ height: "100%" }}
           >
             {task.completedAt ? (
               <IconButton size="small" onClick={handleIncomplete}>
@@ -132,7 +118,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.memo((props) => {
             <ListItemText primary={`[${task.index}] ${task.title}`} />
             <button onClick={handleDelete}>delete</button>
           </ListItemButton>
-        </ListItem>
+        </TaskListItemContainer>
       )}
     </Draggable>
   );

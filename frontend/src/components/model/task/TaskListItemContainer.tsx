@@ -14,12 +14,14 @@ const TaskListItemContainer: React.VFC<TaskListItemContainerProps> =
       <ListItem
         {...listItemProps}
         ref={ref}
+        disablePadding
         sx={{
           backgroundColor: theme.palette.background.paper,
           border: "1px solid",
           borderColor: "divider",
           height: 38,
           marginTop: "-1px",
+          ...listItemProps.sx,
         }}
       >
         {children}
