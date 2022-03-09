@@ -5,16 +5,14 @@ import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef, useState } from "react";
 import Link from "@/components/utils/Link";
-import Popper from "@/components/utils/Popper";
+import PopperList from "@/components/utils/PopperList";
 import { Project } from "@/models/project";
 
 export type ProjectCardProps = {
@@ -95,36 +93,31 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
           </CardActionArea>
         </Link>
       </Card>
-      <Popper
+      <PopperList
         open={openMenu}
         onClose={handleCloseMenu}
         anchorEl={menuButtonEl.current}
-        placement="bottom-end"
       >
-        <Paper elevation={3}>
-          <List dense>
-            <ListItem disablePadding>
-              <ListItemButton onClick={handleEdit}>
-                <ListItemIcon>
-                  <EditIcon />
-                </ListItemIcon>
-                <ListItemText primary="プロジェクトを編集" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={handleDelete}
-                sx={{ color: theme.palette.error.main }}
-              >
-                <ListItemIcon>
-                  <DeleteIcon color="error" />
-                </ListItemIcon>
-                <ListItemText primary="プロジェクトを削除" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Paper>
-      </Popper>
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleEdit}>
+            <ListItemIcon>
+              <EditIcon />
+            </ListItemIcon>
+            <ListItemText primary="プロジェクトを編集" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={handleDelete}
+            sx={{ color: theme.palette.error.main }}
+          >
+            <ListItemIcon>
+              <DeleteIcon color="error" />
+            </ListItemIcon>
+            <ListItemText primary="プロジェクトを削除" />
+          </ListItemButton>
+        </ListItem>
+      </PopperList>
     </>
   );
 });
