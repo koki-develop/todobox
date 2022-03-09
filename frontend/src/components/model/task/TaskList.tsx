@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
+import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem";
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
@@ -86,7 +87,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             {...provided.droppableProps}
           >
             {incompletedTasks.map((task) => (
-              <TaskListItem
+              <TaskDraggableListItem
                 key={task.id}
                 task={task}
                 selectedTasks={selectedTasks}
