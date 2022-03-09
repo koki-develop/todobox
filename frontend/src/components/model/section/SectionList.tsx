@@ -1,4 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
@@ -73,7 +74,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
   return (
     <Droppable droppableId="sections" type="sections">
       {(provided) => (
-        <div ref={provided.innerRef} {...provided.droppableProps}>
+        <Box ref={provided.innerRef} {...provided.droppableProps}>
           {sectionsWithTasks
             .sort((a, b) => a.section.index - b.section.index)
             .map((sectionWithTasks) => (
@@ -106,7 +107,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
               セクションを追加
             </Button>
           )}
-        </div>
+        </Box>
       )}
     </Droppable>
   );
