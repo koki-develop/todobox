@@ -103,6 +103,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
                 fullWidth
                 disabled={loading}
                 label="プロジェクト名 *"
+                placeholder={project?.name}
                 value={name}
                 error={Boolean(nameError)}
                 helperText={nameError}
