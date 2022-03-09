@@ -58,11 +58,14 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
         <Link
           to={`/projects/${project.id}`}
           sx={{
-            color: (theme) => theme.palette.primary.main,
+            color: theme.palette.primary.main,
             textDecoration: "none",
           }}
         >
-          <CardActionArea component="div">
+          <CardActionArea
+            component="div"
+            sx={{ color: theme.palette.text.primary }}
+          >
             <CardHeader
               title={project.name}
               titleTypographyProps={{
