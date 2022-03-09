@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useState } from "react";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import Form from "@/components/utils/Form";
@@ -19,6 +20,8 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
     const { projectId, sections, onCreate, onCancel } = props;
 
     const [name, setName] = useState<string>("");
+
+    const theme = useTheme();
 
     const handleChangeName = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,15 +49,17 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
     return (
       <Box sx={{ mb: 2 }}>
         <SectionListItemCard sx={{ px: 2 }}>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} style={{ flexGrow: 1 }}>
             <TextField
               autoFocus
+              fullWidth
               variant="standard"
-              size="small"
               placeholder="新しいセクション"
               onChange={handleChangeName}
               InputProps={{ disableUnderline: true }}
-              inputProps={{ style: { paddingBottom: 0 } }}
+              inputProps={{
+                style: { ...theme.typography.h6, paddingBottom: 0 },
+              }}
               onBlur={handleBlur}
               value={name}
             />
