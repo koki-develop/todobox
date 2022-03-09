@@ -4,7 +4,7 @@ import TaskListItemContainer from "@/components/model/task/TaskListItemContainer
 import Form from "@/components/utils/Form";
 
 export type TaskNewListItemProps = {
-  onCreate: (title: string) => void;
+  onCreate: (title: string, cont: boolean) => void;
   onCancel: () => void;
 };
 
@@ -20,18 +20,26 @@ const TaskNewListItem: React.VFC<TaskNewListItemProps> = React.memo((props) => {
     []
   );
 
+  const handleCreate = useCallback(
+    (cont: boolean) => {
+      const trimmedTitle = title.trim();
+      if (trimmedTitle === "") {
+        onCancel();
+        return;
+      }
+      onCreate(trimmedTitle, cont);
+      setTitle("");
+    },
+    [onCancel, onCreate, title]
+  );
+
   const handleSubmit = useCallback(() => {
-    const trimmedTitle = title.trim();
-    if (trimmedTitle === "") {
-      onCancel();
-      return;
-    }
-    onCreate(trimmedTitle);
-  }, [onCancel, onCreate, title]);
+    handleCreate(true);
+  }, [handleCreate]);
 
   const handleBlur = useCallback(() => {
-    handleSubmit();
-  }, [handleSubmit]);
+    handleCreate(false);
+  }, [handleCreate]);
 
   return (
     <TaskListItemContainer sx={{ px: 2 }}>

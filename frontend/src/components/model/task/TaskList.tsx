@@ -62,8 +62,10 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   }, []);
 
   const handleCreateTask = useCallback(
-    (title: string) => {
-      setInputtingTask(false);
+    (title: string, cont: boolean) => {
+      if (!cont) {
+        setInputtingTask(false);
+      }
       const index =
         incompletedTasks.length === 0
           ? 0
