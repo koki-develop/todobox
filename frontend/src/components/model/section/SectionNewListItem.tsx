@@ -1,8 +1,7 @@
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useState } from "react";
+import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import Form from "@/components/utils/Form";
 import { Section } from "@/models/section";
 import { buildSection } from "@/lib/sectionUtils";
@@ -46,27 +45,21 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
 
     return (
       <Box sx={{ mb: 2 }}>
-        <Card square sx={{ alignItems: "center", display: "flex", height: 50 }}>
-          <CardHeader
-            sx={{ p: 1 }}
-            title={
-              <Form onSubmit={handleSubmit}>
-                <TextField
-                  autoFocus
-                  variant="outlined"
-                  size="small"
-                  onChange={handleChangeName}
-                  onBlur={handleBlur}
-                  value={name}
-                />
-              </Form>
-            }
-            titleTypographyProps={{
-              alignItems: "center",
-              display: "flex",
-            }}
-          />
-        </Card>
+        <SectionListItemCard sx={{ px: 2 }}>
+          <Form onSubmit={handleSubmit}>
+            <TextField
+              autoFocus
+              variant="standard"
+              size="small"
+              placeholder="新しいセクション"
+              onChange={handleChangeName}
+              InputProps={{ disableUnderline: true }}
+              inputProps={{ style: { paddingBottom: 0 } }}
+              onBlur={handleBlur}
+              value={name}
+            />
+          </Form>
+        </SectionListItemCard>
       </Box>
     );
   }
