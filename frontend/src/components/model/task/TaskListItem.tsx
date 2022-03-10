@@ -1,5 +1,6 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -82,24 +83,41 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
     );
 
     return (
-      <TaskListItemContainer {...taskListItemContainerProps} ref={ref}>
+      <TaskListItemContainer
+        {...taskListItemContainerProps}
+        ref={ref}
+        sx={{
+          ":hover": {
+            "& .moreIconButton": {
+              visibility: "visible",
+            },
+          },
+        }}
+      >
         <ListItemButton
           selected={selected}
           onClick={handleClick}
-          sx={{ height: "100%" }}
+          sx={{ height: "100%", pl: 1 }}
         >
           <IconButton
             size="small"
             onClick={task.completedAt ? handleIncomplete : handleComplete}
           >
             {task.completedAt ? (
-              <CheckCircleIcon color="success" />
+              <CheckCircleIcon fontSize="small" color="success" />
             ) : (
-              <CheckCircleOutlineIcon />
+              <CheckCircleOutlineIcon fontSize="small" />
             )}
           </IconButton>
           <ListItemText primary={`[${task.index}] ${task.title}`} />
-          <button onClick={handleDelete}>delete</button>
+          <IconButton
+            className="moreIconButton"
+            size="small"
+            sx={{ visibility: "hidden" }}
+          >
+            <MoreHorizIcon fontSize="small" />
+          </IconButton>
+          {/* <button onClick={handleDelete}>delete</button> */}
         </ListItemButton>
       </TaskListItemContainer>
     );
