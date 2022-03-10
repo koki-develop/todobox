@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
@@ -14,6 +13,7 @@ import Field from "@/components/utils/Field";
 import LoadableButton from "@/components/utils/LoadableButton";
 import Loading from "@/components/utils/Loading";
 import ModalCard from "@/components/utils/ModalCard";
+import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
 import {
   createProject,
@@ -135,10 +135,8 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             open={openDeleteConfirmDialog}
             onClose={handleCancelDeleteProject}
           >
-            <CardHeader
+            <ModalCardHeader
               title={`プロジェクト「${deletingProject?.name}」を削除しますか？`}
-              titleTypographyProps={{ variant: "h6" }}
-              sx={{ pb: 0 }}
             />
             <CardContent>
               プロジェクトを削除するとプロジェクト内のセクションとタスクも全て削除されます。この操作は取り消せません。
