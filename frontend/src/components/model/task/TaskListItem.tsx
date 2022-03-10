@@ -1,13 +1,18 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import IconButton from "@mui/material/IconButton";
 import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useCallback, useMemo } from "react";
+import { useTheme } from "@mui/material/styles";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import TaskListItemContainer, {
   TaskListItemContainerProps,
 } from "@/components/model/task/TaskListItemContainer";
+import PopperList from "@/components/utils/PopperList";
+import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 
 export type TaskListItemProps = Omit<
@@ -38,6 +43,11 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
       onDelete,
       ...taskListItemContainerProps
     } = props;
+
+    const theme = useTheme();
+
+    const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
 
     const selected = useMemo(() => {
       return selectedTasks.some((selectedTask) => selectedTask.id === task.id);
@@ -74,22 +84,37 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
       [onComplete, task]
     );
 
-    const handleDelete = useCallback(
+    const handleOpenMenu = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        setOpenMenu(true);
+      },
+      []
+    );
+
+    const handleCloseMenu = useCallback(() => {
+      setOpenMenu(false);
+    }, []);
+
+    const handleDelete = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         onDelete(task);
       },
       [onDelete, task]
     );
+    console.log(JSON.stringify(theme.palette.action, null, 4));
 
     return (
       <TaskListItemContainer
         {...taskListItemContainerProps}
         ref={ref}
         sx={{
-          ":hover": {
-            "& .moreIconButton": {
-              visibility: "visible",
+          [theme.breakpoints.up("sm")]: {
+            ":hover": {
+              "& .moreIconButton": {
+                visibility: "visible",
+              },
             },
           },
         }}
@@ -98,10 +123,11 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
           selected={selected}
           onClick={handleClick}
           sx={{
-            pl: 1,
+            backgroundColor: openMenu ? theme.palette.action.hover : undefined,
             border: "1px solid",
             borderColor: "divider",
             height: 38,
+            pl: 1,
           }}
         >
           <IconButton
@@ -116,14 +142,31 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
           </IconButton>
           <ListItemText primary={`[${task.index}] ${task.title}`} />
           <IconButton
+            ref={menuButtonRef}
             className="moreIconButton"
             size="small"
             sx={{ visibility: "hidden" }}
+            onClick={handleOpenMenu}
           >
             <MoreHorizIcon fontSize="small" />
           </IconButton>
-          {/* <button onClick={handleDelete}>delete</button> */}
         </ListItemButton>
+        <PopperList
+          anchorEl={menuButtonRef.current}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          clickAwayListenerProps={{ mouseEvent: "onMouseDown" }}
+        >
+          <PopperListItem
+            onClick={handleDelete}
+            sx={{ color: theme.palette.error.main }}
+          >
+            <ListItemIcon>
+              <DeleteIcon color="error" />
+            </ListItemIcon>
+            <ListItemText primary="タスクを削除" />
+          </PopperListItem>
+        </PopperList>
       </TaskListItemContainer>
     );
   }
