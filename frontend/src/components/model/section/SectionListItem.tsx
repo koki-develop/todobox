@@ -4,19 +4,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import TaskList from "@/components/model/task/TaskList";
-import Popper from "@/components/utils/Popper";
+import PopperList from "@/components/utils/PopperList";
+import PopperListItem from "@/components/utils/PopperListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
@@ -108,32 +105,29 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
             <IconButton ref={menuButtonRef} onClick={handleOpenMenu}>
               <MoreHorizIcon />
             </IconButton>
-            <Popper
+            <PopperList
               anchorEl={menuButtonRef.current}
               open={openMenu}
               onClose={handleCloseMenu}
               placement="bottom-end"
+              clickAwayListenerProps={{
+                mouseEvent: "onMouseDown",
+              }}
             >
-              <Paper>
-                <List dense>
-                  <ListItem disablePadding>
-                    <ListItemButton onClick={handleDelete}>
-                      <ListItemIcon>
-                        <DeleteIcon color="error" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="セクションを削除"
-                        primaryTypographyProps={{
-                          sx: {
-                            color: theme.palette.error.main,
-                          },
-                        }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                </List>
-              </Paper>
-            </Popper>
+              <PopperListItem onClick={handleDelete}>
+                <ListItemIcon>
+                  <DeleteIcon color="error" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="セクションを削除"
+                  primaryTypographyProps={{
+                    sx: {
+                      color: theme.palette.error.main,
+                    },
+                  }}
+                />
+              </PopperListItem>
+            </PopperList>
           </SectionListItemCard>
           {expanded && (
             <TaskList
