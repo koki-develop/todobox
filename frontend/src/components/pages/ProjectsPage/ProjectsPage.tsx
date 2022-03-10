@@ -1,12 +1,10 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
 import Container from "@mui/material/Container";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import { useProjects } from "@/components/providers/ProjectsProvider";
@@ -15,6 +13,7 @@ import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import LoadableButton from "@/components/utils/LoadableButton";
 import Loading from "@/components/utils/Loading";
+import ModalCard from "@/components/utils/ModalCard";
 import { Project } from "@/models/project";
 import {
   createProject,
@@ -132,19 +131,19 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             onCreate={handleCreateProject}
             onUpdate={handleUpdateProject}
           />
-          <Dialog
+          <ModalCard
             open={openDeleteConfirmDialog}
             onClose={handleCancelDeleteProject}
           >
-            <DialogTitle>
-              プロジェクト「{deletingProject?.name}」を削除しますか？
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                プロジェクトを削除するとプロジェクト内のセクションとタスクも全て削除されます。この操作は取り消せません。
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
+            <CardHeader
+              title={`プロジェクト「${deletingProject?.name}」を削除しますか？`}
+              titleTypographyProps={{ variant: "h6" }}
+              sx={{ pb: 0 }}
+            />
+            <CardContent>
+              プロジェクトを削除するとプロジェクト内のセクションとタスクも全て削除されます。この操作は取り消せません。
+            </CardContent>
+            <CardActions sx={{ justifyContent: "flex-end", pt: 0 }}>
               <Button onClick={handleCancelDeleteProject}>キャンセル</Button>
               <LoadableButton
                 variant="contained"
@@ -154,8 +153,8 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
               >
                 削除
               </LoadableButton>
-            </DialogActions>
-          </Dialog>
+            </CardActions>
+          </ModalCard>
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
             <Button startIcon={<AddIcon />} onClick={handleClickAddProject}>
