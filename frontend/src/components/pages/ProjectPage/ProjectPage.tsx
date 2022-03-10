@@ -485,10 +485,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   return (
-    <Box>
-      {!loaded ? (
-        <Loading text="プロジェクトを読み込んでいます" />
-      ) : !project ? (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
+      {!loaded && <Loading text="プロジェクトを読み込んでいます" />}
+      {loaded && !project && (
         <Box
           sx={{
             alignItems: "center",
@@ -501,8 +506,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           </Typography>
           <Link to="/projects">プロジェクト一覧へ</Link>
         </Box>
-      ) : (
-        <Box>
+      )}
+      {loaded && project && (
+        <>
           <TaskModalCard
             userId={currentUser.uid}
             projectId={projectId}
@@ -510,6 +516,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             open={Boolean(showingTaskId)}
             onClose={handleCloseTaskModal}
           />
+
+          {/* project header */}
           <Container maxWidth="lg">
             <Field
               sx={{
@@ -562,38 +570,19 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             </Field>
           </Container>
           <Divider />
-          <Box
-            sx={{
-              // TODO: もうちょっとうまいやり方があると思いたい
-              height: `calc(100vh - 1px - ${headerHeight}px - ${layoutHeaderHeight}px)`,
-              overflowY: "auto",
-              py: 2,
-            }}
+
+          {/* content */}
+          <Container
+            maxWidth="lg"
+            sx={{ flexGrow: 1, overflowY: "auto", py: 2 }}
           >
-            <Container maxWidth="lg">
-              <DragDropContext onDragEnd={handleDragEnd}>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Box>
                 <Box>
-                  <Box>
-                    <TaskList
-                      projectId={projectId}
-                      sectionId={null}
-                      tasks={noSectionTasks}
-                      selectedTasks={selectedTasks}
-                      onCompleteTask={handleCompleteTask}
-                      onIncompleteTask={handleIncompleteTask}
-                      onCreateTask={handleCreateTask}
-                      onDeleteTask={handleDeleteTask}
-                      onClickTask={handleClickTask}
-                      onSelectTask={handleSelectTask}
-                      onMultiSelectTask={handleMultiSelectTask}
-                    />
-                  </Box>
-                  <SectionList
+                  <TaskList
                     projectId={projectId}
-                    sections={sections}
-                    onCreateSection={handleCreateSection}
-                    onDeleteSection={handleDeleteSection}
-                    tasks={[...completedTasks, ...incompletedTasks]}
+                    sectionId={null}
+                    tasks={noSectionTasks}
                     selectedTasks={selectedTasks}
                     onCompleteTask={handleCompleteTask}
                     onIncompleteTask={handleIncompleteTask}
@@ -604,10 +593,25 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                     onMultiSelectTask={handleMultiSelectTask}
                   />
                 </Box>
-              </DragDropContext>
-            </Container>
-          </Box>
-        </Box>
+                <SectionList
+                  projectId={projectId}
+                  sections={sections}
+                  onCreateSection={handleCreateSection}
+                  onDeleteSection={handleDeleteSection}
+                  tasks={[...completedTasks, ...incompletedTasks]}
+                  selectedTasks={selectedTasks}
+                  onCompleteTask={handleCompleteTask}
+                  onIncompleteTask={handleIncompleteTask}
+                  onCreateTask={handleCreateTask}
+                  onDeleteTask={handleDeleteTask}
+                  onClickTask={handleClickTask}
+                  onSelectTask={handleSelectTask}
+                  onMultiSelectTask={handleMultiSelectTask}
+                />
+              </Box>
+            </DragDropContext>
+          </Container>
+        </>
       )}
     </Box>
   );
