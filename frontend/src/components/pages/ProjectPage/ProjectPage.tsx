@@ -567,7 +567,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
               // TODO: もうちょっとうまいやり方があると思いたい
               height: `calc(100vh - 1px - ${headerHeight}px - ${layoutHeaderHeight}px)`,
               overflowY: "auto",
-              pb: 2,
+              py: 2,
             }}
           >
             <Container maxWidth="lg">
