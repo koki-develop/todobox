@@ -1,5 +1,4 @@
 import Button from "@mui/material/Button";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -7,6 +6,7 @@ import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
 import ModalCard from "@/components/utils/ModalCard";
+import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
 import { buildProject } from "@/lib/projectUtils";
@@ -108,7 +108,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
             </Field>
           </Form>
         </CardContent>
-        <CardActions sx={{ justifyContent: "flex-end" }}>
+        <ModalCardActions sx={{ justifyContent: "flex-end" }}>
           <Button disabled={loading} onClick={onClose}>
             キャンセル
           </Button>
@@ -119,7 +119,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
           >
             {project ? "更新" : "作成"}
           </LoadableButton>
-        </CardActions>
+        </ModalCardActions>
       </ModalCard>
     );
   }

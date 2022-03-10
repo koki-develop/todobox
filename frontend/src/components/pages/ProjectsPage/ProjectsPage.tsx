@@ -1,7 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
@@ -13,6 +12,7 @@ import Field from "@/components/utils/Field";
 import LoadableButton from "@/components/utils/LoadableButton";
 import Loading from "@/components/utils/Loading";
 import ModalCard from "@/components/utils/ModalCard";
+import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
 import {
@@ -141,7 +141,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             <CardContent>
               プロジェクトを削除するとプロジェクト内のセクションとタスクも全て削除されます。この操作は取り消せません。
             </CardContent>
-            <CardActions sx={{ justifyContent: "flex-end", pt: 0 }}>
+            <ModalCardActions>
               <Button onClick={handleCancelDeleteProject}>キャンセル</Button>
               <LoadableButton
                 variant="contained"
@@ -151,7 +151,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
               >
                 削除
               </LoadableButton>
-            </CardActions>
+            </ModalCardActions>
           </ModalCard>
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
