@@ -115,7 +115,9 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
               <TaskListItemContainer>
                 <ListItemButton
                   sx={{
-                    height: "100%",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    height: 38,
                     color: theme.palette.text.secondary,
                     ":hover": {
                       backgroundColor: snapshot.isDraggingOver

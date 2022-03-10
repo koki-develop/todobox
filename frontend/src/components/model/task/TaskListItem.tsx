@@ -97,7 +97,12 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
         <ListItemButton
           selected={selected}
           onClick={handleClick}
-          sx={{ height: "100%", pl: 1 }}
+          sx={{
+            pl: 1,
+            border: "1px solid",
+            borderColor: "divider",
+            height: 38,
+          }}
         >
           <IconButton
             size="small"

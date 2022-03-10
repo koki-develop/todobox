@@ -51,7 +51,9 @@ const TaskNewListItem: React.VFC<TaskNewListItemProps> = React.memo((props) => {
   }, [handleCreate]);
 
   return (
-    <TaskListItemContainer sx={{ px: 2 }}>
+    <TaskListItemContainer
+      sx={{ px: 2, border: "1px solid", borderColor: "divider", height: 38 }}
+    >
       <Form onSubmit={handleSubmit}>
         <TextField
           autoFocus
