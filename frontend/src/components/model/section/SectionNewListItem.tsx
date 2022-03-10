@@ -30,6 +30,15 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
       []
     );
 
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Escape") {
+          onCancel();
+        }
+      },
+      [onCancel]
+    );
+
     const handleSubmit = useCallback(() => {
       setName("");
       const trimmedName = name.trim();
@@ -56,6 +65,7 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
               variant="standard"
               placeholder="新しいセクション"
               onChange={handleChangeName}
+              onKeyDown={handleKeyDown}
               InputProps={{ disableUnderline: true }}
               inputProps={{
                 style: { ...theme.typography.h6, paddingBottom: 0 },

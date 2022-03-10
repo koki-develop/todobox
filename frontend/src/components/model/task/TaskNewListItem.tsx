@@ -20,6 +20,15 @@ const TaskNewListItem: React.VFC<TaskNewListItemProps> = React.memo((props) => {
     []
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Escape") {
+        onCancel();
+      }
+    },
+    [onCancel]
+  );
+
   const handleCreate = useCallback(
     (cont: boolean) => {
       const trimmedTitle = title.trim();
@@ -50,6 +59,7 @@ const TaskNewListItem: React.VFC<TaskNewListItemProps> = React.memo((props) => {
           variant="standard"
           onBlur={handleBlur}
           onChange={handleChangeTitle}
+          onKeyDown={handleKeyDown}
           value={title}
           InputProps={{ disableUnderline: true }}
         />
