@@ -145,7 +145,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
             ref={menuButtonRef}
             className="moreIconButton"
             size="small"
-            sx={{ visibility: "hidden" }}
+            sx={{ visibility: openMenu ? "visible" : "hidden" }}
             onClick={handleOpenMenu}
           >
             <MoreHorizIcon fontSize="small" />
