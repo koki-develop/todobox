@@ -83,12 +83,11 @@ const Layout: React.VFC = React.memo(() => {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
         height: "100vh",
         paddingTop: `${headerHeight}px`,
       }}
     >
+      {/* header */}
       <AppBar sx={{ ...drawerTransitionStyles }}>
         <Container
           maxWidth="lg"
@@ -134,6 +133,7 @@ const Layout: React.VFC = React.memo(() => {
         </Container>
       </AppBar>
 
+      {/* drawer */}
       {currentUser && (
         <Drawer
           open={openDrawer}
@@ -159,16 +159,16 @@ const Layout: React.VFC = React.memo(() => {
         </Drawer>
       )}
 
+      {/* main content */}
       <Box
+        component="main"
         sx={{
-          flexGrow: 1,
+          height: `calc(100vh - ${headerHeight}px)`,
           overflowY: "auto",
           ...drawerTransitionStyles,
         }}
       >
-        <Box component="main">
-          <Outlet />
-        </Box>
+        <Outlet />
       </Box>
     </Box>
   );
