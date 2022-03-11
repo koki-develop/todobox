@@ -102,7 +102,11 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
             >
               [{section.index}] {section.name}
             </Typography>
-            <IconButton ref={menuButtonRef} onClick={handleOpenMenu}>
+            <IconButton
+              ref={menuButtonRef}
+              onClick={handleOpenMenu}
+              size="small"
+            >
               <MoreHorizIcon />
             </IconButton>
             <PopperList
