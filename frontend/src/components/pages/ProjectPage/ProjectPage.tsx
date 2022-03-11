@@ -24,6 +24,7 @@ import React, {
 } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
@@ -89,6 +90,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
     useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
+  const [openDeleteProjectConfirm, setOpenDeleteProjectConfirm] =
+    useState<boolean>(false);
 
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
@@ -128,7 +131,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleDeleteProject = useCallback(() => {
     setOpenProjectMenu(false);
-    console.log("delete");
+    setOpenDeleteProjectConfirm(true);
+  }, []);
+
+  const handleDeletedProject = useCallback(() => {
+    navigate("/projects");
+  }, [navigate]);
+
+  const handleCancelDeleteProject = useCallback(() => {
+    setOpenDeleteProjectConfirm(false);
   }, []);
 
   const handleCloseProjectForm = useCallback(() => {
@@ -554,6 +565,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             userId={currentUser.uid}
             onUpdated={handleUpdatedProject}
             onClose={handleCloseProjectForm}
+          />
+          <ProjectDeleteConfirmModal
+            open={openDeleteProjectConfirm}
+            project={project}
+            userId={currentUser.uid}
+            onCancel={handleCancelDeleteProject}
+            onDeleted={handleDeletedProject}
           />
           <TaskModalCard
             userId={currentUser.uid}
