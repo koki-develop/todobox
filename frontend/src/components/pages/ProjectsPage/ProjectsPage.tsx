@@ -1,24 +1,18 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CardContent from "@mui/material/CardContent";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import { useProjects } from "@/components/providers/ProjectsProvider";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
+import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
-import LoadableButton from "@/components/utils/LoadableButton";
 import Loading from "@/components/utils/Loading";
-import ModalCard from "@/components/utils/ModalCard";
-import ModalCardActions from "@/components/utils/ModalCardActions";
-import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
 import {
   createProject,
-  deleteProject,
-  deleteProjectState,
   updateOrAddProjectState,
   updateProject,
 } from "@/lib/projectUtils";
@@ -35,8 +29,6 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =
-    useState<boolean>(false);
-  const [loadingDeleteConfirmDialog, setLoadingDeleteConfirmDialog] =
     useState<boolean>(false);
   const [loadingForm, setLoadingForm] = useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
@@ -102,21 +94,9 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     [currentUser.uid, setProjects, showToast]
   );
 
-  const handleConfirmDeleteProject = useCallback(() => {
-    if (!deletingProject) return;
-    setLoadingDeleteConfirmDialog(true);
-    deleteProject(currentUser.uid, deletingProject.id)
-      .then(() => {
-        showToast("プロジェクトを削除しました。", "success");
-        setProjects((prev) => {
-          return deleteProjectState(prev, deletingProject.id);
-        });
-        setOpenDeleteConfirmDialog(false);
-      })
-      .finally(() => {
-        setLoadingDeleteConfirmDialog(false);
-      });
-  }, [currentUser.uid, deletingProject, setProjects, showToast]);
+  const handleDeletedProject = useCallback(() => {
+    setOpenDeleteConfirmDialog(false);
+  }, []);
 
   return (
     <Container sx={{ pt: 2 }} maxWidth="md">
@@ -131,28 +111,15 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             onCreate={handleCreateProject}
             onUpdate={handleUpdateProject}
           />
-          <ModalCard
-            open={openDeleteConfirmDialog}
-            onClose={handleCancelDeleteProject}
-          >
-            <ModalCardHeader
-              title={`プロジェクト「${deletingProject?.name}」を削除しますか？`}
+          {deletingProject && (
+            <ProjectDeleteConfirmModal
+              open={openDeleteConfirmDialog}
+              project={deletingProject}
+              userId={currentUser.uid}
+              onCancel={handleCancelDeleteProject}
+              onDeleted={handleDeletedProject}
             />
-            <CardContent>
-              プロジェクトを削除するとプロジェクト内のセクションとタスクも全て削除されます。この操作は取り消せません。
-            </CardContent>
-            <ModalCardActions>
-              <Button onClick={handleCancelDeleteProject}>キャンセル</Button>
-              <LoadableButton
-                variant="contained"
-                color="error"
-                loading={loadingDeleteConfirmDialog}
-                onClick={handleConfirmDeleteProject}
-              >
-                削除
-              </LoadableButton>
-            </ModalCardActions>
-          </ModalCard>
+          )}
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
             <Button startIcon={<AddIcon />} onClick={handleClickAddProject}>
