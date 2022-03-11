@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useTheme } from "@mui/material/styles";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import Form from "@/components/utils/Form";
 import { Section } from "@/models/section";
@@ -9,15 +9,18 @@ import { buildSection } from "@/lib/sectionUtils";
 
 export type SectionNewListItemProps = {
   projectId: string;
+  section?: Section;
   sections: Section[];
 
-  onCreate: (section: Section) => void;
+  onCreate?: (section: Section) => void;
+  onUpdate?: (section: Section) => void;
   onCancel: () => void;
 };
 
 const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
   (props) => {
-    const { projectId, sections, onCreate, onCancel } = props;
+    const { projectId, section, sections, onCreate, onUpdate, onCancel } =
+      props;
 
     const [name, setName] = useState<string>("");
 
@@ -39,8 +42,18 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
       [onCancel]
     );
 
-    const handleSubmit = useCallback(() => {
-      setName("");
+    const handleUpdate = useCallback(() => {
+      if (!section) return;
+      const trimmedName = name.trim();
+      if (trimmedName === "") {
+        onCancel();
+        return;
+      }
+      const updatedSection = { ...section, name: trimmedName };
+      onUpdate?.(updatedSection);
+    }, [name, onCancel, onUpdate, section]);
+
+    const handleCreate = useCallback(() => {
       const trimmedName = name.trim();
       if (trimmedName === "") {
         onCancel();
@@ -48,12 +61,22 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
       }
       const index = (sections.slice(-1)[0]?.index ?? -1) + 1;
       const section = buildSection({ projectId, name: trimmedName, index });
-      onCreate(section);
+      onCreate?.(section);
     }, [name, onCancel, onCreate, projectId, sections]);
+
+    const handleSubmit = useMemo(() => {
+      return section ? handleUpdate : handleCreate;
+    }, [handleCreate, handleUpdate, section]);
 
     const handleBlur = useCallback(() => {
       handleSubmit();
     }, [handleSubmit]);
+
+    useEffect(() => {
+      if (section) {
+        setName(section.name);
+      }
+    }, [section]);
 
     return (
       <Box sx={{ mb: 2 }}>
@@ -63,7 +86,7 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
               autoFocus
               fullWidth
               variant="standard"
-              placeholder="新しいセクション"
+              placeholder={section?.name ?? "新しいセクション"}
               onChange={handleChangeName}
               onKeyDown={handleKeyDown}
               InputProps={{ disableUnderline: true }}

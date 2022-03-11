@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   setDoc,
+  updateDoc,
   WriteBatch,
   writeBatch,
 } from "firebase/firestore";
@@ -119,6 +120,23 @@ export const createSection = async (
     id
   );
   await setDoc(ref, data);
+};
+
+export const updateSection = async (
+  userId: string,
+  section: Section
+): Promise<void> => {
+  const { id, projectId, ...data } = section;
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "sections",
+    id
+  );
+  await updateDoc(ref, { ...data });
 };
 
 export const updateSections = async (

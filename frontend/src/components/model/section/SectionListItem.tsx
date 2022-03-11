@@ -16,13 +16,16 @@ import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
+import SectionNewListItem from "./SectionNewListItem";
 
 export type SectionListItemProps = {
   projectId: string;
+  sections: Section[];
   section: Section;
   tasks: Task[];
   selectedTasks: Task[];
 
+  onUpdate: (section: Section) => void;
   onDelete: (section: Section) => void;
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
@@ -37,8 +40,10 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const {
     projectId,
     section,
+    sections,
     tasks,
     selectedTasks,
+    onUpdate,
     onDelete,
     onCompleteTask,
     onIncompleteTask,
@@ -52,6 +57,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
+  const [editing, setEditing] = useState<boolean>(false);
 
   const theme = useTheme();
 
@@ -71,11 +77,37 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     setExpanded(false);
   }, []);
 
+  const handleEdit = useCallback(() => {
+    setOpenMenu(false);
+    setEditing(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditing(false);
+  }, []);
+
+  const handleUpdate = useCallback(
+    (section: Section) => {
+      setEditing(false);
+      onUpdate(section);
+    },
+    [onUpdate]
+  );
+
   const handleDelete = useCallback(() => {
+    setOpenMenu(false);
     onDelete(section);
   }, [onDelete, section]);
 
-  return (
+  return editing ? (
+    <SectionNewListItem
+      projectId={projectId}
+      section={section}
+      sections={sections}
+      onUpdate={handleUpdate}
+      onCancel={handleCancelEdit}
+    />
+  ) : (
     <Draggable draggableId={section.id} index={section.index}>
       {(provided) => (
         <Box
@@ -118,6 +150,12 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
                 mouseEvent: "onMouseDown",
               }}
             >
+              <PopperListItem onClick={handleEdit}>
+                <ListItemIcon>
+                  <DeleteIcon />
+                </ListItemIcon>
+                <ListItemText primary="セクションを編集" />
+              </PopperListItem>
               <PopperListItem onClick={handleDelete}>
                 <ListItemIcon>
                   <DeleteIcon color="error" />
