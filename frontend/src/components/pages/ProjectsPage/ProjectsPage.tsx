@@ -11,7 +11,6 @@ import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
-import { updateOrAddProjectState } from "@/lib/projectUtils";
 
 export type ProjectsPageProps = {
   currentUser: User;
@@ -20,7 +19,7 @@ export type ProjectsPageProps = {
 const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
-  const { initialized: projectsLoaded, projects, setProjects } = useProjects();
+  const { initialized: projectsLoaded, projects } = useProjects();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =
@@ -50,25 +49,13 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     setOpenDeleteConfirmDialog(false);
   }, []);
 
-  const handleCreatedProject = useCallback(
-    (createdProject: Project) => {
-      setProjects((prev) => {
-        return updateOrAddProjectState(prev, createdProject);
-      });
-      setOpenProjectForm(false);
-    },
-    [setProjects]
-  );
+  const handleCreatedProject = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
 
-  const handleUpdatedProject = useCallback(
-    (updatedProject: Project) => {
-      setProjects((prev) => {
-        return updateOrAddProjectState(prev, updatedProject);
-      });
-      setOpenProjectForm(false);
-    },
-    [setProjects]
-  );
+  const handleUpdatedProject = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
 
   const handleDeletedProject = useCallback(() => {
     setOpenDeleteConfirmDialog(false);

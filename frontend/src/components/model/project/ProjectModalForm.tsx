@@ -2,6 +2,7 @@ import Button from "@mui/material/Button";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useProjects } from "@/components/providers/ProjectsProvider";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
@@ -9,7 +10,12 @@ import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
-import { buildProject, createProject, updateProject } from "@/lib/projectUtils";
+import {
+  buildProject,
+  createProject,
+  updateOrAddProjectState,
+  updateProject,
+} from "@/lib/projectUtils";
 import { useToast } from "@/hooks/useToast";
 
 export type ProjectModalFormProps = {
@@ -27,6 +33,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
     const { open, project, userId, onClose, onCreated, onUpdated } = props;
 
     const { showToast } = useToast();
+    const { setProjects } = useProjects();
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<string | null>(null);
@@ -72,12 +79,15 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
       createProject(userId, project)
         .then(() => {
           showToast("プロジェクトを作成しました。", "success");
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, project);
+          });
           onCreated?.(project);
         })
         .finally(() => {
           setLoading(false);
         });
-    }, [name, onCreated, showToast, userId, validateForm]);
+    }, [name, onCreated, setProjects, showToast, userId, validateForm]);
 
     const handleUpdate = useCallback(() => {
       if (!project) return;
@@ -88,12 +98,23 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
       updateProject(userId, updatedProject)
         .then(() => {
           showToast("プロジェクトを更新しました。", "success");
+          setProjects((prev) => {
+            return updateOrAddProjectState(prev, updatedProject);
+          });
           onUpdated?.(updatedProject);
         })
         .finally(() => {
           setLoading(false);
         });
-    }, [name, onUpdated, project, showToast, userId, validateForm]);
+    }, [
+      name,
+      onUpdated,
+      project,
+      setProjects,
+      showToast,
+      userId,
+      validateForm,
+    ]);
 
     const handleSubmit = useMemo(() => {
       return project ? handleUpdate : handleCreate;
