@@ -1,5 +1,7 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -9,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
 import qs from "query-string";
@@ -21,6 +24,7 @@ import React, {
 } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
 import TaskModalCard from "@/components/model/task/TaskModalCard";
@@ -33,7 +37,7 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
-import { listenProject } from "@/lib/projectUtils";
+import { listenProject, updateProject } from "@/lib/projectUtils";
 import {
   createSection,
   deleteSectionBatch,
@@ -62,6 +66,7 @@ import {
   listenCompletedTasks,
   separateTasks,
 } from "@/lib/taskUtils";
+import { useToast } from "@/hooks/useToast";
 
 export type ProjectPageProps = {
   currentUser: User;
@@ -72,13 +77,26 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const params = useParams();
   const projectId = params.id as string;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const theme = useTheme();
 
+  const { showToast } = useToast();
+
+  const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
   const [project, setProject] = useState<Project | null>(null);
+  const [openProjectMenu, setOpenProjectMenu] = useState<boolean>(false);
+  const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
+    useState<boolean>(false);
+  const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
+  const [updatingProject, setUpdatingProject] = useState<boolean>(false);
+
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
+
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
   const [allTasks, setAllTasks] = useState<{
     completed: Task[];
@@ -89,15 +107,47 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [completedTasksLoaded, setCompletedTasksLoaded] =
     useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
-  const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
-    useState<boolean>(false);
-
-  const location = useLocation();
-  const navigate = useNavigate();
 
   /*
    * project
    */
+
+  const handleOpenProjectMenu = useCallback(() => {
+    setOpenProjectMenu(true);
+  }, []);
+
+  const handleCloseProjectMenu = useCallback(() => {
+    setOpenProjectMenu(false);
+  }, []);
+
+  const handleEditProject = useCallback(() => {
+    setOpenProjectMenu(false);
+    setOpenProjectForm(true);
+  }, []);
+
+  const handleUpdateProject = useCallback(
+    (project: Project) => {
+      setUpdatingProject(true);
+      updateProject(currentUser.uid, project)
+        .then(() => {
+          showToast("プロジェクトを更新しました。", "success");
+          setOpenProjectForm(false);
+        })
+        .finally(() => {
+          setUpdatingProject(false);
+        });
+    },
+    [currentUser.uid, showToast]
+  );
+
+  const handleDeleteProject = useCallback(() => {
+    setOpenProjectMenu(false);
+    console.log("delete");
+  }, []);
+
+  const handleCloseProjectForm = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
@@ -512,6 +562,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       )}
       {loaded && project && (
         <>
+          <ProjectModalForm
+            open={openProjectForm}
+            loading={updatingProject}
+            project={project}
+            onUpdate={handleUpdateProject}
+            onClose={handleCloseProjectForm}
+          />
           <TaskModalCard
             userId={currentUser.uid}
             projectId={projectId}
@@ -537,9 +594,35 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 <Typography variant="h4">{project.name}</Typography>
               </Box>
               <Box>
-                <IconButton>
+                <IconButton
+                  ref={projectMenuButtonRef}
+                  onClick={handleOpenProjectMenu}
+                >
                   <MoreHorizIcon />
                 </IconButton>
+                <PopperList
+                  anchorEl={projectMenuButtonRef.current}
+                  open={openProjectMenu}
+                  onClose={handleCloseProjectMenu}
+                >
+                  <PopperListItem onClick={handleEditProject}>
+                    <ListItemIcon>
+                      <EditIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="プロジェクトを編集" />
+                  </PopperListItem>
+                  <PopperListItem onClick={handleDeleteProject}>
+                    <ListItemIcon>
+                      <DeleteIcon color="error" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="プロジェクトを削除"
+                      primaryTypographyProps={{
+                        sx: { color: theme.palette.error.main },
+                      }}
+                    />
+                  </PopperListItem>
+                </PopperList>
               </Box>
             </Field>
           </Container>
