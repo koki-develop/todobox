@@ -453,7 +453,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    * other
    */
 
-  const layoutHeaderHeight = 48;
   const headerHeight = 56;
 
   const loaded = useMemo(() => {
