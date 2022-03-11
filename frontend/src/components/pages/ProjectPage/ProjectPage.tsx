@@ -4,12 +4,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
@@ -23,7 +19,8 @@ import TaskModalCard from "@/components/model/task/TaskModalCard";
 import Field from "@/components/utils/Field";
 import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
-import Popper from "@/components/utils/Popper";
+import PopperList from "@/components/utils/PopperList";
+import PopperListItem from "@/components/utils/PopperListItem";
 import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
@@ -532,49 +529,38 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h4">{project.name}</Typography>
               </Box>
-              <Box>
-                <Button
-                  onClick={handleClickChangeShowCompletedTasks}
-                  startIcon={<CheckCircleOutlineIcon />}
-                >
-                  {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
-                </Button>
-                <Popper
-                  open={Boolean(showCompletedTasksButtonEl)}
-                  anchorEl={showCompletedTasksButtonEl}
-                  onClose={handleCloseShowCompletedTasks}
-                >
-                  <Paper>
-                    <List disablePadding>
-                      <ListItem disablePadding>
-                        <ListItemButton onClick={handleSelectAllTasks}>
-                          <ListItemIcon>
-                            {showCompletedTasks && <CheckIcon />}
-                          </ListItemIcon>
-                          <ListItemText primary="すべてのタスク" />
-                        </ListItemButton>
-                      </ListItem>
-                      <ListItem disablePadding>
-                        <ListItemButton onClick={handleSelectIncompletedTasks}>
-                          <ListItemIcon>
-                            {!showCompletedTasks && <CheckIcon />}
-                          </ListItemIcon>
-                          <ListItemText primary="未完了のタスク" />
-                        </ListItemButton>
-                      </ListItem>
-                    </List>
-                  </Paper>
-                </Popper>
-              </Box>
             </Field>
           </Container>
           <Divider />
 
           {/* content */}
-          <Container
-            maxWidth="lg"
-            sx={{ flexGrow: 1, overflowY: "auto", py: 2 }}
-          >
+          <Container maxWidth="lg" sx={{ flexGrow: 1, overflowY: "auto" }}>
+            <Box sx={{ display: "flex", my: 1, justifyContent: "flex-end" }}>
+              <Button
+                onClick={handleClickChangeShowCompletedTasks}
+                startIcon={<CheckCircleOutlineIcon />}
+              >
+                {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
+              </Button>
+              <PopperList
+                open={Boolean(showCompletedTasksButtonEl)}
+                anchorEl={showCompletedTasksButtonEl}
+                onClose={handleCloseShowCompletedTasks}
+              >
+                <PopperListItem onClick={handleSelectAllTasks}>
+                  <ListItemIcon>
+                    {showCompletedTasks && <CheckIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary="すべてのタスク" />
+                </PopperListItem>
+                <PopperListItem onClick={handleSelectIncompletedTasks}>
+                  <ListItemIcon>
+                    {!showCompletedTasks && <CheckIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary="未完了のタスク" />
+                </PopperListItem>
+              </PopperList>
+            </Box>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Box>
                 <Box>
