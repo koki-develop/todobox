@@ -89,9 +89,12 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
               placeholder={section?.name ?? "新しいセクション"}
               onChange={handleChangeName}
               onKeyDown={handleKeyDown}
-              InputProps={{ disableUnderline: true }}
+              InputProps={{
+                disableUnderline: true,
+                sx: { ...theme.typography.h6 },
+              }}
               inputProps={{
-                style: { ...theme.typography.h6, paddingBottom: 0 },
+                style: { paddingBottom: 0 },
               }}
               onBlur={handleBlur}
               value={name}
