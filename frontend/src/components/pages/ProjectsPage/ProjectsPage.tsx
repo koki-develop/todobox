@@ -11,12 +11,7 @@ import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
-import {
-  createProject,
-  updateOrAddProjectState,
-  updateProject,
-} from "@/lib/projectUtils";
-import { useToast } from "@/hooks/useToast";
+import { updateOrAddProjectState } from "@/lib/projectUtils";
 
 export type ProjectsPageProps = {
   currentUser: User;
@@ -30,10 +25,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =
     useState<boolean>(false);
-  const [loadingForm, setLoadingForm] = useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
-
-  const { showToast } = useToast();
 
   const handleClickAddProject = useCallback(() => {
     setEditingProject(null);
@@ -58,40 +50,24 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     setOpenDeleteConfirmDialog(false);
   }, []);
 
-  const handleCreateProject = useCallback(
+  const handleCreatedProject = useCallback(
     (createdProject: Project) => {
-      setLoadingForm(true);
-      createProject(currentUser.uid, createdProject)
-        .then(() => {
-          showToast("プロジェクトを作成しました。", "success");
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, createdProject);
-          });
-          setOpenProjectForm(false);
-        })
-        .finally(() => {
-          setLoadingForm(false);
-        });
+      setProjects((prev) => {
+        return updateOrAddProjectState(prev, createdProject);
+      });
+      setOpenProjectForm(false);
     },
-    [currentUser.uid, setProjects, showToast]
+    [setProjects]
   );
 
-  const handleUpdateProject = useCallback(
+  const handleUpdatedProject = useCallback(
     (updatedProject: Project) => {
-      setLoadingForm(true);
-      updateProject(currentUser.uid, updatedProject)
-        .then(() => {
-          showToast("プロジェクトを更新しました。", "success");
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, updatedProject);
-          });
-          setOpenProjectForm(false);
-        })
-        .finally(() => {
-          setLoadingForm(false);
-        });
+      setProjects((prev) => {
+        return updateOrAddProjectState(prev, updatedProject);
+      });
+      setOpenProjectForm(false);
     },
-    [currentUser.uid, setProjects, showToast]
+    [setProjects]
   );
 
   const handleDeletedProject = useCallback(() => {
@@ -104,12 +80,12 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
       {projectsLoaded && (
         <Box>
           <ProjectModalForm
-            loading={loadingForm}
             open={openProjectForm}
             project={editingProject}
+            userId={currentUser.uid}
             onClose={handleCloseProjectForm}
-            onCreate={handleCreateProject}
-            onUpdate={handleUpdateProject}
+            onCreated={handleCreatedProject}
+            onUpdated={handleUpdatedProject}
           />
           {deletingProject && (
             <ProjectDeleteConfirmModal

@@ -9,24 +9,28 @@ import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
-import { buildProject } from "@/lib/projectUtils";
+import { buildProject, createProject, updateProject } from "@/lib/projectUtils";
+import { useToast } from "@/hooks/useToast";
 
 export type ProjectModalFormProps = {
   open: boolean;
-  loading: boolean;
   project: Project | null;
+  userId: string;
 
   onClose: () => void;
-  onCreate?: (project: Project) => void;
-  onUpdate?: (project: Project) => void;
+  onCreated?: (project: Project) => void;
+  onUpdated?: (project: Project) => void;
 };
 
 const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
   (props) => {
-    const { open, loading, project, onClose, onCreate, onUpdate } = props;
+    const { open, project, userId, onClose, onCreated, onUpdated } = props;
+
+    const { showToast } = useToast();
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const clearForm = useCallback(() => {
       setName("");
@@ -62,18 +66,34 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
 
     const handleCreate = useCallback(() => {
       if (!validateForm()) return;
+      setLoading(true);
       const trimmedName = name.trim();
       const project = buildProject({ name: trimmedName });
-      onCreate?.(project);
-    }, [name, onCreate, validateForm]);
+      createProject(userId, project)
+        .then(() => {
+          showToast("プロジェクトを作成しました。", "success");
+          onCreated?.(project);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, [name, onCreated, showToast, userId, validateForm]);
 
     const handleUpdate = useCallback(() => {
       if (!project) return;
       if (!validateForm()) return;
+      setLoading(true);
       const trimmedName = name.trim();
       const updatedProject = { ...project, name: trimmedName };
-      onUpdate?.(updatedProject);
-    }, [name, onUpdate, project, validateForm]);
+      updateProject(userId, updatedProject)
+        .then(() => {
+          showToast("プロジェクトを更新しました。", "success");
+          onUpdated?.(updatedProject);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, [name, onUpdated, project, showToast, userId, validateForm]);
 
     const handleSubmit = useMemo(() => {
       return project ? handleUpdate : handleCreate;

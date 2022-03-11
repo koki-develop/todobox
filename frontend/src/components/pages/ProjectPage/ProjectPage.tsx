@@ -37,7 +37,7 @@ import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
-import { listenProject, updateProject } from "@/lib/projectUtils";
+import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
   deleteSectionBatch,
@@ -66,7 +66,6 @@ import {
   listenCompletedTasks,
   separateTasks,
 } from "@/lib/taskUtils";
-import { useToast } from "@/hooks/useToast";
 
 export type ProjectPageProps = {
   currentUser: User;
@@ -81,8 +80,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const { showToast } = useToast();
-
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -92,7 +89,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
     useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
-  const [updatingProject, setUpdatingProject] = useState<boolean>(false);
 
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
@@ -125,20 +121,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     setOpenProjectForm(true);
   }, []);
 
-  const handleUpdateProject = useCallback(
-    (project: Project) => {
-      setUpdatingProject(true);
-      updateProject(currentUser.uid, project)
-        .then(() => {
-          showToast("プロジェクトを更新しました。", "success");
-          setOpenProjectForm(false);
-        })
-        .finally(() => {
-          setUpdatingProject(false);
-        });
-    },
-    [currentUser.uid, showToast]
-  );
+  const handleUpdatedProject = useCallback((updatedProject: Project) => {
+    setProject(updatedProject);
+    setOpenProjectForm(false);
+  }, []);
 
   const handleDeleteProject = useCallback(() => {
     setOpenProjectMenu(false);
@@ -564,9 +550,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         <>
           <ProjectModalForm
             open={openProjectForm}
-            loading={updatingProject}
             project={project}
-            onUpdate={handleUpdateProject}
+            userId={currentUser.uid}
+            onUpdated={handleUpdatedProject}
             onClose={handleCloseProjectForm}
           />
           <TaskModalCard
