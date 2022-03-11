@@ -103,7 +103,6 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
       },
       [onDelete, task]
     );
-    console.log(JSON.stringify(theme.palette.action, null, 4));
 
     return (
       <TaskListItemContainer
