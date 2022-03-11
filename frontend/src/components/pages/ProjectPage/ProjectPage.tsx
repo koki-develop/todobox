@@ -1,16 +1,24 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { User } from "firebase/auth";
 import { writeBatch } from "firebase/firestore";
 import qs from "query-string";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SectionList from "@/components/model/section/SectionList";
@@ -65,6 +73,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const params = useParams();
   const projectId = params.id as string;
 
+  const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+
   const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
   const [project, setProject] = useState<Project | null>(null);
   const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
@@ -79,8 +89,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [completedTasksLoaded, setCompletedTasksLoaded] =
     useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
-  const [showCompletedTasksButtonEl, setShowCompletedTasksButtonEl] =
-    useState<HTMLButtonElement | null>(null);
+  const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
+    useState<boolean>(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -190,23 +200,20 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleSelectAllTasks = useCallback(() => {
     setShowCompletedTasks(true);
-    setShowCompletedTasksButtonEl(null);
+    setOpenCompletedFilterMenu(false);
   }, []);
 
   const handleSelectIncompletedTasks = useCallback(() => {
     setShowCompletedTasks(false);
-    setShowCompletedTasksButtonEl(null);
+    setOpenCompletedFilterMenu(false);
   }, []);
 
-  const handleClickChangeShowCompletedTasks = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      setShowCompletedTasksButtonEl(e.currentTarget);
-    },
-    []
-  );
+  const handleClickChangeShowCompletedTasks = useCallback(() => {
+    setOpenCompletedFilterMenu(true);
+  }, []);
 
   const handleCloseShowCompletedTasks = useCallback(() => {
-    setShowCompletedTasksButtonEl(null);
+    setOpenCompletedFilterMenu(false);
   }, []);
 
   const handleCompleteTask = useCallback(
@@ -529,6 +536,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="h4">{project.name}</Typography>
               </Box>
+              <Box>
+                <IconButton>
+                  <MoreHorizIcon />
+                </IconButton>
+              </Box>
             </Field>
           </Container>
           <Divider />
@@ -537,14 +549,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           <Container maxWidth="lg" sx={{ flexGrow: 1, overflowY: "auto" }}>
             <Box sx={{ display: "flex", my: 1, justifyContent: "flex-end" }}>
               <Button
+                ref={completedFilterMenuButtonRef}
                 onClick={handleClickChangeShowCompletedTasks}
                 startIcon={<CheckCircleOutlineIcon />}
               >
                 {showCompletedTasks ? "すべてのタスク" : "未完了のタスク"}
               </Button>
               <PopperList
-                open={Boolean(showCompletedTasksButtonEl)}
-                anchorEl={showCompletedTasksButtonEl}
+                open={openCompletedFilterMenu}
+                anchorEl={completedFilterMenuButtonRef.current}
                 onClose={handleCloseShowCompletedTasks}
               >
                 <PopperListItem onClick={handleSelectAllTasks}>
