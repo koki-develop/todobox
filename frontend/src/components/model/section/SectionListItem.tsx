@@ -99,78 +99,84 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     onDelete(section);
   }, [onDelete, section]);
 
-  return editing ? (
-    <SectionNewListItem
-      projectId={projectId}
-      section={section}
-      sections={sections}
-      onUpdate={handleUpdate}
-      onCancel={handleCancelEdit}
-    />
-  ) : (
-    <Draggable draggableId={section.id} index={section.index}>
+  return (
+    <Draggable
+      isDragDisabled={editing}
+      draggableId={section.id}
+      index={section.index}
+    >
       {(provided) => (
         <Box
           ref={provided.innerRef}
           {...provided.draggableProps}
           sx={{ mb: 2 }}
         >
-          <SectionListItemCard {...provided.dragHandleProps}>
-            <IconButton
-              size="small"
-              sx={{ mr: 1 }}
-              onClick={expanded ? handleCollapse : handleExpand}
-            >
-              {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-            </IconButton>
-            <Typography
-              variant="h6"
-              sx={{
-                flexGrow: 1,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              [{section.index}] {section.name}
-            </Typography>
-            <IconButton
-              ref={menuButtonRef}
-              onClick={handleOpenMenu}
-              size="small"
-            >
-              <MoreHorizIcon />
-            </IconButton>
-            <PopperList
-              anchorEl={menuButtonRef.current}
-              open={openMenu}
-              onClose={handleCloseMenu}
-              placement="bottom-end"
-              clickAwayListenerProps={{
-                mouseEvent: "onMouseDown",
-              }}
-            >
-              <PopperListItem onClick={handleEdit}>
-                <ListItemIcon>
-                  <DeleteIcon />
-                </ListItemIcon>
-                <ListItemText primary="セクションを編集" />
-              </PopperListItem>
-              <PopperListItem onClick={handleDelete}>
-                <ListItemIcon>
-                  <DeleteIcon color="error" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="セクションを削除"
-                  primaryTypographyProps={{
-                    sx: {
-                      color: theme.palette.error.main,
-                    },
-                  }}
-                />
-              </PopperListItem>
-            </PopperList>
-          </SectionListItemCard>
+          {editing ? (
+            <SectionNewListItem
+              projectId={projectId}
+              section={section}
+              sections={sections}
+              onUpdate={handleUpdate}
+              onCancel={handleCancelEdit}
+            />
+          ) : (
+            <SectionListItemCard {...provided.dragHandleProps}>
+              <IconButton
+                size="small"
+                sx={{ mr: 1 }}
+                onClick={expanded ? handleCollapse : handleExpand}
+              >
+                {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+              </IconButton>
+              <Typography
+                variant="h6"
+                sx={{
+                  flexGrow: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                [{section.index}] {section.name}
+              </Typography>
+              <IconButton
+                ref={menuButtonRef}
+                onClick={handleOpenMenu}
+                size="small"
+              >
+                <MoreHorizIcon />
+              </IconButton>
+              <PopperList
+                anchorEl={menuButtonRef.current}
+                open={openMenu}
+                onClose={handleCloseMenu}
+                placement="bottom-end"
+                clickAwayListenerProps={{
+                  mouseEvent: "onMouseDown",
+                }}
+              >
+                <PopperListItem onClick={handleEdit}>
+                  <ListItemIcon>
+                    <DeleteIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="セクションを編集" />
+                </PopperListItem>
+                <PopperListItem onClick={handleDelete}>
+                  <ListItemIcon>
+                    <DeleteIcon color="error" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="セクションを削除"
+                    primaryTypographyProps={{
+                      sx: {
+                        color: theme.palette.error.main,
+                      },
+                    }}
+                  />
+                </PopperListItem>
+              </PopperList>
+            </SectionListItemCard>
+          )}
           {expanded && (
             <TaskList
               projectId={projectId}

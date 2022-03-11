@@ -79,7 +79,7 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
     }, [section]);
 
     return (
-      <Box sx={{ mb: 2 }}>
+      <Box>
         <SectionListItemCard sx={{ px: 2 }}>
           <Form onSubmit={handleSubmit} style={{ flexGrow: 1 }}>
             <TextField
