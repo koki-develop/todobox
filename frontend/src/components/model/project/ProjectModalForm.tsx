@@ -17,8 +17,8 @@ export type ProjectModalFormProps = {
   project: Project | null;
 
   onClose: () => void;
-  onCreate: (project: Project) => void;
-  onUpdate: (project: Project) => void;
+  onCreate?: (project: Project) => void;
+  onUpdate?: (project: Project) => void;
 };
 
 const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
@@ -64,7 +64,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
       if (!validateForm()) return;
       const trimmedName = name.trim();
       const project = buildProject({ name: trimmedName });
-      onCreate(project);
+      onCreate?.(project);
     }, [name, onCreate, validateForm]);
 
     const handleUpdate = useCallback(() => {
@@ -72,7 +72,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
       if (!validateForm()) return;
       const trimmedName = name.trim();
       const updatedProject = { ...project, name: trimmedName };
-      onUpdate(updatedProject);
+      onUpdate?.(updatedProject);
     }, [name, onUpdate, project, validateForm]);
 
     const handleSubmit = useMemo(() => {
