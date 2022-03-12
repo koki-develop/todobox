@@ -8,6 +8,13 @@ export const theme = responsiveFontSizes(
           disableRipple: true,
         },
       },
+      MuiCssBaseline: {
+        styleOverrides: {
+          a: {
+            textDecoration: "none",
+          },
+        },
+      },
       MuiListItemIcon: {
         styleOverrides: {
           root: {
