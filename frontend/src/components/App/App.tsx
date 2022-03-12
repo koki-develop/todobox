@@ -6,7 +6,6 @@ import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { theme } from "@/components/Layout/theme";
 import AuthProvider from "@/components/providers/AuthProvider";
-import ProjectsProvider from "@/components/providers/ProjectsProvider";
 import ProjectsListener from "@/components/model/project/ProjectsListener";
 import AppRoutes from "./AppRoutes";
 
@@ -21,12 +20,10 @@ const App: React.VFC = React.memo(() => {
         <RecoilRoot>
           <AuthProvider>
             <ProjectsListener />
-            <ProjectsProvider>
-              <CssBaseline />
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
-            </ProjectsProvider>
+            <CssBaseline />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
           </AuthProvider>
         </RecoilRoot>
       </SnackbarProvider>
