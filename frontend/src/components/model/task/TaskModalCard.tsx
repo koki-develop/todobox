@@ -53,6 +53,7 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
 
   useEffect(() => {
     if (!task) return;
+    if (task.title === title) return;
     const timeoutId = setTimeout(() => {
       const updatedTask = { ...task, title };
       updateTask(userId, updatedTask).then(() => {
