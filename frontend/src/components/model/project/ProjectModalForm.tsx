@@ -3,6 +3,7 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetRecoilState } from "recoil";
+import { useProjects } from "@/components/model/project/ProjectHooks";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
@@ -11,12 +12,7 @@ import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
-import {
-  buildProject,
-  createProject,
-  updateOrAddProjectState,
-  updateProject,
-} from "@/lib/projectUtils";
+import { updateOrAddProjectState, updateProject } from "@/lib/projectUtils";
 import { useToast } from "@/hooks/useToast";
 
 export type ProjectModalFormProps = {
@@ -25,7 +21,7 @@ export type ProjectModalFormProps = {
   userId: string;
 
   onClose: () => void;
-  onCreated?: (project: Project) => void;
+  onCreated?: () => void;
   onUpdated?: (project: Project) => void;
 };
 
@@ -35,6 +31,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
 
     const { showToast } = useToast();
     const setProjects = useSetRecoilState(projectsState);
+    const { createProject } = useProjects();
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<string | null>(null);
@@ -72,23 +69,18 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
       []
     );
 
-    const handleCreate = useCallback(() => {
+    const handleCreate = useCallback(async () => {
       if (!validateForm()) return;
       setLoading(true);
       const trimmedName = name.trim();
-      const project = buildProject({ name: trimmedName });
-      createProject(userId, project)
+      await createProject({ name: trimmedName })
         .then(() => {
-          showToast("プロジェクトを作成しました。", "success");
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, project);
-          });
-          onCreated?.(project);
+          onCreated?.();
         })
         .finally(() => {
           setLoading(false);
         });
-    }, [name, onCreated, setProjects, showToast, userId, validateForm]);
+    }, [createProject, name, onCreated, validateForm]);
 
     const handleUpdate = useCallback(() => {
       if (!project) return;
