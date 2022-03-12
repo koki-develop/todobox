@@ -1,8 +1,39 @@
 rules_version = '2';
 service cloud.firestore {
+  function loggedInWith(userId) {
+    return request.auth != null && request.auth.uid == userId
+  }
+
+  function createOnly(resource, keys) {
+    return resource.data.keys().hasOnly(keys) && resource.data.keys().hasAll(keys);
+  }
+
+  function updateOnly(resource, keys) {
+    return resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+  }
+
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    match /users/{userId} {
+      match /projects/{projectId} {
+        allow list, get: if loggedInWith(userId)
+        allow create: if loggedInWith(userId) && createOnly(request.resource, ['name']);
+        allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name'])
+        allow delete: if loggedInWith(userId);
+
+        match /sections/{sectionId} {
+          allow list, get: if loggedInWith(userId);
+          allow create: if loggedInWith(userId) && createOnly(request.resource, ['name', 'index']);
+          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name', 'index']);
+          allow delete: if loggedInWith(userId);
+        }
+
+        match /tasks/{taskId} {
+          allow list, get: if loggedInWith(userId);
+          allow create: if loggedInWith(userId) && createOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
+          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
+          allow delete: if loggedInWith(userId);
+        }
+      }
     }
   }
 }
