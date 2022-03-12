@@ -1,12 +1,12 @@
-import { useTheme } from "@mui/material/styles";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
+import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useEffect, useState } from "react";
+import Loading from "@/components/utils/Loading";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Task } from "@/models/task";
 import { listenTask, updateTask } from "@/lib/taskUtils";
-import Loading from "@/components/utils/Loading";
 
 export type TaskModalCardProps = {
   open: boolean;
