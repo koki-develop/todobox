@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import SectionListItem from "@/components/model/section/SectionListItem";
-import SectionNewListItem from "@/components/model/section/SectionNewListItem";
+import SectionListItemInput from "@/components/model/section/SectionListItemInput";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 
@@ -100,7 +100,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
             ))}
           {provided.placeholder}
           {inputtingNewSection ? (
-            <SectionNewListItem
+            <SectionListItemInput
               projectId={projectId}
               sections={sections}
               onCreate={handleCreateSection}

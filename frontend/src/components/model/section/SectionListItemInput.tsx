@@ -7,7 +7,7 @@ import Form from "@/components/utils/Form";
 import { Section } from "@/models/section";
 import { buildSection } from "@/lib/sectionUtils";
 
-export type SectionNewListItemProps = {
+export type SectionListItemInputProps = {
   projectId: string;
   section?: Section;
   sections: Section[];
@@ -17,7 +17,7 @@ export type SectionNewListItemProps = {
   onCancel: () => void;
 };
 
-const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
+const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
   (props) => {
     const { projectId, section, sections, onCreate, onUpdate, onCancel } =
       props;
@@ -106,6 +106,6 @@ const SectionNewListItem: React.VFC<SectionNewListItemProps> = React.memo(
   }
 );
 
-SectionNewListItem.displayName = "SectionNewListItem";
+SectionListItemInput.displayName = "SectionListItemInput";
 
-export default SectionNewListItem;
+export default SectionListItemInput;

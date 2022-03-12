@@ -16,7 +16,7 @@ import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import SectionNewListItem from "./SectionNewListItem";
+import SectionListItemInput from "./SectionListItemInput";
 
 export type SectionListItemProps = {
   projectId: string;
@@ -112,7 +112,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
           sx={{ mb: 2 }}
         >
           {editing ? (
-            <SectionNewListItem
+            <SectionListItemInput
               projectId={projectId}
               section={section}
               sections={sections}
