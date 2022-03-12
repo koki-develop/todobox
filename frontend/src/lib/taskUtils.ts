@@ -7,6 +7,7 @@ import {
   query,
   setDoc,
   Unsubscribe,
+  updateDoc,
   where,
   WriteBatch,
   writeBatch,
@@ -533,6 +534,20 @@ export const createTask = async (userId: string, task: Task): Promise<void> => {
     taskId
   );
   await setDoc(ref, { ...data });
+};
+
+export const updateTask = async (userId: string, task: Task): Promise<void> => {
+  const { id: taskId, projectId, ...data } = task;
+  const ref = doc(
+    firestore,
+    "users",
+    userId,
+    "projects",
+    projectId,
+    "tasks",
+    taskId
+  );
+  await updateDoc(ref, { ...data });
 };
 
 export const updateTasks = async (
