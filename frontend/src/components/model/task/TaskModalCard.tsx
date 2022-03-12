@@ -1,8 +1,12 @@
+import { useTheme } from "@mui/material/styles";
 import CardContent from "@mui/material/CardContent";
-import React, { useEffect, useState } from "react";
+import TextField from "@mui/material/TextField";
+import React, { useCallback, useEffect, useState } from "react";
 import ModalCard from "@/components/utils/ModalCard";
+import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Task } from "@/models/task";
-import { listenTask } from "@/lib/taskUtils";
+import { listenTask, updateTask } from "@/lib/taskUtils";
+import Loading from "@/components/utils/Loading";
 
 export type TaskModalCardProps = {
   open: boolean;
@@ -10,14 +14,25 @@ export type TaskModalCardProps = {
   projectId: string;
   taskId?: string;
 
+  onUpdated(task: Task): void;
   onClose: () => void;
 };
 
 const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
-  const { open, userId, projectId, taskId, onClose } = props;
+  const { open, userId, projectId, taskId, onUpdated, onClose } = props;
+
+  const theme = useTheme();
 
   const [loadedTask, setLoadedTask] = useState<boolean>(false);
   const [task, setTask] = useState<Task | null>(null);
+  const [title, setTitle] = useState<string>("");
+
+  const handleChangeTitle = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.currentTarget.value.replace(/\r?\n/g, ""));
+    },
+    []
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -30,13 +45,52 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
     return unsubscribe;
   }, [open, projectId, taskId, userId]);
 
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+    }
+  }, [task]);
+
+  useEffect(() => {
+    if (!task) return;
+    const timeoutId = setTimeout(() => {
+      const updatedTask = { ...task, title };
+      updateTask(userId, updatedTask).then(() => {
+        onUpdated(updatedTask);
+      });
+    }, 500);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task, title]);
+
   return (
     <ModalCard open={open} onClose={onClose}>
-      <CardContent>
-        {!loadedTask && "loading..."}
-        {loadedTask && !task && "not found"}
-        {loadedTask && task && task.title}
-      </CardContent>
+      {!loadedTask && (
+        <CardContent>
+          <Loading />
+        </CardContent>
+      )}
+      {loadedTask && !task && (
+        <CardContent>タスクが見つかりませんでした</CardContent>
+      )}
+      {loadedTask && task && (
+        <>
+          <ModalCardHeader
+            title={
+              <TextField
+                fullWidth
+                multiline
+                value={title}
+                InputProps={{ sx: { ...theme.typography.h6 } }}
+                onChange={handleChangeTitle}
+              />
+            }
+          />
+          <CardContent>TODO: description</CardContent>
+        </>
+      )}
     </ModalCard>
   );
 });
