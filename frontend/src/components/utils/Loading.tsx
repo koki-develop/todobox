@@ -13,9 +13,10 @@ const Loading: React.VFC<LoadingProps> = React.memo(() => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        my: 1,
       }}
     >
-      <CircularProgress sx={{ mb: 1 }} />
+      <CircularProgress />
     </Box>
   );
 });
