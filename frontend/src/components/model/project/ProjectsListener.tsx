@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
+import {
+  projectsInitializedState,
+  projectsState,
+} from "@/components/model/project/projectAtoms";
 import { listenProjects } from "@/lib/projectUtils";
 
 export type ProjectsListenerProps = {

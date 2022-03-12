@@ -1,7 +1,10 @@
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
+import {
+  projectsInitializedState,
+  projectsState,
+} from "@/components/model/project/projectAtoms";
 import { CreateProjectInput } from "@/models/project";
 import {
   buildProject,
