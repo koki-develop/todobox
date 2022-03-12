@@ -1,6 +1,7 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import SettingsIcon from "@mui/icons-material/Settings";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -13,8 +14,9 @@ import ListItemText from "@mui/material/ListItemText";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import React, { useCallback, useMemo, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { auth } from "@/lib/firebase";
@@ -71,6 +73,10 @@ const Layout: React.VFC = React.memo(() => {
     setAvatarButtonEl(null);
   }, []);
 
+  const handleClickSettings = useCallback(() => {
+    setAvatarButtonEl(null);
+  }, []);
+
   const handleClickLogout = useCallback(() => {
     setAvatarButtonEl(null);
     signOut(auth);
@@ -121,6 +127,14 @@ const Layout: React.VFC = React.memo(() => {
                 placement="bottom-end"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
+                <Link to="/settings">
+                  <PopperListItem onClick={handleClickSettings}>
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="設定" />
+                  </PopperListItem>
+                </Link>
                 <PopperListItem onClick={handleClickLogout}>
                   <ListItemIcon>
                     <LogoutIcon />
