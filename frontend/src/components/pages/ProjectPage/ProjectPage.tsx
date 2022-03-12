@@ -566,7 +566,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         height: "100%",
       }}
     >
-      {!loaded && <Loading text="プロジェクトを読み込んでいます" />}
+      {!loaded && <Loading />}
       {loaded && !project && (
         <Box
           sx={{

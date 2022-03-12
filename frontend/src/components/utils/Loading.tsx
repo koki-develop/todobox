@@ -2,12 +2,10 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import React from "react";
 
 export type LoadingProps = {
-  text?: string;
+  //
 };
 
 const Loading: React.VFC<LoadingProps> = React.memo((props) => {
-  const { text } = props;
-
   return (
     <Box
       sx={{
@@ -18,7 +16,6 @@ const Loading: React.VFC<LoadingProps> = React.memo((props) => {
       }}
     >
       <CircularProgress sx={{ mb: 1 }} />
-      {text && <Typography>{text}</Typography>}
     </Box>
   );
 });

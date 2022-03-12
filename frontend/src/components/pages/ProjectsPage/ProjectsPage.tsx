@@ -63,7 +63,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
 
   return (
     <Container sx={{ pt: 2 }} maxWidth="md">
-      {!projectsLoaded && <Loading text="プロジェクトを読み込んでいます" />}
+      {!projectsLoaded && <Loading />}
       {projectsLoaded && (
         <Box>
           <ProjectModalForm
