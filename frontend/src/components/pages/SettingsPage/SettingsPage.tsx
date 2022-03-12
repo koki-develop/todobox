@@ -1,5 +1,7 @@
-import { User } from "firebase/auth";
-import React from "react";
+import { signOut, User } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
+import React, { useCallback, useState } from "react";
+import { auth, functions } from "@/lib/firebase";
 
 export type SettingsPageProps = {
   currentUser: User;
@@ -8,7 +10,27 @@ export type SettingsPageProps = {
 const SettingsPage: React.VFC<SettingsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
-  return <div>settings: {currentUser.uid}</div>;
+  const [deleting, setDeleting] = useState<boolean>(false);
+
+  const handleClickDeleteAccount = useCallback(() => {
+    setDeleting(true);
+    const deleteUser = httpsCallable(functions, "deleteUser");
+    deleteUser()
+      .then(() => {
+        signOut(auth);
+      })
+      .finally(() => {
+        setDeleting(false);
+      });
+  }, []);
+
+  return (
+    <div>
+      {deleting && "deleting..."}
+      {currentUser.uid}
+      <button onClick={handleClickDeleteAccount}>delete account</button>
+    </div>
+  );
 });
 
 SettingsPage.displayName = "SettingsPage";
