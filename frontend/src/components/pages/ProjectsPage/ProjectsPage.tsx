@@ -4,12 +4,13 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
-import { useProjects } from "@/components/providers/ProjectsProvider";
+import { useRecoilValue } from "recoil";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
+import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
 
 export type ProjectsPageProps = {
@@ -19,7 +20,8 @@ export type ProjectsPageProps = {
 const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
   const { currentUser } = props;
 
-  const { initialized: projectsLoaded, projects } = useProjects();
+  const projectsLoaded = useRecoilValue(projectsInitializedState);
+  const projects = useRecoilValue(projectsState);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =

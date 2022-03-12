@@ -1,11 +1,12 @@
 import Button from "@mui/material/Button";
 import CardContent from "@mui/material/CardContent";
 import React, { useCallback, useState } from "react";
-import { useProjects } from "@/components/providers/ProjectsProvider";
+import { useSetRecoilState } from "recoil";
 import LoadableButton from "@/components/utils/LoadableButton";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
+import { projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
 import { deleteProject, deleteProjectState } from "@/lib/projectUtils";
 import { useToast } from "@/hooks/useToast";
@@ -24,7 +25,7 @@ const ProjectDeleteConfirmModal: React.VFC<ProjectDeleteConfirmModalProps> =
     const { open, userId, project, onCancel, onDeleted } = props;
 
     const { showToast } = useToast();
-    const { setProjects } = useProjects();
+    const setProjects = useSetRecoilState(projectsState);
 
     const [deleting, setDeleting] = useState<boolean>(false);
 

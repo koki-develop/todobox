@@ -2,13 +2,14 @@ import Button from "@mui/material/Button";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useProjects } from "@/components/providers/ProjectsProvider";
+import { useSetRecoilState } from "recoil";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
+import { projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
 import {
   buildProject,
@@ -33,7 +34,7 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
     const { open, project, userId, onClose, onCreated, onUpdated } = props;
 
     const { showToast } = useToast();
-    const { setProjects } = useProjects();
+    const setProjects = useSetRecoilState(projectsState);
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<string | null>(null);
