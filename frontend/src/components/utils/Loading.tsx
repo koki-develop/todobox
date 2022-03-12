@@ -1,11 +1,11 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import React from "react";
 
 export type LoadingProps = {
   //
 };
 
-const Loading: React.VFC<LoadingProps> = React.memo((props) => {
+const Loading: React.VFC<LoadingProps> = React.memo(() => {
   return (
     <Box
       sx={{
