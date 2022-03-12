@@ -3,7 +3,7 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { useProjects } from "@/components/model/project/ProjectHooks";
+import { useProjects } from "@/components/model/project/projectHooks";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";

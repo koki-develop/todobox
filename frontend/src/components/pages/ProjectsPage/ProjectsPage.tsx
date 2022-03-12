@@ -6,7 +6,7 @@ import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
-import { useProjects } from "@/components/model/project/ProjectHooks";
+import { useProjects } from "@/components/model/project/projectHooks";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
