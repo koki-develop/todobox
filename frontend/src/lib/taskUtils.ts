@@ -788,8 +788,8 @@ export class TasksStateHelper {
   }
 
   public static move(
-    sections: Section[],
     prev: Task[],
+    sections: Section[],
     taskId: string,
     toSectionId: string | null,
     toIndex: number

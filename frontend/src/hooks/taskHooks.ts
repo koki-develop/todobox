@@ -82,6 +82,34 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const moveTask = useCallback(
+    async (
+      projectId: string,
+      taskId: string,
+      toSectionId: string | null,
+      toIndex: number
+    ) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.move(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskId,
+          toSectionId,
+          toIndex
+        );
+        const updateInputs = allTasks.reduce((result, current) => {
+          const { id, index } = current;
+          result[id] = { index };
+          return result;
+        }, {} as { [id: string]: UpdateTaskInput });
+        TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   const deleteTasks = useCallback(
     async (projectId: string, taskIds: string[]) => {
       if (!currentUser) return;
@@ -150,5 +178,6 @@ export const useTasks = () => {
     deleteTasks,
     completeTask,
     incompleteTask,
+    moveTask,
   };
 };
