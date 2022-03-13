@@ -26,12 +26,12 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
-  const handleClickAddProject = useCallback(() => {
+  const handleCreateProject = useCallback(() => {
     setEditingProject(null);
     setOpenProjectForm(true);
   }, []);
 
-  const handleCloseProjectForm = useCallback(() => {
+  const handleCreatedProject = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
 
@@ -40,25 +40,25 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     setOpenProjectForm(true);
   }, []);
 
+  const handleUpdatedProject = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
+
   const handleDeleteProject = useCallback((project: Project) => {
     setDeletingProject(project);
     setOpenDeleteConfirmDialog(true);
+  }, []);
+
+  const handleDeletedProject = useCallback(() => {
+    setOpenDeleteConfirmDialog(false);
   }, []);
 
   const handleCancelDeleteProject = useCallback(() => {
     setOpenDeleteConfirmDialog(false);
   }, []);
 
-  const handleCreatedProject = useCallback(() => {
+  const handleCloseProjectForm = useCallback(() => {
     setOpenProjectForm(false);
-  }, []);
-
-  const handleUpdatedProject = useCallback(() => {
-    setOpenProjectForm(false);
-  }, []);
-
-  const handleDeletedProject = useCallback(() => {
-    setOpenDeleteConfirmDialog(false);
   }, []);
 
   return (
@@ -85,7 +85,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           )}
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
-            <Button startIcon={<AddIcon />} onClick={handleClickAddProject}>
+            <Button startIcon={<AddIcon />} onClick={handleCreateProject}>
               プロジェクトを作成
             </Button>
           </Field>
