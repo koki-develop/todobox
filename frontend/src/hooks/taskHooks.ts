@@ -75,6 +75,27 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const incompleteTask = useCallback(
+    async (projectId: string, taskId: string) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.incomplete(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskId
+        );
+        const updateInputs = allTasks.reduce((result, current) => {
+          const { id, completedAt, index } = current;
+          result[id] = { completedAt, index };
+          return result;
+        }, {} as { [id: string]: UpdateTaskInput });
+        TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   return {
     tasksInitialized,
     tasks,
@@ -82,5 +103,6 @@ export const useTasks = () => {
     completedTasks,
     createTask,
     completeTask,
+    incompleteTask,
   };
 };
