@@ -3,6 +3,7 @@ import {
   CollectionReference,
   deleteDoc,
   doc,
+  DocumentReference,
   onSnapshot,
   orderBy,
   Query,
@@ -629,6 +630,20 @@ export const deleteTasksBatch = (
 };
 
 export class TasksRepository {
+  public static build(input: CreateTaskInput) {
+    return { id: ulid(), completedAt: null, ...input };
+  }
+
+  public static async create(
+    userId: string,
+    projectId: string,
+    task: Task
+  ): Promise<void> {
+    const { id, ...data } = task;
+    const ref = this._getTaskRef(userId, projectId, id);
+    await setDoc(ref, data);
+  }
+
   public static listenIncompletedTasks(
     userId: string,
     projectId: string,
@@ -662,6 +677,22 @@ export class TasksRepository {
         ...data,
       } as Task;
     });
+  }
+
+  private static _getTaskRef(
+    userId: string,
+    projectId: string,
+    taskId: string
+  ): DocumentReference {
+    return doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "tasks",
+      taskId
+    );
   }
 
   private static _getTasksRef(
