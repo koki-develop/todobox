@@ -77,6 +77,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+  const [showingTaskId, setShowingTaskId] = useState<string | null>(null);
+  const [openTaskModal, setOpenTaskModal] = useState<boolean>(false);
 
   /*
    * project
@@ -133,11 +135,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   /*
    * task
    */
-
-  const showingTaskId = useMemo(() => {
-    const query = qs.parse(location.search);
-    return (query.task as string) ?? undefined;
-  }, [location.search]);
 
   const handleSelectAllTasks = useCallback(() => {
     setShowCompletedTasks(true);
@@ -239,6 +236,17 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   useEffect(() => {
+    const query = qs.parse(location.search);
+    const taskId = (query.task as string) ?? null;
+    if (taskId) {
+      setShowingTaskId(taskId);
+      setOpenTaskModal(true);
+    } else {
+      setOpenTaskModal(false);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     setSelectedTasks((prev) => {
       return prev.filter((prevSelectedTask) => {
         return !completedTasks.some(
@@ -312,13 +320,15 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             onCancel={handleCancelDeleteProject}
             onDeleted={handleDeletedProject}
           />
-          <TaskModalCard
-            userId={currentUser.uid}
-            projectId={projectId}
-            taskId={showingTaskId}
-            open={Boolean(showingTaskId)}
-            onClose={handleCloseTaskModal}
-          />
+          {showingTaskId && (
+            <TaskModalCard
+              userId={currentUser.uid}
+              projectId={projectId}
+              taskId={showingTaskId}
+              open={openTaskModal}
+              onClose={handleCloseTaskModal}
+            />
+          )}
 
           {/* project header */}
           <Container maxWidth="lg">

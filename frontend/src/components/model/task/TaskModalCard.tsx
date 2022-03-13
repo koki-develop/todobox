@@ -2,31 +2,27 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useEffect, useState } from "react";
+import TaskListener from "@/components/model/task/TaskListener";
 import Loading from "@/components/utils/Loading";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
-import { Task } from "@/models/task";
-import { listenTask } from "@/lib/taskUtils";
 import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskModalCardProps = {
   open: boolean;
-  userId: string;
   projectId: string;
-  taskId?: string;
+  taskId: string;
 
   onClose: () => void;
 };
 
 const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
-  const { open, userId, projectId, taskId, onClose } = props;
+  const { open, projectId, taskId, onClose } = props;
 
   const theme = useTheme();
 
-  const { updateTask } = useTasks();
+  const { task, taskInitialized, updateTask } = useTasks();
 
-  const [loadedTask, setLoadedTask] = useState<boolean>(false);
-  const [task, setTask] = useState<Task | null>(null);
   const [title, setTitle] = useState<string>("");
 
   const handleChangeTitle = useCallback(
@@ -35,17 +31,6 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
     },
     []
   );
-
-  useEffect(() => {
-    if (!open) return;
-    if (!taskId) return;
-    setLoadedTask(false);
-    const unsubscribe = listenTask(userId, projectId, taskId, (task) => {
-      setTask(task);
-      setLoadedTask(true);
-    });
-    return unsubscribe;
-  }, [open, projectId, taskId, userId]);
 
   useEffect(() => {
     if (task) {
@@ -66,32 +51,35 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
   }, [task, title]);
 
   return (
-    <ModalCard open={open} onClose={onClose}>
-      {!loadedTask && (
-        <CardContent>
-          <Loading />
-        </CardContent>
-      )}
-      {loadedTask && !task && (
-        <CardContent>タスクが見つかりませんでした</CardContent>
-      )}
-      {loadedTask && task && (
-        <>
-          <ModalCardHeader
-            title={
-              <TextField
-                fullWidth
-                multiline
-                value={title}
-                InputProps={{ sx: { ...theme.typography.h6 } }}
-                onChange={handleChangeTitle}
-              />
-            }
-          />
-          <CardContent>TODO: description</CardContent>
-        </>
-      )}
-    </ModalCard>
+    <>
+      <TaskListener projectId={projectId} taskId={taskId} />
+      <ModalCard open={open} onClose={onClose}>
+        {!taskInitialized && (
+          <CardContent>
+            <Loading />
+          </CardContent>
+        )}
+        {taskInitialized && !task && (
+          <CardContent>タスクが見つかりませんでした</CardContent>
+        )}
+        {taskInitialized && task && (
+          <>
+            <ModalCardHeader
+              title={
+                <TextField
+                  fullWidth
+                  multiline
+                  value={title}
+                  InputProps={{ sx: { ...theme.typography.h6 } }}
+                  onChange={handleChangeTitle}
+                />
+              }
+            />
+            <CardContent>TODO: description</CardContent>
+          </>
+        )}
+      </ModalCard>
+    </>
   );
 });
 
