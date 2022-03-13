@@ -4,3 +4,5 @@ export type Project = {
 };
 
 export type CreateProjectInput = Omit<Project, "id">;
+
+export type UpdateProjectInput = Partial<Omit<Project, "id">>;
