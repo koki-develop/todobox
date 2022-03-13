@@ -893,14 +893,68 @@ export class TasksStateHelper {
     toSectionId: string | null,
     toIndex: number
   ): Task[] {
-    // FIXME: 後で直す
-    return moveTasksState(
+    // 移動対象のタスクを取得
+    const firstTask = prev.find((task) => task.id === firstTaskId);
+    if (!firstTask) return prev;
+
+    // 付随する移動対象のタスク一覧を取得
+    const otherTasks: Task[] = otherTaskIds.reduce((result, current) => {
+      const otherTask = prev.find((task) => task.id === current);
+      if (!otherTask) {
+        return result;
+      }
+      return [...result, otherTask];
+    }, [] as Task[]);
+
+    // 全ての移動対象のタスクの順序を保持しておく
+    const sortedMovingTasks = indexTasksState(
+      sections,
+      sortTasks(sections, [firstTask, ...otherTasks]).map((task) => ({
+        ...task,
+        sectionId: toSectionId,
+      }))
+    );
+
+    // 移動対象のタスクを移動する
+    const movedTasks = moveTaskState(
       sections,
       prev,
-      firstTaskId,
-      otherTaskIds,
+      firstTask.id,
       toSectionId,
       toIndex
+    );
+
+    // 付随する移動対象のタスクを一旦タスク一覧から省いて採番する
+    const filteredTasks = movedTasks.filter(
+      (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
+    );
+    const indexedFilteredTasks = indexTasksState(sections, filteredTasks);
+
+    // 移動後のタスクを取得
+    const movedFirstTask = indexedFilteredTasks.find(
+      (task) => task.id === firstTask.id
+    );
+    if (!movedFirstTask) {
+      throw new Error();
+    }
+
+    // 移動後のタスクの直下に付随するタスク一覧を挿入
+    const insertedTasks = insertTasksToTasks(
+      sections,
+      indexedFilteredTasks,
+      otherTasks,
+      toSectionId,
+      movedFirstTask.index + 1
+    );
+
+    // 移動したタスクの index を最初の順序に更新
+    return updateTasksState(
+      sections,
+      insertedTasks,
+      sortedMovingTasks.map((task) => ({
+        ...task,
+        index: task.index + movedFirstTask.index,
+      }))
     );
   }
 
