@@ -335,6 +335,16 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   useEffect(() => {
+    setSelectedTasks((prev) => {
+      return prev.filter((prevSelectedTask) => {
+        return !completedTasks.some(
+          (completedTask) => completedTask.id === prevSelectedTask.id
+        );
+      });
+    });
+  }, [completedTasks]);
+
+  useEffect(() => {
     if (!project) {
       setIncompletedTasksLoaded(true);
       return;
