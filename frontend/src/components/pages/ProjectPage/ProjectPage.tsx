@@ -43,8 +43,6 @@ import {
   moveTasksState,
   updateOrAddTaskState,
   updateTasks,
-  listenIncompletedTasks,
-  listenCompletedTasks,
   separateTasks,
 } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
@@ -66,7 +64,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const { project, projectInitialized } = useProjects();
   const { sections, sectionsInitialized, moveSection } = useSections();
-  const { incompletedTasks, completedTasks } = useTasks();
+  const { incompletedTasks, tasksInitialized, completedTasks } = useTasks();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -83,10 +81,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     completed: Task[];
     incompleted: Task[];
   }>({ completed: [], incompleted: [] });
-  const [incompletedTasksLoaded, setIncompletedTasksLoaded] =
-    useState<boolean>(false);
-  const [completedTasksLoaded, setCompletedTasksLoaded] =
-    useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
   /*
@@ -298,42 +292,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     });
   }, [completedTasks]);
 
-  useEffect(() => {
-    if (!project) {
-      setIncompletedTasksLoaded(true);
-      return;
-    }
-    const unsubscribe = listenIncompletedTasks(
-      currentUser.uid,
-      projectId,
-      (tasks) => {
-        setAllTasks((prev) => ({ ...prev, incompleted: tasks }));
-        setIncompletedTasksLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
-
-  useEffect(() => {
-    if (!project) {
-      setCompletedTasksLoaded(true);
-      return;
-    }
-    if (!showCompletedTasks) {
-      setCompletedTasksLoaded(true);
-      return;
-    }
-    const unsubscribe = listenCompletedTasks(
-      currentUser.uid,
-      projectId,
-      (tasks) => {
-        setAllTasks((prev) => ({ ...prev, completed: tasks }));
-        setCompletedTasksLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId, showCompletedTasks]);
-
   /*
    * other
    */
@@ -341,18 +299,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const headerHeight = 56;
 
   const loaded = useMemo(() => {
-    return (
-      projectInitialized &&
-      sectionsInitialized &&
-      incompletedTasksLoaded &&
-      completedTasksLoaded
-    );
-  }, [
-    completedTasksLoaded,
-    incompletedTasksLoaded,
-    projectInitialized,
-    sectionsInitialized,
-  ]);
+    return projectInitialized && sectionsInitialized && tasksInitialized;
+  }, [projectInitialized, sectionsInitialized, tasksInitialized]);
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
