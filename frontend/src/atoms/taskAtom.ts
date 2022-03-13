@@ -20,3 +20,11 @@ export const completedTasksState = atom<Task[]>({
   key: "completedTasksState",
   default: [],
 });
+
+export const tasksState = atom<{ incompleted: Task[]; completed: Task[] }>({
+  key: "tasksState",
+  default: {
+    incompleted: [],
+    completed: [],
+  },
+});
