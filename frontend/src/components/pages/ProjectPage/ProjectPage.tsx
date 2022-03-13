@@ -36,7 +36,6 @@ import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
 import {
@@ -85,9 +84,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
   const [openDeleteProjectConfirm, setOpenDeleteProjectConfirm] =
     useState<boolean>(false);
-
-  const [, setSectionsLoaded] = useState<boolean>(false);
-  const [, setSections] = useState<Section[]>([]);
 
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
   const [allTasks, setAllTasks] = useState<{
