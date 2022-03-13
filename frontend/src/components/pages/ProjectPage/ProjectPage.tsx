@@ -44,8 +44,6 @@ import {
   deleteSectionState,
   listenSections,
   moveSectionState,
-  updateOrAddSectionState,
-  updateSection,
   updateSections,
   updateSectionsBatch,
 } from "@/lib/sectionUtils";
@@ -151,14 +149,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   /*
    * section
    */
-
-  const handleUpdateSection = useCallback(
-    (updatedSection: Section) => {
-      setSections((prev) => updateOrAddSectionState(prev, updatedSection));
-      updateSection(currentUser.uid, updatedSection);
-    },
-    [currentUser.uid]
-  );
 
   const handleDeleteSection = useCallback(
     (deletedSection: Section) => {
@@ -691,7 +681,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 <SectionList
                   projectId={projectId}
                   sections={sections}
-                  onUpdateSection={handleUpdateSection}
                   onDeleteSection={handleDeleteSection}
                   tasks={[...completedTasks, ...incompletedTasks]}
                   selectedTasks={selectedTasks}

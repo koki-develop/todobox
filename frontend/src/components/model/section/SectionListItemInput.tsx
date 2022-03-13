@@ -4,14 +4,18 @@ import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import Form from "@/components/utils/Form";
-import { CreateSectionInput, Section } from "@/models/section";
+import {
+  CreateSectionInput,
+  Section,
+  UpdateSectionInput,
+} from "@/models/section";
 
 export type SectionListItemInputProps = {
   section?: Section;
   sections: Section[];
 
   onCreate?: (input: CreateSectionInput) => void;
-  onUpdate?: (section: Section) => void;
+  onUpdate?: (input: UpdateSectionInput) => void;
   onCancel: () => void;
 };
 
@@ -46,8 +50,8 @@ const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
         onCancel();
         return;
       }
-      const updatedSection = { ...section, name: trimmedName };
-      onUpdate?.(updatedSection);
+      const input = { name: trimmedName };
+      onUpdate?.(input);
     }, [name, onCancel, onUpdate, section]);
 
     const handleCreate = useCallback(() => {

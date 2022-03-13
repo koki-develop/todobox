@@ -14,8 +14,9 @@ import SectionListItemCard from "@/components/model/section/SectionListItemCard"
 import TaskList from "@/components/model/task/TaskList";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { Section } from "@/models/section";
+import { Section, UpdateSectionInput } from "@/models/section";
 import { Task } from "@/models/task";
+import { useSections } from "@/hooks/sectionHooks";
 import SectionListItemInput from "./SectionListItemInput";
 
 export type SectionListItemProps = {
@@ -25,7 +26,6 @@ export type SectionListItemProps = {
   tasks: Task[];
   selectedTasks: Task[];
 
-  onUpdate: (section: Section) => void;
   onDelete: (section: Section) => void;
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
@@ -43,7 +43,6 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     sections,
     tasks,
     selectedTasks,
-    onUpdate,
     onDelete,
     onCompleteTask,
     onIncompleteTask,
@@ -53,6 +52,8 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     onSelectTask,
     onMultiSelectTask,
   } = props;
+
+  const { updateSection } = useSections();
 
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -87,11 +88,11 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   }, []);
 
   const handleUpdate = useCallback(
-    (section: Section) => {
+    async (input: UpdateSectionInput) => {
       setEditing(false);
-      onUpdate(section);
+      await updateSection(projectId, section, input);
     },
-    [onUpdate]
+    [projectId, section, updateSection]
   );
 
   const handleDelete = useCallback(() => {
@@ -113,7 +114,6 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
         >
           {editing ? (
             <SectionListItemInput
-              projectId={projectId}
               section={section}
               sections={sections}
               onUpdate={handleUpdate}
