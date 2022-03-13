@@ -3,9 +3,8 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
 import { CreateProjectInput } from "@/models/project";
 import {
-  buildProject,
-  createProject as createProjectApi,
   updateOrAddProjectState,
+  ProjectsRepository,
 } from "@/lib/projectUtils";
 import { useToast } from "@/hooks/useToast";
 import { useCurrentUser } from "@/hooks/userHooks";
@@ -20,8 +19,8 @@ export const useProjects = () => {
   const createProject = useCallback(
     async (input: CreateProjectInput) => {
       if (!currentUser) return;
-      const project = buildProject(input);
-      await createProjectApi(currentUser.uid, project).then(() => {
+      const project = ProjectsRepository.build(input);
+      await ProjectsRepository.create(currentUser.uid, project).then(() => {
         showToast("プロジェクトを作成しました。", "success");
         setProjects((prev) => {
           return updateOrAddProjectState(prev, project);
