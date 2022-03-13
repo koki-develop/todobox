@@ -51,6 +51,7 @@ import {
 } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
 import { useSections } from "@/hooks/sectionHooks";
+import { useTasks } from "@/hooks/taskHooks";
 
 export type ProjectPageProps = {
   currentUser: User;
@@ -67,6 +68,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const { project, projectInitialized } = useProjects();
   const { sections, sectionsInitialized, moveSection } = useSections();
+  const { incompletedTasks, completedTasks } = useTasks();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -149,15 +151,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     const query = qs.parse(location.search);
     return (query.task as string) ?? undefined;
   }, [location.search]);
-
-  const completedTasks = useMemo(() => {
-    if (!showCompletedTasks) return [];
-    return allTasks.completed;
-  }, [allTasks.completed, showCompletedTasks]);
-
-  const incompletedTasks = useMemo(() => {
-    return allTasks.incompleted;
-  }, [allTasks.incompleted]);
 
   const handleSelectAllTasks = useCallback(() => {
     setShowCompletedTasks(true);
