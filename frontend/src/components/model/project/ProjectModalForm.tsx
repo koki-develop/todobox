@@ -3,7 +3,6 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { useProjects } from "@/components/model/project/projectHooks";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
@@ -13,6 +12,7 @@ import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
 import { updateOrAddProjectState, updateProject } from "@/lib/projectUtils";
+import { useProjects } from "@/hooks/projectHooks";
 import { useToast } from "@/hooks/useToast";
 
 export type ProjectModalFormProps = {

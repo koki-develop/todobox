@@ -7,10 +7,10 @@ import React, { useCallback, useState } from "react";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
-import { useProjects } from "@/components/model/project/projectHooks";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
+import { useProjects } from "@/hooks/projectHooks";
 
 export type ProjectsPageProps = {
   currentUser: User;
