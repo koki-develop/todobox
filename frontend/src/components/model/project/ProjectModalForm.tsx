@@ -2,18 +2,14 @@ import Button from "@mui/material/Button";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSetRecoilState } from "recoil";
 import Field from "@/components/utils/Field";
 import Form from "@/components/utils/Form";
 import LoadableButton from "@/components/utils/LoadableButton";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
-import { projectsState } from "@/atoms/projectAtoms";
 import { Project } from "@/models/project";
-import { updateOrAddProjectState, updateProject } from "@/lib/projectUtils";
 import { useProjects } from "@/hooks/projectHooks";
-import { useToast } from "@/hooks/useToast";
 
 export type ProjectModalFormProps = {
   open: boolean;
@@ -22,16 +18,14 @@ export type ProjectModalFormProps = {
 
   onClose: () => void;
   onCreated?: () => void;
-  onUpdated?: (project: Project) => void;
+  onUpdated?: () => void;
 };
 
 const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
   (props) => {
-    const { open, project, userId, onClose, onCreated, onUpdated } = props;
+    const { open, project, onClose, onCreated, onUpdated } = props;
 
-    const { showToast } = useToast();
-    const setProjects = useSetRecoilState(projectsState);
-    const { createProject } = useProjects();
+    const { createProject, updateProject } = useProjects();
 
     const [name, setName] = useState<string>("");
     const [nameError, setNameError] = useState<string | null>(null);
@@ -82,32 +76,19 @@ const ProjectModalForm: React.VFC<ProjectModalFormProps> = React.memo(
         });
     }, [createProject, name, onCreated, validateForm]);
 
-    const handleUpdate = useCallback(() => {
+    const handleUpdate = useCallback(async () => {
       if (!project) return;
       if (!validateForm()) return;
       setLoading(true);
       const trimmedName = name.trim();
-      const updatedProject = { ...project, name: trimmedName };
-      updateProject(userId, updatedProject)
+      await updateProject(project, { name: trimmedName })
         .then(() => {
-          showToast("プロジェクトを更新しました。", "success");
-          setProjects((prev) => {
-            return updateOrAddProjectState(prev, updatedProject);
-          });
-          onUpdated?.(updatedProject);
+          onUpdated?.();
         })
         .finally(() => {
           setLoading(false);
         });
-    }, [
-      name,
-      onUpdated,
-      project,
-      setProjects,
-      showToast,
-      userId,
-      validateForm,
-    ]);
+    }, [name, onUpdated, project, updateProject, validateForm]);
 
     const handleSubmit = useMemo(() => {
       return project ? handleUpdate : handleCreate;
