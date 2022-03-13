@@ -14,13 +14,16 @@ export const useTasks = () => {
   const { currentUser } = useCurrentUser();
   const { sections } = useSections();
 
-  const [tasks, setTasks] = useRecoilState(tasksState);
+  const [allTasks, setAllTasks] = useRecoilState(tasksState);
+  const tasks = useMemo(() => {
+    return [...allTasks.incompleted, ...allTasks.completed];
+  }, [allTasks.completed, allTasks.incompleted]);
   const incompletedTasks = useMemo(() => {
-    return tasks.incompleted;
-  }, [tasks.incompleted]);
+    return allTasks.incompleted;
+  }, [allTasks.incompleted]);
   const completedTasks = useMemo(() => {
-    return tasks.completed;
-  }, [tasks.completed]);
+    return allTasks.completed;
+  }, [allTasks.completed]);
 
   const incompletedTasksInitialized = useRecoilValue(
     incompletedTasksInitializedState
@@ -37,7 +40,7 @@ export const useTasks = () => {
     async (projectId: string, input: CreateTaskInput) => {
       if (!currentUser) return;
       const newTask = TasksRepository.build(input);
-      setTasks((prev) => {
+      setAllTasks((prev) => {
         const allTasks = TasksStateHelper.create(
           [...prev.incompleted, ...prev.completed],
           sections,
@@ -47,7 +50,7 @@ export const useTasks = () => {
       });
       await TasksRepository.create(currentUser.uid, projectId, newTask);
     },
-    [currentUser, sections, setTasks]
+    [currentUser, sections, setAllTasks]
   );
 
   return {
