@@ -37,9 +37,7 @@ import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
-import {
-  getTasksByRange,
-} from "@/lib/taskUtils";
+import { getTasksByRange } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
 import { useSections } from "@/hooks/sectionHooks";
 import { useTasks } from "@/hooks/taskHooks";
@@ -78,10 +76,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     useState<boolean>(false);
 
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
-  const [allTasks, setAllTasks] = useState<{
-    completed: Task[];
-    incompleted: Task[];
-  }>({ completed: [], incompleted: [] });
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
   /*
