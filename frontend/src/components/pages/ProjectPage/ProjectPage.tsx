@@ -39,8 +39,6 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 import {
   getTasksByRange,
-  updateOrAddTaskState,
-  separateTasks,
 } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
 import { useSections } from "@/hooks/sectionHooks";
