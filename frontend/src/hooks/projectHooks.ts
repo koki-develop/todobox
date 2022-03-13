@@ -1,6 +1,11 @@
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
+import {
+  projectInitializedState,
+  projectsInitializedState,
+  projectsState,
+  projectState,
+} from "@/atoms/projectAtoms";
 import {
   CreateProjectInput,
   Project,
@@ -14,6 +19,8 @@ export const useProjects = () => {
   const { currentUser } = useCurrentUser();
   const { showToast } = useToast();
 
+  const projectInitialized = useRecoilValue(projectInitializedState);
+  const [project, setProject] = useRecoilState(projectState);
   const projectsInitialized = useRecoilValue(projectsInitializedState);
   const [projects, setProjects] = useRecoilState(projectsState);
 
@@ -41,10 +48,17 @@ export const useProjects = () => {
           setProjects((prev) => {
             return ProjectsStateHelper.update(prev, updatedProject);
           });
+          setProject((prev) => {
+            if (prev?.id === updatedProject.id) {
+              return updatedProject;
+            } else {
+              return prev;
+            }
+          });
         }
       );
     },
-    [currentUser, setProjects, showToast]
+    [currentUser, setProject, setProjects, showToast]
   );
 
   const deleteProject = useCallback(
@@ -55,12 +69,21 @@ export const useProjects = () => {
         setProjects((prev) => {
           return ProjectsStateHelper.delete(prev, projectId);
         });
+        setProject((prev) => {
+          if (prev?.id === projectId) {
+            return null;
+          } else {
+            return prev;
+          }
+        });
       });
     },
-    [currentUser, setProjects, showToast]
+    [currentUser, setProject, setProjects, showToast]
   );
 
   return {
+    projectInitialized,
+    project,
     projectsInitialized,
     projects,
     createProject,
