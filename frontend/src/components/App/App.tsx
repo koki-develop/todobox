@@ -7,6 +7,7 @@ import { RecoilRoot } from "recoil";
 import { theme } from "@/components/Layout/theme";
 import AuthProvider from "@/components/providers/AuthProvider";
 import ProjectsListener from "@/components/model/project/ProjectsListener";
+import CurrentUserListener from "@/components/model/user/CurrentUserListener";
 import AppRoutes from "./AppRoutes";
 
 const App: React.VFC = React.memo(() => {
@@ -19,6 +20,7 @@ const App: React.VFC = React.memo(() => {
       >
         <RecoilRoot>
           <AuthProvider>
+            <CurrentUserListener />
             <ProjectsListener />
             <CssBaseline />
             <BrowserRouter>
