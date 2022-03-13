@@ -809,13 +809,13 @@ export class TasksStateHelper {
       (result, current) => {
         if (current.completedAt) {
           return {
-            incompleted: [...result.incompleted, current],
-            completed: result.completed,
+            incompleted: result.incompleted,
+            completed: [...result.completed, current],
           };
         } else {
           return {
-            incompleted: result.incompleted,
-            completed: [...result.completed, current],
+            incompleted: [...result.incompleted, current],
+            completed: result.completed,
           };
         }
       },
