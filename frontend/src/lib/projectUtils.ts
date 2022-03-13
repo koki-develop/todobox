@@ -150,21 +150,29 @@ export class ProjectsStateHelper {
     return this._addOrUpdate(prev, project);
   }
 
-  private static _addOrUpdate(
-    prev: Project[],
-    projectToAddOrUpdate: Project
-  ): Project[] {
-    if (
-      !prev.some((prevProject) => prevProject.id === projectToAddOrUpdate.id)
-    ) {
-      return [...prev, projectToAddOrUpdate];
+  public static update(prev: Project[], project: Project): Project[] {
+    return this._update(prev, project);
+  }
+
+  private static _update(prev: Project[], project: Project): Project[] {
+    return prev.map((prevProject) => {
+      if (prevProject.id !== project.id) {
+        return prevProject;
+      }
+      return project;
+    });
+  }
+
+  private static _addOrUpdate(prev: Project[], project: Project): Project[] {
+    if (!prev.some((prevProject) => prevProject.id === project.id)) {
+      return [...prev, project];
     }
 
     return prev.map((prevProject) => {
-      if (prevProject.id !== projectToAddOrUpdate.id) {
+      if (prevProject.id !== project.id) {
         return prevProject;
       }
-      return projectToAddOrUpdate;
+      return project;
     });
   }
 }
