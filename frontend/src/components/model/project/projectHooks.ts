@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useAuth } from "@/components/providers/AuthProvider";
 import {
   projectsInitializedState,
   projectsState,
 } from "@/components/model/project/projectAtoms";
+import { useCurrentUser } from "@/components/model/user/userHooks";
 import { CreateProjectInput } from "@/models/project";
 import {
   buildProject,
@@ -14,7 +14,7 @@ import {
 import { useToast } from "@/hooks/useToast";
 
 export const useProjects = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useCurrentUser();
   const { showToast } = useToast();
 
   const initialized = useRecoilValue(projectsInitializedState);

@@ -15,7 +15,7 @@ const CurrentUserListener: React.VFC<CurrentUserListenerProps> = React.memo(
 
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setCurrentUser(user);
+        setCurrentUser(user ? { uid: user.uid } : null);
         setInitialized(true);
       });
       return () => {

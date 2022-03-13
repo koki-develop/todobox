@@ -5,7 +5,7 @@ import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useCurrentUser } from "@/components/model/user/userHooks";
 import Loading from "@/components/utils/Loading";
 import Layout from "@/components/Layout";
 
@@ -16,7 +16,7 @@ type WithAuthOptions = {
 const withAuth = (options?: WithAuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const WithAuth = (Component: React.VFC<any>) => {
-    const { initialized, currentUser } = useAuth();
+    const { initialized, currentUser } = useCurrentUser();
 
     if (!initialized) {
       return <Loading />;

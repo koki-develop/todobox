@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import { useAuth } from "@/components/providers/AuthProvider";
 import {
   projectsInitializedState,
   projectsState,
 } from "@/components/model/project/projectAtoms";
+import { useCurrentUser } from "@/components/model/user/userHooks";
 import { listenProjects } from "@/lib/projectUtils";
 
 export type ProjectsListenerProps = {
@@ -12,7 +12,7 @@ export type ProjectsListenerProps = {
 };
 
 const ProjectsListener: React.VFC<ProjectsListenerProps> = React.memo(() => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useCurrentUser();
 
   const setProjectsInitialized = useSetRecoilState(projectsInitializedState);
   const setProjects = useSetRecoilState(projectsState);

@@ -1,9 +1,9 @@
-import { useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { currentUserState } from "./userAtoms";
+import { useRecoilValue } from "recoil";
+import { currentUserInitializedState, currentUserState } from "./userAtoms";
 
 export const useCurrentUser = () => {
-  const initialized = useRecoilValue;
-  const currentUser = useRecoilValueLoadable(currentUserState);
+  const initialized = useRecoilValue(currentUserInitializedState);
+  const currentUser = useRecoilValue(currentUserState);
 
   return {
     initialized,

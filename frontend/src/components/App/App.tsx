@@ -5,7 +5,6 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { theme } from "@/components/Layout/theme";
-import AuthProvider from "@/components/providers/AuthProvider";
 import ProjectsListener from "@/components/model/project/ProjectsListener";
 import CurrentUserListener from "@/components/model/user/CurrentUserListener";
 import AppRoutes from "./AppRoutes";
@@ -19,14 +18,12 @@ const App: React.VFC = React.memo(() => {
         autoHideDuration={3000}
       >
         <RecoilRoot>
-          <AuthProvider>
-            <CurrentUserListener />
-            <ProjectsListener />
-            <CssBaseline />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </AuthProvider>
+          <CurrentUserListener />
+          <ProjectsListener />
+          <CssBaseline />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
         </RecoilRoot>
       </SnackbarProvider>
     </ThemeProvider>
