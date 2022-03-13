@@ -59,13 +59,13 @@ jobs:
 
       - name: Create dotenv
         run: |
-          echo "VITE_STAGE=\"stg\""
-          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.STG_FIREBASE_API_KEY }}\""
-          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.STG_FIREBASE_AUTH_DOMAIN }}\""
-          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.STG_FIREBASE_PROJECT_ID }}\""
-          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.STG_FIREBASE_STORAGE_BUCKET }}\""
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.STG_FIREBASE_MESSAGING_SENDER_ID }}\""
-          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.STG_FIREBASE_APP_ID }}\""
+          echo "VITE_STAGE=\"stg\""                                                                     > .env
+          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.STG_FIREBASE_API_KEY }}\""                         >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.STG_FIREBASE_AUTH_DOMAIN }}\""                 >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.STG_FIREBASE_PROJECT_ID }}\""                   >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.STG_FIREBASE_STORAGE_BUCKET }}\""           >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.STG_FIREBASE_MESSAGING_SENDER_ID }}\"" >> .env
+          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.STG_FIREBASE_APP_ID }}\""                           >> .env
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
       - name: Build
