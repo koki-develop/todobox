@@ -9,6 +9,7 @@ import { CreateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
 import { useSections } from "@/hooks/sectionHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
+import { UpdateTaskInput } from "@/models/task";
 
 export const useTasks = () => {
   const { currentUser } = useCurrentUser();
@@ -53,11 +54,33 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const completeTask = useCallback(
+    async (projectId: string, taskId: string) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.complete(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskId
+        );
+        const updateInputs = allTasks.reduce((result, current) => {
+          const { id, completedAt, index } = current;
+          result[id] = { completedAt, index };
+          return result;
+        }, {} as { [id: string]: UpdateTaskInput });
+        TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   return {
     tasksInitialized,
     tasks,
     incompletedTasks,
     completedTasks,
     createTask,
+    completeTask,
   };
 };
