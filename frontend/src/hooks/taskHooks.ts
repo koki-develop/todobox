@@ -2,9 +2,8 @@ import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   completedTasksInitializedState,
-  completedTasksState,
   incompletedTasksInitializedState,
-  incompletedTasksState,
+  tasksState,
 } from "@/atoms/taskAtom";
 import { CreateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
@@ -15,37 +14,40 @@ export const useTasks = () => {
   const { currentUser } = useCurrentUser();
   const { sections } = useSections();
 
+  const [tasks, setTasks] = useRecoilState(tasksState);
+  const incompletedTasks = useMemo(() => {
+    return tasks.incompleted;
+  }, [tasks.incompleted]);
+  const completedTasks = useMemo(() => {
+    return tasks.completed;
+  }, [tasks.completed]);
+
   const incompletedTasksInitialized = useRecoilValue(
     incompletedTasksInitializedState
   );
-  const [incompletedTasks, setIncompleteTasks] = useRecoilState(
-    incompletedTasksState
-  );
-
   const completedTasksInitialized = useRecoilValue(
     completedTasksInitializedState
   );
-  const [completedTasks, setCompletedTasks] =
-    useRecoilState(completedTasksState);
 
   const tasksInitialized = useMemo(() => {
     return incompletedTasksInitialized && completedTasksInitialized;
   }, [completedTasksInitialized, incompletedTasksInitialized]);
 
-  const tasks = useMemo(() => {
-    return [...incompletedTasks, ...completedTasks];
-  }, [completedTasks, incompletedTasks]);
-
   const createTask = useCallback(
     async (projectId: string, input: CreateTaskInput) => {
       if (!currentUser) return;
       const newTask = TasksRepository.build(input);
-      setIncompleteTasks((prev) => {
-        return TasksStateHelper.create(prev, sections, newTask);
+      setTasks((prev) => {
+        const allTasks = TasksStateHelper.create(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          newTask
+        );
+        return TasksStateHelper.separateTasks(allTasks);
       });
       await TasksRepository.create(currentUser.uid, projectId, newTask);
     },
-    [currentUser, sections, setIncompleteTasks]
+    [currentUser, sections, setTasks]
   );
 
   return {
