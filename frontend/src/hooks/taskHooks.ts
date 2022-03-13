@@ -99,8 +99,8 @@ export const useTasks = () => {
           toIndex
         );
         const updateInputs = allTasks.reduce((result, current) => {
-          const { id, index } = current;
-          result[id] = { index };
+          const { id, index, sectionId } = current;
+          result[id] = { index, sectionId };
           return result;
         }, {} as { [id: string]: UpdateTaskInput });
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
@@ -129,8 +129,8 @@ export const useTasks = () => {
           toIndex
         );
         const updateInputs = allTasks.reduce((result, current) => {
-          const { id, index } = current;
-          result[id] = { index };
+          const { id, index, sectionId } = current;
+          result[id] = { index, sectionId };
           return result;
         }, {} as { [id: string]: UpdateTaskInput });
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
