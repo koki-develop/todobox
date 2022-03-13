@@ -14,7 +14,7 @@ export const useProjects = () => {
   const { currentUser } = useCurrentUser();
   const { showToast } = useToast();
 
-  const initialized = useRecoilValue(projectsInitializedState);
+  const projectsInitialized = useRecoilValue(projectsInitializedState);
   const [projects, setProjects] = useRecoilState(projectsState);
 
   const createProject = useCallback(
@@ -61,7 +61,7 @@ export const useProjects = () => {
   );
 
   return {
-    initialized,
+    projectsInitialized,
     projects,
     createProject,
     updateProject,

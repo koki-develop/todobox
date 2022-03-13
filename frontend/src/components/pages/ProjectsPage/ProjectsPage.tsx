@@ -17,7 +17,7 @@ export type ProjectsPageProps = {
 };
 
 const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo(() => {
-  const { projects, initialized: projectsLoaded } = useProjects();
+  const { projects, projectsInitialized } = useProjects();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =
@@ -61,8 +61,8 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo(() => {
 
   return (
     <Container sx={{ pt: 2 }} maxWidth="md">
-      {!projectsLoaded && <Loading />}
-      {projectsLoaded && (
+      {!projectsInitialized && <Loading />}
+      {projectsInitialized && (
         <Box>
           <ProjectModalForm
             open={openProjectForm}
