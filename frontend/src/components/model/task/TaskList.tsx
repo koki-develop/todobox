@@ -16,8 +16,6 @@ export type TaskListProps = {
   sectionId: string | null;
   selectedTasks: Task[];
 
-  onCompleteTask: (task: Task) => void;
-  onIncompleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -28,8 +26,6 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     projectId,
     sectionId,
     selectedTasks,
-    onCompleteTask,
-    onIncompleteTask,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -37,7 +33,14 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const theme = useTheme();
 
-  const { tasks, createTask, deleteTask, deleteTasks } = useTasks();
+  const {
+    tasks,
+    createTask,
+    deleteTask,
+    deleteTasks,
+    completeTask,
+    incompleteTask,
+  } = useTasks();
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
@@ -77,6 +80,20 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     [createTask, incompletedTasks, projectId, sectionId]
   );
 
+  const handleCompleteTask = useCallback(
+    async (task: Task) => {
+      await completeTask(projectId, task.id);
+    },
+    [completeTask, projectId]
+  );
+
+  const handleIncompleteTask = useCallback(
+    async (task: Task) => {
+      await incompleteTask(projectId, task.id);
+    },
+    [incompleteTask, projectId]
+  );
+
   const handleDeleteTask = useCallback(
     async (task: Task) => {
       if (
@@ -112,8 +129,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 key={task.id}
                 task={task}
                 selectedTasks={selectedTasks}
-                onComplete={onCompleteTask}
-                onIncomplete={onIncompleteTask}
+                onComplete={handleCompleteTask}
+                onIncomplete={handleIncompleteTask}
                 onDelete={handleDeleteTask}
                 onClick={onClickTask}
                 onSelect={onSelectTask}
@@ -155,8 +172,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             key={task.id}
             task={task}
             selectedTasks={selectedTasks}
-            onComplete={onCompleteTask}
-            onIncomplete={onIncompleteTask}
+            onComplete={handleCompleteTask}
+            onIncomplete={handleIncompleteTask}
             onDelete={handleDeleteTask}
             onClick={onClickTask}
             onSelect={onSelectTask}

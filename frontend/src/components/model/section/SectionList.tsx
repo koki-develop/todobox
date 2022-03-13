@@ -15,8 +15,6 @@ export type SectionListProps = {
   tasks: Task[];
   selectedTasks: Task[];
 
-  onCompleteTask: (task: Task) => void;
-  onIncompleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -28,8 +26,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     sections,
     tasks,
     selectedTasks,
-    onCompleteTask,
-    onIncompleteTask,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -79,8 +75,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
                 section={sectionWithTasks.section}
                 sections={sections}
                 selectedTasks={selectedTasks}
-                onCompleteTask={onCompleteTask}
-                onIncompleteTask={onIncompleteTask}
                 onClickTask={onClickTask}
                 onSelectTask={onSelectTask}
                 onMultiSelectTask={onMultiSelectTask}

@@ -38,9 +38,7 @@ import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 import {
-  completeTaskState,
   getTasksByRange,
-  incompleteTaskState,
   moveTaskState,
   moveTasksState,
   updateOrAddTaskState,
@@ -169,43 +167,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const handleCloseShowCompletedTasks = useCallback(() => {
     setOpenCompletedFilterMenu(false);
   }, []);
-
-  const handleCompleteTask = useCallback(
-    (completedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = completeTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          completedTask.id
-        );
-        updateTasks(currentUser.uid, next);
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-      setSelectedTasks(
-        selectedTasks.filter(
-          (selectedTask) => selectedTask.id !== completedTask.id
-        )
-      );
-    },
-    [currentUser.uid, sections, selectedTasks]
-  );
-
-  const handleIncompleteTask = useCallback(
-    (incompletedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = incompleteTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          incompletedTask.id
-        );
-        updateTasks(currentUser.uid, next);
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-    },
-    [currentUser.uid, sections]
-  );
 
   const handleClickTask = useCallback(
     (clickedTask: Task) => {
@@ -543,8 +504,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                     projectId={projectId}
                     sectionId={null}
                     selectedTasks={selectedTasks}
-                    onCompleteTask={handleCompleteTask}
-                    onIncompleteTask={handleIncompleteTask}
                     onClickTask={handleClickTask}
                     onSelectTask={handleSelectTask}
                     onMultiSelectTask={handleMultiSelectTask}
@@ -555,8 +514,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   sections={sections}
                   tasks={[...completedTasks, ...incompletedTasks]}
                   selectedTasks={selectedTasks}
-                  onCompleteTask={handleCompleteTask}
-                  onIncompleteTask={handleIncompleteTask}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}

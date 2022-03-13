@@ -77,7 +77,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
     );
 
     const handleComplete = useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
+      async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         onComplete(task);
       },
