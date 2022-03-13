@@ -69,6 +69,7 @@ import {
   separateTasks,
 } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
+import { useSections } from "@/hooks/sectionHooks";
 
 export type ProjectPageProps = {
   currentUser: User;
@@ -84,6 +85,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const theme = useTheme();
 
   const { project, projectInitialized } = useProjects();
+  const { sections, sectionsInitialized } = useSections();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -95,8 +97,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [openDeleteProjectConfirm, setOpenDeleteProjectConfirm] =
     useState<boolean>(false);
 
-  const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
-  const [sections, setSections] = useState<Section[]>([]);
+  const [, setSectionsLoaded] = useState<boolean>(false);
+  const [, setSections] = useState<Section[]>([]);
 
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
   const [allTasks, setAllTasks] = useState<{
@@ -525,7 +527,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const loaded = useMemo(() => {
     return (
       projectInitialized &&
-      sectionsLoaded &&
+      sectionsInitialized &&
       incompletedTasksLoaded &&
       completedTasksLoaded
     );
@@ -533,7 +535,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     completedTasksLoaded,
     incompletedTasksLoaded,
     projectInitialized,
-    sectionsLoaded,
+    sectionsInitialized,
   ]);
 
   const handleDragEnd = useCallback(
