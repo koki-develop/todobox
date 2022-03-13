@@ -787,6 +787,61 @@ export class TasksStateHelper {
     return this._addOrUpdate(prev, sections, task);
   }
 
+  public static move(
+    sections: Section[],
+    prev: Task[],
+    taskId: string,
+    toSectionId: string | null,
+    toIndex: number
+  ): Task[] {
+    // 移動対象のタスクを取得
+    const movingTask = prev.find((task) => task.id === taskId);
+    if (!movingTask) return prev;
+
+    // 移動元のセクションのタスク一覧を取得
+    const fromSectionTasks = this._filterBySectionId(
+      prev,
+      movingTask.sectionId
+    );
+
+    if (movingTask.sectionId === toSectionId) {
+      // 同一セクション内の移動
+      // タスクを移動して index を採番
+      const updatedTasks = this._index(
+        arrayMove(fromSectionTasks, movingTask.index, toIndex),
+        sections
+      );
+
+      // タスクを更新
+      return this._updateTasks(prev, sections, updatedTasks);
+    } else {
+      // 異なるセクション間の移動
+      // 移動先のタスク一覧を取得
+      const toSectionTasks = this._filterBySectionId(prev, toSectionId);
+
+      // タスクを移動
+      const [updatedFromSectionTasks, updatedToSectionTasks] = arrayMoveToArray(
+        fromSectionTasks,
+        toSectionTasks,
+        movingTask.index,
+        toIndex
+      );
+
+      // index を採番してタスクを更新
+      const updatedTasks = [
+        ...this._index(updatedFromSectionTasks, sections),
+        ...this._index(
+          updatedToSectionTasks.map((task) => ({
+            ...task,
+            sectionId: toSectionId,
+          })),
+          sections
+        ),
+      ];
+      return this._updateTasks(prev, sections, updatedTasks);
+    }
+  }
+
   public static complete(
     prev: Task[],
     sections: Section[],
@@ -870,6 +925,13 @@ export class TasksStateHelper {
     );
   }
 
+  private static _filterBySectionId(
+    tasks: Task[],
+    sectionId: string | null
+  ): Task[] {
+    return tasks.filter((task) => task.sectionId === sectionId);
+  }
+
   private static _addOrUpdate(
     prev: Task[],
     sections: Section[],
@@ -896,6 +958,22 @@ export class TasksStateHelper {
         }
       }),
       sections
+    );
+  }
+
+  private static _updateTasks(
+    prev: Task[],
+    sections: Section[],
+    tasks: Task[]
+  ): Task[] {
+    return sortTasks(
+      sections,
+      prev.map((prevTask) => {
+        const updatedTask = tasks.find(
+          (updatedTask) => updatedTask.id === prevTask.id
+        );
+        return updatedTask ?? prevTask;
+      })
     );
   }
 
