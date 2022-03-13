@@ -6,14 +6,6 @@ admin.initializeApp(functions.firebaseConfig() ?? undefined);
 const firestore = admin.firestore();
 const functionBuilder = functions.runWith({ timeoutSeconds: 300 });
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
-
 export const deleteUser = functionBuilder.https.onCall(
   async (_data, context) => {
     if (!context.auth) {
