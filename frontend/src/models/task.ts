@@ -8,3 +8,5 @@ export type Task = {
 };
 
 export type CreateTaskInput = Omit<Task, "id" | "completedAt">;
+
+export type UpdateTaskInput = Partial<Omit<Task, "id">>;
