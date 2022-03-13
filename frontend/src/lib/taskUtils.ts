@@ -674,6 +674,18 @@ export class TasksRepository {
     }
   }
 
+  public static async deleteTasks(
+    userId: string,
+    projectId: string,
+    taskIds: string[]
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    for (const taskId of taskIds) {
+      this.deleteBatch(batch, userId, projectId, taskId);
+    }
+    await this.commitBatch(batch);
+  }
+
   public static deleteBatch(
     batch: WriteBatch,
     userId: string,
@@ -818,6 +830,17 @@ export class TasksStateHelper {
   ): Task[] {
     return this._index(
       prev.filter((prevTask) => prevTask.id !== taskId),
+      sections
+    );
+  }
+
+  public static deleteTasks(
+    prev: Task[],
+    sections: Section[],
+    taskIds: string[]
+  ): Task[] {
+    return this._index(
+      prev.filter((prevTask) => !taskIds.includes(prevTask.id)),
       sections
     );
   }
