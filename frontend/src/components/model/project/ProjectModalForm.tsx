@@ -14,7 +14,6 @@ import { useProjects } from "@/hooks/projectHooks";
 export type ProjectModalFormProps = {
   open: boolean;
   project: Project | null;
-  userId: string;
 
   onClose: () => void;
   onCreated?: () => void;

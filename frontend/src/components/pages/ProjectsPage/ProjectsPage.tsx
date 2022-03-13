@@ -16,9 +16,7 @@ export type ProjectsPageProps = {
   currentUser: User;
 };
 
-const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
-  const { currentUser } = props;
-
+const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo(() => {
   const { projects, initialized: projectsLoaded } = useProjects();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
@@ -69,7 +67,6 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
           <ProjectModalForm
             open={openProjectForm}
             project={editingProject}
-            userId={currentUser.uid}
             onClose={handleCloseProjectForm}
             onCreated={handleCreatedProject}
             onUpdated={handleUpdatedProject}
@@ -78,7 +75,6 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             <ProjectDeleteConfirmModal
               open={openDeleteConfirmDialog}
               project={deletingProject}
-              userId={currentUser.uid}
               onCancel={handleCancelDeleteProject}
               onDeleted={handleDeletedProject}
             />

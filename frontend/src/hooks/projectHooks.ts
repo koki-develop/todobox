@@ -47,10 +47,24 @@ export const useProjects = () => {
     [currentUser, setProjects, showToast]
   );
 
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      if (!currentUser) return;
+      await ProjectsRepository.delete(currentUser.uid, projectId).then(() => {
+        showToast("プロジェクトを削除しました。", "success");
+        setProjects((prev) => {
+          return ProjectsStateHelper.delete(prev, projectId);
+        });
+      });
+    },
+    [currentUser, setProjects, showToast]
+  );
+
   return {
     initialized,
     projects,
     createProject,
     updateProject,
+    deleteProject,
   };
 };

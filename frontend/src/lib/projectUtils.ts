@@ -154,6 +154,10 @@ export class ProjectsStateHelper {
     return this._update(prev, project);
   }
 
+  public static delete(prev: Project[], projectId: string): Project[] {
+    return this._delete(prev, projectId);
+  }
+
   private static _update(prev: Project[], project: Project): Project[] {
     return prev.map((prevProject) => {
       if (prevProject.id !== project.id) {
@@ -174,5 +178,9 @@ export class ProjectsStateHelper {
       }
       return project;
     });
+  }
+
+  private static _delete(prev: Project[], projectId: string): Project[] {
+    return prev.filter((prevProject) => prevProject.id !== projectId);
   }
 }
