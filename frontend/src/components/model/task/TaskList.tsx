@@ -18,7 +18,6 @@ export type TaskListProps = {
 
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
-  onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -31,7 +30,6 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     selectedTasks,
     onCompleteTask,
     onIncompleteTask,
-    onDeleteTask,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -39,7 +37,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const theme = useTheme();
 
-  const { tasks, createTask } = useTasks();
+  const { tasks, createTask, deleteTask, deleteTasks } = useTasks();
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
@@ -79,6 +77,25 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     [createTask, incompletedTasks, projectId, sectionId]
   );
 
+  const handleDeleteTask = useCallback(
+    async (task: Task) => {
+      if (
+        selectedTasks.length > 1 &&
+        selectedTasks.some((selectedTask) => selectedTask.id === task.id)
+      ) {
+        // 複数削除
+        await deleteTasks(
+          projectId,
+          selectedTasks.map((task) => task.id)
+        );
+      } else {
+        // 単一削除
+        await deleteTask(projectId, task.id);
+      }
+    },
+    [deleteTask, deleteTasks, projectId, selectedTasks]
+  );
+
   // TODO: リファクタ
   return (
     <>
@@ -97,7 +114,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
                 selectedTasks={selectedTasks}
                 onComplete={onCompleteTask}
                 onIncomplete={onIncompleteTask}
-                onDelete={onDeleteTask}
+                onDelete={handleDeleteTask}
                 onClick={onClickTask}
                 onSelect={onSelectTask}
                 onMultiSelect={onMultiSelectTask}
@@ -140,7 +157,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             selectedTasks={selectedTasks}
             onComplete={onCompleteTask}
             onIncomplete={onIncompleteTask}
-            onDelete={onDeleteTask}
+            onDelete={handleDeleteTask}
             onClick={onClickTask}
             onSelect={onSelectTask}
             onMultiSelect={onMultiSelectTask}

@@ -221,49 +221,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [currentUser.uid, sections]
   );
 
-  const handleDeleteTask = useCallback(
-    (deletedTask: Task) => {
-      setAllTasks((prev) => {
-        if (
-          selectedTasks.length > 1 &&
-          selectedTasks.some(
-            (selectedTask) => selectedTask.id === deletedTask.id
-          )
-        ) {
-          // 複数削除
-          const deletedTaskIds = selectedTasks.map(
-            (selectedTask) => selectedTask.id
-          );
-          const next = deleteTasksState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            deletedTaskIds
-          );
-          const batch = writeBatch(firestore);
-          updateTasksBatch(batch, currentUser.uid, next);
-          deleteTasksBatch(batch, currentUser.uid, projectId, deletedTaskIds);
-          batch.commit();
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        } else {
-          // 単一削除
-          const next = deleteTaskState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            deletedTask.id
-          );
-          const batch = writeBatch(firestore);
-          updateTasksBatch(batch, currentUser.uid, next);
-          deleteTaskBatch(batch, currentUser.uid, projectId, deletedTask.id);
-          batch.commit();
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        }
-      });
-    },
-    [currentUser.uid, projectId, sections, selectedTasks]
-  );
-
   const handleClickTask = useCallback(
     (clickedTask: Task) => {
       navigate(`?task=${clickedTask.id}`);
@@ -592,7 +549,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                     selectedTasks={selectedTasks}
                     onCompleteTask={handleCompleteTask}
                     onIncompleteTask={handleIncompleteTask}
-                    onDeleteTask={handleDeleteTask}
                     onClickTask={handleClickTask}
                     onSelectTask={handleSelectTask}
                     onMultiSelectTask={handleMultiSelectTask}
@@ -605,7 +561,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   selectedTasks={selectedTasks}
                   onCompleteTask={handleCompleteTask}
                   onIncompleteTask={handleIncompleteTask}
-                  onDeleteTask={handleDeleteTask}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}
