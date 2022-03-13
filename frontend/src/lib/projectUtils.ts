@@ -1,9 +1,12 @@
 import {
   collection,
+  CollectionReference,
   deleteDoc,
   doc,
   DocumentReference,
+  DocumentSnapshot,
   onSnapshot,
+  QuerySnapshot,
   setDoc,
   Unsubscribe,
   updateDoc,
@@ -117,6 +120,29 @@ export class ProjectsRepository {
     return { id, ...input };
   }
 
+  public static listen(
+    userId: string,
+    projectId: string,
+    callback: (project: Project | null) => void
+  ): Unsubscribe {
+    const ref = this._getProjectRef(userId, projectId);
+    return onSnapshot(ref, (snapshot) => {
+      const project = this._documentSnapshotToProject(snapshot);
+      callback(project);
+    });
+  }
+
+  public static listenAll(
+    userId: string,
+    callback: (projects: Project[]) => void
+  ): Unsubscribe {
+    const ref = this._getProjectsRef(userId);
+    return onSnapshot(ref, (snapshot) => {
+      const projects = this._querySnapshotToProjects(snapshot);
+      callback(projects);
+    });
+  }
+
   public static async create(userId: string, project: Project): Promise<void> {
     const { id, ...data } = project;
     const ref = this._getProjectRef(userId, id);
@@ -135,6 +161,26 @@ export class ProjectsRepository {
   public static async delete(userId: string, projectId: string): Promise<void> {
     const ref = this._getProjectRef(userId, projectId);
     await deleteDoc(ref);
+  }
+
+  private static _documentSnapshotToProject(
+    snapshot: DocumentSnapshot
+  ): Project | null {
+    if (snapshot.exists()) {
+      return { id: snapshot.id, ...snapshot.data() } as Project;
+    } else {
+      return null;
+    }
+  }
+
+  private static _querySnapshotToProjects(snapshot: QuerySnapshot): Project[] {
+    return snapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as Project)
+    );
+  }
+
+  private static _getProjectsRef(userId: string): CollectionReference {
+    return collection(firestore, "users", userId, "projects");
   }
 
   private static _getProjectRef(
