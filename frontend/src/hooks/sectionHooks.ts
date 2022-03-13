@@ -1,7 +1,11 @@
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { sectionsInitializedState, sectionsState } from "@/atoms/sectionAtoms";
-import { CreateSectionInput } from "@/models/section";
+import {
+  CreateSectionInput,
+  Section,
+  UpdateSectionInput,
+} from "@/models/section";
 import { SectionsRepository, SectionsStateHelper } from "@/lib/sectionUtils";
 import { useCurrentUser } from "./userHooks";
 
@@ -23,9 +27,27 @@ export const useSections = () => {
     [currentUser, setSections]
   );
 
+  const updateSection = useCallback(
+    async (projectId: string, section: Section, input: UpdateSectionInput) => {
+      if (!currentUser) return;
+      const updatedSection = { ...section, ...input };
+      setSections((prev) => {
+        return SectionsStateHelper.update(prev, updatedSection);
+      });
+      await SectionsRepository.update(
+        currentUser.uid,
+        projectId,
+        section.id,
+        input
+      );
+    },
+    [currentUser, setSections]
+  );
+
   return {
     sectionsInitialized,
     sections,
     createSection,
+    updateSection,
   };
 };
