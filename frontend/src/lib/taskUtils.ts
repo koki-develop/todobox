@@ -735,6 +735,31 @@ export class TasksStateHelper {
     return this._addOrUpdate(prev, sections, task);
   }
 
+  public static separateTasks(prev: Task[]): {
+    incompleted: Task[];
+    completed: Task[];
+  } {
+    return prev.reduce(
+      (result, current) => {
+        if (current.completedAt) {
+          return {
+            incompleted: [...result.incompleted, current],
+            completed: result.completed,
+          };
+        } else {
+          return {
+            incompleted: result.incompleted,
+            completed: [...result.completed, current],
+          };
+        }
+      },
+      { incompleted: [], completed: [] } as {
+        incompleted: Task[];
+        completed: Task[];
+      }
+    );
+  }
+
   private static _addOrUpdate(
     prev: Task[],
     sections: Section[],
