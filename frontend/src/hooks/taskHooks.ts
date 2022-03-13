@@ -6,10 +6,10 @@ import {
   tasksState,
 } from "@/atoms/taskAtom";
 import { CreateTaskInput } from "@/models/task";
+import { UpdateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
 import { useSections } from "@/hooks/sectionHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
-import { UpdateTaskInput } from "@/models/task";
 
 export const useTasks = () => {
   const { currentUser } = useCurrentUser();
