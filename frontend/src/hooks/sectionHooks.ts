@@ -18,7 +18,7 @@ export const useSections = () => {
       setSections((prev) => {
         return SectionsStateHelper.create(prev, newSection);
       });
-      SectionsRepository.create(currentUser.uid, projectId, newSection);
+      await SectionsRepository.create(currentUser.uid, projectId, newSection);
     },
     [currentUser, setSections]
   );

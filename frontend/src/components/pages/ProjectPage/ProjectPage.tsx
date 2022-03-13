@@ -40,7 +40,6 @@ import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
 import {
-  createSection,
   deleteSectionBatch,
   deleteSectionState,
   listenSections,
@@ -152,14 +151,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   /*
    * section
    */
-
-  const handleCreateSection = useCallback(
-    (createdSection: Section) => {
-      setSections((prev) => updateOrAddSectionState(prev, createdSection));
-      createSection(currentUser.uid, createdSection);
-    },
-    [currentUser.uid]
-  );
 
   const handleUpdateSection = useCallback(
     (updatedSection: Section) => {
@@ -700,7 +691,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 <SectionList
                   projectId={projectId}
                   sections={sections}
-                  onCreateSection={handleCreateSection}
                   onUpdateSection={handleUpdateSection}
                   onDeleteSection={handleDeleteSection}
                   tasks={[...completedTasks, ...incompletedTasks]}

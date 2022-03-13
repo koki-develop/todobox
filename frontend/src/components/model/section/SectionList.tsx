@@ -5,8 +5,9 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import SectionListItem from "@/components/model/section/SectionListItem";
 import SectionListItemInput from "@/components/model/section/SectionListItemInput";
-import { Section } from "@/models/section";
+import { CreateSectionInput, Section } from "@/models/section";
 import { Task } from "@/models/task";
+import { useSections } from "@/hooks/sectionHooks";
 
 export type SectionListProps = {
   projectId: string;
@@ -14,7 +15,6 @@ export type SectionListProps = {
   tasks: Task[];
   selectedTasks: Task[];
 
-  onCreateSection: (section: Section) => void;
   onUpdateSection: (section: Section) => void;
   onDeleteSection: (section: Section) => void;
   onCompleteTask: (task: Task) => void;
@@ -32,7 +32,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     sections,
     tasks,
     selectedTasks,
-    onCreateSection,
     onUpdateSection,
     onDeleteSection,
     onCompleteTask,
@@ -43,6 +42,8 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     onSelectTask,
     onMultiSelectTask,
   } = props;
+
+  const { createSection } = useSections();
 
   const [inputtingNewSection, setInputtingNewSection] =
     useState<boolean>(false);
@@ -66,11 +67,11 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
   }, []);
 
   const handleCreateSection = useCallback(
-    (section: Section) => {
+    async (input: CreateSectionInput) => {
       setInputtingNewSection(false);
-      onCreateSection(section);
+      createSection(projectId, input);
     },
-    [onCreateSection]
+    [createSection, projectId]
   );
 
   return (
@@ -101,7 +102,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
           {provided.placeholder}
           {inputtingNewSection ? (
             <SectionListItemInput
-              projectId={projectId}
               sections={sections}
               onCreate={handleCreateSection}
               onCancel={handleCancelCreateSection}
