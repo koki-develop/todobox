@@ -31,6 +31,7 @@ import SectionList from "@/components/model/section/SectionList";
 import SectionsListener from "@/components/model/section/SectionsListener";
 import TaskList from "@/components/model/task/TaskList";
 import TaskModalCard from "@/components/model/task/TaskModalCard";
+import TasksListener from "@/components/model/task/TasksListener";
 import Field from "@/components/utils/Field";
 import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
@@ -487,6 +488,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     >
       <ProjectListener projectId={projectId} />
       <SectionsListener projectId={projectId} />
+      <TasksListener projectId={projectId} withCompleted={showCompletedTasks} />
       {!loaded && <Loading />}
       {loaded && !project && (
         <Box
