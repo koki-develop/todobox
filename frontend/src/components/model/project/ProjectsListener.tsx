@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import {
-  projectsInitializedState,
-  projectsState,
-} from "@/components/model/project/projectAtoms";
 import { useCurrentUser } from "@/components/model/user/userHooks";
+import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
 import { listenProjects } from "@/lib/projectUtils";
 
 export type ProjectsListenerProps = {

@@ -1,8 +1,11 @@
 import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
+import {
+  currentUserInitializedState,
+  currentUserState,
+} from "@/atoms/userAtoms";
 import { auth } from "@/lib/firebase";
-import { currentUserInitializedState, currentUserState } from "./userAtoms";
 
 export type CurrentUserListenerProps = {
   //

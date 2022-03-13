@@ -1,5 +1,8 @@
 import { useRecoilValue } from "recoil";
-import { currentUserInitializedState, currentUserState } from "./userAtoms";
+import {
+  currentUserInitializedState,
+  currentUserState,
+} from "@/atoms/userAtoms";
 
 export const useCurrentUser = () => {
   const initialized = useRecoilValue(currentUserInitializedState);
