@@ -13,7 +13,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { User } from "firebase/auth";
-import { writeBatch } from "firebase/firestore";
 import qs from "query-string";
 import React, {
   useCallback,
@@ -38,20 +37,14 @@ import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
-import { firestore } from "@/lib/firebase";
 import {
   completeTaskState,
-  deleteTaskBatch,
-  deleteTaskState,
   getTasksByRange,
   incompleteTaskState,
   moveTaskState,
   moveTasksState,
-  deleteTasksState,
   updateOrAddTaskState,
   updateTasks,
-  updateTasksBatch,
-  deleteTasksBatch,
   listenIncompletedTasks,
   listenCompletedTasks,
   separateTasks,

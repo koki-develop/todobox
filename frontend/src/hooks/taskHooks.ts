@@ -5,8 +5,7 @@ import {
   incompletedTasksInitializedState,
   tasksState,
 } from "@/atoms/taskAtom";
-import { CreateTaskInput } from "@/models/task";
-import { UpdateTaskInput } from "@/models/task";
+import { CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
 import { useSections } from "@/hooks/sectionHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
