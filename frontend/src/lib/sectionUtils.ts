@@ -72,15 +72,7 @@ export class SectionsRepository {
     inputs: { [id: string]: UpdateSectionInput }
   ): void {
     for (const [id, input] of Object.entries(inputs)) {
-      const ref = doc(
-        firestore,
-        "users",
-        userId,
-        "projects",
-        projectId,
-        "sections",
-        id
-      );
+      const ref = this._getSectionRef(userId, projectId, id);
       batch.update(ref, { ...input });
     }
   }
@@ -91,15 +83,7 @@ export class SectionsRepository {
     projectId: string,
     sectionId: string
   ): void {
-    const ref = doc(
-      firestore,
-      "users",
-      userId,
-      "projects",
-      projectId,
-      "sections",
-      sectionId
-    );
+    const ref = this._getSectionRef(userId, projectId, sectionId);
     batch.delete(ref);
   }
 
