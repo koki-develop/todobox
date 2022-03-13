@@ -1,10 +1,13 @@
 import {
   collection,
+  CollectionReference,
   deleteDoc,
   doc,
   onSnapshot,
   orderBy,
+  Query,
   query,
+  QuerySnapshot,
   setDoc,
   Unsubscribe,
   updateDoc,
@@ -624,3 +627,74 @@ export const deleteTasksBatch = (
     deleteTaskBatch(batch, userId, projectId, taskId);
   }
 };
+
+export class TasksRepository {
+  public static listenIncompletedTasks(
+    userId: string,
+    projectId: string,
+    callback: (tasks: Task[]) => void
+  ): Unsubscribe {
+    const q = this._getIncompletedTasksQuery(userId, projectId);
+    return onSnapshot(q, (snapshot) => {
+      const tasks = this._querySnapshotToTasks(snapshot);
+      callback(tasks);
+    });
+  }
+
+  public static listenCompletedTasks(
+    userId: string,
+    projectId: string,
+    callback: (tasks: Task[]) => void
+  ): Unsubscribe {
+    const q = this._getCompletedTasksQuery(userId, projectId);
+    return onSnapshot(q, (snapshot) => {
+      const tasks = this._querySnapshotToTasks(snapshot);
+      callback(tasks);
+    });
+  }
+
+  private static _querySnapshotToTasks(snapshot: QuerySnapshot): Task[] {
+    return snapshot.docs.map((doc) => {
+      const { completedAt, ...data } = doc.data();
+      return {
+        id: doc.id,
+        completedAt: completedAt?.toDate() ?? null,
+        ...data,
+      } as Task;
+    });
+  }
+
+  private static _getTasksRef(
+    userId: string,
+    projectId: string
+  ): CollectionReference {
+    return collection(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "tasks"
+    );
+  }
+
+  private static _getIncompletedTasksQuery(
+    userId: string,
+    projectId: string
+  ): Query {
+    const ref = this._getTasksRef(userId, projectId);
+    return query(ref, where("completedAt", "==", null), orderBy("index"));
+  }
+
+  private static _getCompletedTasksQuery(
+    userId: string,
+    projectId: string
+  ): Query {
+    const ref = this._getTasksRef(userId, projectId);
+    return query(
+      ref,
+      where("completedAt", "!=", null),
+      orderBy("completedAt", "desc")
+    );
+  }
+}
