@@ -939,9 +939,9 @@ export class TasksStateHelper {
     }
 
     // 移動後のタスクの直下に付随するタスク一覧を挿入
-    const insertedTasks = insertTasksToTasks(
-      sections,
+    const insertedTasks = this._insertTasks(
       indexedFilteredTasks,
+      sections,
       otherTasks,
       toSectionId,
       movedFirstTask.index + 1
@@ -1060,6 +1060,28 @@ export class TasksStateHelper {
     }
   }
 
+  private static _addOrUpdateTasks(
+    prev: Task[],
+    sections: Section[],
+    tasks: Task[]
+  ): Task[] {
+    const [tasksToAdd, tasksToUpdate]: [Task[], Task[]] = tasks.reduce(
+      (result, current) => {
+        if (prev.some((task) => task.id === current.id)) {
+          return [result[0], [...result[1], current]];
+        } else {
+          return [[...result[0], current], result[1]];
+        }
+      },
+      [[], []] as [Task[], Task[]]
+    );
+
+    return this._sort(
+      [...this._updateTasks(prev, sections, tasksToUpdate), ...tasksToAdd],
+      sections
+    );
+  }
+
   private static _update(
     prev: Task[],
     sections: Section[],
@@ -1170,16 +1192,19 @@ export class TasksStateHelper {
     sectionId: string | null,
     index: number
   ): Task[] => {
+    const tasksClone = prev.concat();
+    const tasksToInsertClone = tasksToInsert.concat();
+
     // 挿入先のセクションのタスク一覧を取得
-    const sectionTasks = this._filterBySectionId(prev, sectionId);
+    const sectionTasks = this._filterBySectionId(tasksClone, sectionId);
 
     // タスクを挿入して採番
     sectionTasks.splice(
       index,
       0,
-      ...tasksToInsert.map((task) => ({ ...task, sectionId }))
+      ...tasksToInsertClone.map((task) => ({ ...task, sectionId }))
     );
     const indexedSectionTasks = this._index(sectionTasks, sections);
-    return this._updateTasks(prev, sections, indexedSectionTasks);
+    return this._addOrUpdateTasks(tasksClone, sections, indexedSectionTasks);
   };
 }
