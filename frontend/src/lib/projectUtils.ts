@@ -144,3 +144,27 @@ export class ProjectsRepository {
     return doc(firestore, "users", userId, "projects", projectId);
   }
 }
+
+export class ProjectsStateHelper {
+  public static create(prev: Project[], project: Project): Project[] {
+    return this._addOrUpdate(prev, project);
+  }
+
+  private static _addOrUpdate(
+    prev: Project[],
+    projectToAddOrUpdate: Project
+  ): Project[] {
+    if (
+      !prev.some((prevProject) => prevProject.id === projectToAddOrUpdate.id)
+    ) {
+      return [...prev, projectToAddOrUpdate];
+    }
+
+    return prev.map((prevProject) => {
+      if (prevProject.id !== projectToAddOrUpdate.id) {
+        return prevProject;
+      }
+      return projectToAddOrUpdate;
+    });
+  }
+}
