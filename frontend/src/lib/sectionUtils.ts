@@ -12,6 +12,7 @@ import {
   Unsubscribe,
   Query,
   QuerySnapshot,
+  DocumentReference,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section, CreateSectionInput } from "@/models/section";
@@ -206,6 +207,20 @@ export const deleteSectionBatch = (
 };
 
 export class SectionsRepository {
+  public static build(input: CreateSectionInput): Section {
+    return { id: ulid(), ...input };
+  }
+
+  public static async create(
+    userId: string,
+    projectId: string,
+    section: Section
+  ): Promise<void> {
+    const { id, ...data } = section;
+    const ref = this._getSectionRef(userId, projectId, id);
+    await setDoc(ref, data);
+  }
+
   public static listenAll(
     userId: string,
     projectId: string,
@@ -213,9 +228,25 @@ export class SectionsRepository {
   ): Unsubscribe {
     const q = this._getSectionsQuery(userId, projectId);
     return onSnapshot(q, (snapshot) => {
-      const sections = this._querySnapshotToSections(projectId, snapshot);
+      const sections = this._querySnapshotToSections(snapshot);
       callback(sections);
     });
+  }
+
+  private static _getSectionRef(
+    userId: string,
+    projectId: string,
+    sectionId: string
+  ): DocumentReference {
+    return doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "sections",
+      sectionId
+    );
   }
 
   private static _getSectionsQuery(userId: string, projectId: string): Query {
@@ -230,17 +261,47 @@ export class SectionsRepository {
     return query(ref, orderBy("index"));
   }
 
-  private static _querySnapshotToSections(
-    projectId: string,
-    snapshot: QuerySnapshot
-  ): Section[] {
+  private static _querySnapshotToSections(snapshot: QuerySnapshot): Section[] {
     return snapshot.docs.map(
       (doc) =>
         ({
           id: doc.id,
-          projectId,
           ...doc.data(),
         } as Section)
     );
+  }
+}
+
+export class SectionsStateHelper {
+  public static create(prev: Section[], section: Section): Section[] {
+    return this._addOrUpdate(prev, section);
+  }
+
+  private static _addOrUpdate(prev: Section[], section: Section): Section[] {
+    if (prev.some((prevSection) => prevSection.id === section.id)) {
+      return this._update(prev, section);
+    } else {
+      return this._sort([...prev, section]);
+    }
+  }
+
+  private static _update(prev: Section[], section: Section): Section[] {
+    return this._sort(
+      prev.map((prevSection) => {
+        if (prevSection.id === section.id) {
+          return section;
+        } else {
+          return prevSection;
+        }
+      })
+    );
+  }
+
+  private static _sort(prev: Section[]): Section[] {
+    return prev.concat().sort((a, b) => a.index - b.index);
+  }
+
+  private static _index(prev: Section[]): Section[] {
+    return prev.map((prevSection, i) => ({ ...prevSection, index: i }));
   }
 }
