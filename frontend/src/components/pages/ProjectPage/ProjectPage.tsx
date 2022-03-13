@@ -39,9 +39,7 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 import {
   getTasksByRange,
-  moveTasksState,
   updateOrAddTaskState,
-  updateTasks,
   separateTasks,
 } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
@@ -63,8 +61,13 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const { project, projectInitialized } = useProjects();
   const { sections, sectionsInitialized, moveSection } = useSections();
-  const { incompletedTasks, tasksInitialized, completedTasks, moveTask } =
-    useTasks();
+  const {
+    incompletedTasks,
+    tasksInitialized,
+    completedTasks,
+    moveTask,
+    moveTasks,
+  } = useTasks();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -227,7 +230,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   const handleDragEndTask = useCallback(
-    (result: DropResult) => {
+    async (result: DropResult) => {
       const { source, destination } = result;
       if (!destination) return;
       const fromSectionId =
@@ -246,29 +249,16 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        moveTask(projectId, taskId, toSectionId, toIndex);
+        await moveTask(projectId, taskId, toSectionId, toIndex);
       } else {
         // 複数移動
-        const firstTaskId = taskId;
         const otherTaskIds = selectedTasks
-          .filter((selectedTask) => selectedTask.id !== firstTaskId)
+          .filter((selectedTask) => selectedTask.id !== taskId)
           .map((selectedTask) => selectedTask.id);
-        setAllTasks((prev) => {
-          const next = moveTasksState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            firstTaskId,
-            otherTaskIds,
-            toSectionId,
-            toIndex
-          );
-          updateTasks(currentUser.uid, next);
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        });
+        await moveTasks(projectId, taskId, otherTaskIds, toSectionId, toIndex);
       }
     },
-    [currentUser.uid, moveTask, projectId, sections, selectedTasks]
+    [moveTask, moveTasks, projectId, selectedTasks]
   );
 
   useEffect(() => {
