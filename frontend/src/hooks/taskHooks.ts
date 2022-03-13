@@ -54,6 +54,35 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const deleteTask = useCallback(
+    async (projectId: string, taskId: string) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.delete(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskId
+        );
+        const batch = TasksRepository.writeBatch();
+        const updateInputs = allTasks.reduce((result, current) => {
+          const { id, completedAt, index } = current;
+          result[id] = { completedAt, index };
+          return result;
+        }, {} as { [id: string]: UpdateTaskInput });
+        TasksRepository.updateTasksBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          updateInputs
+        );
+        TasksRepository.deleteBatch(batch, currentUser.uid, projectId, taskId);
+        TasksRepository.commitBatch(batch);
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   const completeTask = useCallback(
     async (projectId: string, taskId: string) => {
       if (!currentUser) return;
@@ -102,6 +131,7 @@ export const useTasks = () => {
     incompletedTasks,
     completedTasks,
     createTask,
+    deleteTask,
     completeTask,
     incompleteTask,
   };
