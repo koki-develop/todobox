@@ -5,7 +5,7 @@ import {
   incompletedTasksInitializedState,
   tasksState,
 } from "@/atoms/taskAtom";
-import { CreateTaskInput, UpdateTaskInput } from "@/models/task";
+import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
 import { useSections } from "@/hooks/sectionHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
@@ -49,6 +49,23 @@ export const useTasks = () => {
         return TasksStateHelper.separateTasks(allTasks);
       });
       await TasksRepository.create(currentUser.uid, projectId, newTask);
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
+  const updateTask = useCallback(
+    async (projectId: string, task: Task, input: UpdateTaskInput) => {
+      if (!currentUser) return;
+      const updatedTask = { ...task, ...input };
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.update(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          updatedTask
+        );
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+      await TasksRepository.update(currentUser.uid, projectId, task.id, input);
     },
     [currentUser, sections, setAllTasks]
   );
@@ -204,6 +221,7 @@ export const useTasks = () => {
     incompletedTasks,
     completedTasks,
     createTask,
+    updateTask,
     deleteTask,
     deleteTasks,
     completeTask,

@@ -6,7 +6,8 @@ import Loading from "@/components/utils/Loading";
 import ModalCard from "@/components/utils/ModalCard";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Task } from "@/models/task";
-import { listenTask, updateTask } from "@/lib/taskUtils";
+import { listenTask } from "@/lib/taskUtils";
+import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskModalCardProps = {
   open: boolean;
@@ -14,14 +15,15 @@ export type TaskModalCardProps = {
   projectId: string;
   taskId?: string;
 
-  onUpdated(task: Task): void;
   onClose: () => void;
 };
 
 const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
-  const { open, userId, projectId, taskId, onUpdated, onClose } = props;
+  const { open, userId, projectId, taskId, onClose } = props;
 
   const theme = useTheme();
+
+  const { updateTask } = useTasks();
 
   const [loadedTask, setLoadedTask] = useState<boolean>(false);
   const [task, setTask] = useState<Task | null>(null);
@@ -54,11 +56,8 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
   useEffect(() => {
     if (!task) return;
     if (task.title === title) return;
-    const timeoutId = setTimeout(() => {
-      const updatedTask = { ...task, title };
-      updateTask(userId, updatedTask).then(() => {
-        onUpdated(updatedTask);
-      });
+    const timeoutId = setTimeout(async () => {
+      await updateTask(projectId, task, { title });
     }, 500);
     return () => {
       clearTimeout(timeoutId);

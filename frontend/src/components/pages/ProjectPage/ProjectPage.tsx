@@ -172,21 +172,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     [navigate]
   );
 
-  const handleUpdatedTask = useCallback(
-    (updatedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = updateOrAddTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          updatedTask
-        );
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-    },
-    [sections]
-  );
-
   const handleCloseTaskModal = useCallback(() => {
     navigate("");
   }, [navigate]);
@@ -340,7 +325,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
             projectId={projectId}
             taskId={showingTaskId}
             open={Boolean(showingTaskId)}
-            onUpdated={handleUpdatedTask}
             onClose={handleCloseTaskModal}
           />
 

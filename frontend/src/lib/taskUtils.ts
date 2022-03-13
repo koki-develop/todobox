@@ -652,6 +652,16 @@ export class TasksRepository {
     await batch.commit();
   }
 
+  public static async update(
+    userId: string,
+    projectId: string,
+    taskId: string,
+    input: UpdateTaskInput
+  ): Promise<void> {
+    const ref = this._getTaskRef(userId, projectId, taskId);
+    await updateDoc(ref, { ...input });
+  }
+
   public static async updateTasks(
     userId: string,
     projectId: string,
@@ -785,6 +795,10 @@ export class TasksRepository {
 export class TasksStateHelper {
   public static create(prev: Task[], sections: Section[], task: Task): Task[] {
     return this._addOrUpdate(prev, sections, task);
+  }
+
+  public static update(prev: Task[], sections: Section[], task: Task): Task[] {
+    return this._update(prev, sections, task);
   }
 
   public static move(
