@@ -215,6 +215,10 @@ export class SectionsRepository {
     return { id: ulid(), ...input };
   }
 
+  public static writeBatch(): WriteBatch {
+    return writeBatch(firestore);
+  }
+
   public static async create(
     userId: string,
     projectId: string,
@@ -233,6 +237,45 @@ export class SectionsRepository {
   ): Promise<void> {
     const ref = this._getSectionRef(userId, projectId, sectionId);
     await updateDoc(ref, { ...input });
+  }
+
+  public static updateSectionsBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    sections: Section[]
+  ): void {
+    for (const section of sections) {
+      const { id, ...data } = section;
+      const ref = doc(
+        firestore,
+        "users",
+        userId,
+        "projects",
+        projectId,
+        "sections",
+        id
+      );
+      batch.update(ref, { ...data });
+    }
+  }
+
+  public static deleteSectionBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    sectionId: string
+  ): void {
+    const ref = doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "sections",
+      sectionId
+    );
+    batch.delete(ref);
   }
 
   public static listenAll(
@@ -293,6 +336,12 @@ export class SectionsStateHelper {
 
   public static update(prev: Section[], section: Section): Section[] {
     return this._update(prev, section);
+  }
+
+  public static delete(prev: Section[], sectionId: string): Section[] {
+    return this._index(
+      prev.filter((prevSection) => prevSection.id !== sectionId)
+    );
   }
 
   private static _addOrUpdate(prev: Section[], section: Section): Section[] {
