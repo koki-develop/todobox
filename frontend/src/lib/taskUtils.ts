@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   DocumentReference,
+  DocumentSnapshot,
   onSnapshot,
   orderBy,
   Query,
@@ -706,6 +707,19 @@ export class TasksRepository {
     batch.delete(ref);
   }
 
+  public static listen(
+    userId: string,
+    projectId: string,
+    taskId: string,
+    callback: (task: Task | null) => void
+  ): Unsubscribe {
+    const ref = this._getTaskRef(userId, projectId, taskId);
+    return onSnapshot(ref, (snapshot) => {
+      const task = this._documentSnapshotToTask(snapshot);
+      callback(task);
+    });
+  }
+
   public static listenIncompletedTasks(
     userId: string,
     projectId: string,
@@ -728,6 +742,21 @@ export class TasksRepository {
       const tasks = this._querySnapshotToTasks(snapshot);
       callback(tasks);
     });
+  }
+
+  private static _documentSnapshotToTask(
+    snapshot: DocumentSnapshot
+  ): Task | null {
+    if (snapshot.exists()) {
+      const { completedAt, ...data } = snapshot.data();
+      return {
+        id: snapshot.id,
+        completedAt: completedAt?.toDate() ?? null,
+        ...data,
+      } as Task;
+    } else {
+      return null;
+    }
   }
 
   private static _querySnapshotToTasks(snapshot: QuerySnapshot): Task[] {
