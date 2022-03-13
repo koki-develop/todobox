@@ -46,9 +46,7 @@ export type ProjectPageProps = {
   currentUser: User;
 };
 
-const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
-  const { currentUser } = props;
-
+const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
   const params = useParams();
   const projectId = params.id as string;
   const location = useLocation();
@@ -322,7 +320,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           />
           {showingTaskId && (
             <TaskModalCard
-              userId={currentUser.uid}
               projectId={projectId}
               taskId={showingTaskId}
               open={openTaskModal}
