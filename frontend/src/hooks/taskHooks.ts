@@ -83,6 +83,22 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const deleteTasks = useCallback(
+    async (projectId: string, taskIds: string[]) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.deleteTasks(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskIds
+        );
+        TasksRepository.deleteTasks(currentUser.uid, projectId, taskIds);
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   const completeTask = useCallback(
     async (projectId: string, taskId: string) => {
       if (!currentUser) return;
@@ -132,6 +148,7 @@ export const useTasks = () => {
     completedTasks,
     createTask,
     deleteTask,
+    deleteTasks,
     completeTask,
     incompleteTask,
   };
