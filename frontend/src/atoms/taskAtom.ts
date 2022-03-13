@@ -18,3 +18,13 @@ export const tasksState = atom<{ incompleted: Task[]; completed: Task[] }>({
     completed: [],
   },
 });
+
+export const taskInitializedState = atom<boolean>({
+  key: "taskInitializedState",
+  default: false,
+});
+
+export const taskState = atom<Task | null>({
+  key: "taskState",
+  default: null,
+});
