@@ -3,7 +3,9 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import {
   completedTasksInitializedState,
   incompletedTasksInitializedState,
+  taskInitializedState,
   tasksState,
+  taskState,
 } from "@/atoms/taskAtom";
 import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
@@ -31,6 +33,9 @@ export const useTasks = () => {
   const completedTasksInitialized = useRecoilValue(
     completedTasksInitializedState
   );
+
+  const task = useRecoilValue(taskState);
+  const taskInitialized = useRecoilValue(taskInitializedState);
 
   const tasksInitialized = useMemo(() => {
     return incompletedTasksInitialized && completedTasksInitialized;
@@ -216,6 +221,8 @@ export const useTasks = () => {
   );
 
   return {
+    taskInitialized,
+    task,
     tasksInitialized,
     tasks,
     incompletedTasks,
