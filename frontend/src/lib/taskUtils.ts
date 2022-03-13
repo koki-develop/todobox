@@ -674,6 +674,16 @@ export class TasksRepository {
     }
   }
 
+  public static deleteBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    taskId: string
+  ): void {
+    const ref = this._getTaskRef(userId, projectId, taskId);
+    batch.delete(ref);
+  }
+
   public static listenIncompletedTasks(
     userId: string,
     projectId: string,
