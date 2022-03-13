@@ -2,9 +2,8 @@ import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import {
   completedTasksInitializedState,
-  completedTasksState,
   incompletedTasksInitializedState,
-  incompletedTasksState,
+  tasksState,
 } from "@/atoms/taskAtom";
 import { TasksRepository } from "@/lib/taskUtils";
 import { useCurrentUser } from "@/hooks/userHooks";
@@ -18,15 +17,14 @@ const TasksListener: React.VFC<TasksListenerProps> = React.memo((props) => {
   const { projectId, withCompleted } = props;
 
   const { currentUser } = useCurrentUser();
+  const setTasks = useSetRecoilState(tasksState);
 
   const setIncompletedTasksInitialized = useSetRecoilState(
     incompletedTasksInitializedState
   );
-  const setIncompletedTasks = useSetRecoilState(incompletedTasksState);
   const setCompletedTasksInitialized = useSetRecoilState(
     completedTasksInitializedState
   );
-  const setCompletedTasks = useSetRecoilState(completedTasksState);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -34,21 +32,16 @@ const TasksListener: React.VFC<TasksListenerProps> = React.memo((props) => {
       currentUser.uid,
       projectId,
       (tasks) => {
-        setIncompletedTasks(tasks);
+        setTasks((prev) => ({ ...prev, incompleted: tasks }));
         setIncompletedTasksInitialized(true);
       }
     );
     return () => {
       unsubscribe();
       setIncompletedTasksInitialized(false);
-      setIncompletedTasks([]);
+      setTasks((prev) => ({ ...prev, incompleted: [] }));
     };
-  }, [
-    currentUser,
-    projectId,
-    setIncompletedTasks,
-    setIncompletedTasksInitialized,
-  ]);
+  }, [currentUser, projectId, setIncompletedTasksInitialized, setTasks]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -60,20 +53,20 @@ const TasksListener: React.VFC<TasksListenerProps> = React.memo((props) => {
       currentUser.uid,
       projectId,
       (tasks) => {
-        setCompletedTasks(tasks);
+        setTasks((prev) => ({ ...prev, completed: tasks }));
         setCompletedTasksInitialized(true);
       }
     );
     return () => {
       unsubscribe();
       setCompletedTasksInitialized(false);
-      setCompletedTasks([]);
+      setTasks((prev) => ({ ...prev, completed: [] }));
     };
   }, [
     currentUser,
     projectId,
-    setCompletedTasks,
     setCompletedTasksInitialized,
+    setTasks,
     withCompleted,
   ]);
 

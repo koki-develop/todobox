@@ -8,13 +8,12 @@ import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
-import { separateTasks } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/taskUtils";
 import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskListProps = {
   projectId: string;
   sectionId: string | null;
-  tasks: Task[];
   selectedTasks: Task[];
 
   onCompleteTask: (task: Task) => void;
@@ -29,7 +28,6 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   const {
     projectId,
     sectionId,
-    tasks,
     selectedTasks,
     onCompleteTask,
     onIncompleteTask,
@@ -41,17 +39,22 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const theme = useTheme();
 
-  const { createTask } = useTasks();
+  const { tasks, createTask } = useTasks();
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
+
+  const sectionTasks = useMemo(() => {
+    return tasks.filter((task) => task.sectionId === sectionId);
+  }, [sectionId, tasks]);
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
   }, [sectionId]);
 
-  const [completedTasks, incompletedTasks] = useMemo(() => {
-    return separateTasks(tasks);
-  }, [tasks]);
+  const { completed: completedTasks, incompleted: incompletedTasks } =
+    useMemo(() => {
+      return TasksStateHelper.separateTasks(sectionTasks);
+    }, [sectionTasks]);
 
   const handleStartCreateTask = useCallback(() => {
     setInputtingTask(true);

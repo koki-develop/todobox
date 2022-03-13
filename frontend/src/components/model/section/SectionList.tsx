@@ -80,7 +80,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
                 projectId={projectId}
                 section={sectionWithTasks.section}
                 sections={sections}
-                tasks={sectionWithTasks.tasks}
                 selectedTasks={selectedTasks}
                 onCompleteTask={onCompleteTask}
                 onIncompleteTask={onIncompleteTask}

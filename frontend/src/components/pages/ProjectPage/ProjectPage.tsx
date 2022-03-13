@@ -157,13 +157,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     return (query.task as string) ?? undefined;
   }, [location.search]);
 
-  const noSectionTasks = useMemo(() => {
-    return [
-      ...(showCompletedTasks ? allTasks.completed : []),
-      ...allTasks.incompleted,
-    ].filter((task) => task.sectionId == null);
-  }, [allTasks.completed, allTasks.incompleted, showCompletedTasks]);
-
   const completedTasks = useMemo(() => {
     if (!showCompletedTasks) return [];
     return allTasks.completed;
@@ -596,7 +589,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   <TaskList
                     projectId={projectId}
                     sectionId={null}
-                    tasks={noSectionTasks}
                     selectedTasks={selectedTasks}
                     onCompleteTask={handleCompleteTask}
                     onIncompleteTask={handleIncompleteTask}
