@@ -644,6 +644,33 @@ export class TasksRepository {
     await setDoc(ref, data);
   }
 
+  public static writeBatch(): WriteBatch {
+    return writeBatch(firestore);
+  }
+
+  public static async updateTasks(
+    userId: string,
+    projectId: string,
+    tasks: Task[]
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    this.updateTasksBatch(batch, userId, projectId, tasks);
+    await batch.commit();
+  }
+
+  public static updateTasksBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    tasks: Task[]
+  ): void {
+    for (const task of tasks) {
+      const { id, ...data } = task;
+      const ref = this._getTaskRef(userId, projectId, id);
+      batch.update(ref, { ...data });
+    }
+  }
+
   public static listenIncompletedTasks(
     userId: string,
     projectId: string,
