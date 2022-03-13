@@ -39,7 +39,6 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
-import { listenSections } from "@/lib/sectionUtils";
 import {
   completeTaskState,
   createTask,
@@ -152,23 +151,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     },
     [moveSection, projectId]
   );
-
-  useEffect(() => {
-    if (!project) {
-      setSectionsLoaded(true);
-      return;
-    }
-
-    const unsubscribe = listenSections(
-      currentUser.uid,
-      project.id,
-      (sections) => {
-        setSections(sections);
-        setSectionsLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project]);
 
   /*
    * task
