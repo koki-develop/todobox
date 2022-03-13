@@ -28,6 +28,7 @@ import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteC
 import ProjectListener from "@/components/model/project/ProjectListener";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import SectionList from "@/components/model/section/SectionList";
+import SectionsListener from "@/components/model/section/SectionsListener";
 import TaskList from "@/components/model/task/TaskList";
 import TaskModalCard from "@/components/model/task/TaskModalCard";
 import Field from "@/components/utils/Field";
@@ -558,6 +559,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
       }}
     >
       <ProjectListener projectId={projectId} />
+      <SectionsListener projectId={projectId} />
       {!loaded && <Loading />}
       {loaded && !project && (
         <Box
