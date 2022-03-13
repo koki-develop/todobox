@@ -842,6 +842,79 @@ export class TasksStateHelper {
     }
   }
 
+  public static moveTasks(
+    prev: Task[],
+    sections: Section[],
+    firstTaskId: string,
+    otherTaskIds: string[],
+    toSectionId: string | null,
+    toIndex: number
+  ): Task[] {
+    // 移動対象のタスクを取得
+    const firstTask = prev.find((task) => task.id === firstTaskId);
+    if (!firstTask) return prev;
+
+    // 付随する移動対象のタスク一覧を取得
+    const otherTasks: Task[] = otherTaskIds.reduce((result, current) => {
+      const otherTask = prev.find((task) => task.id === current);
+      if (!otherTask) {
+        return result;
+      }
+      return [...result, otherTask];
+    }, [] as Task[]);
+
+    // 全ての移動対象のタスクの順序を保持しておく
+    const sortedMovingTasks = indexTasksState(
+      sections,
+      this._sort([firstTask, ...otherTasks], sections).map((task) => ({
+        ...task,
+        sectionId: toSectionId,
+      }))
+    );
+
+    // 移動対象のタスクを移動する
+    const movedTasks = this.move(
+      prev,
+      sections,
+      firstTask.id,
+      toSectionId,
+      toIndex
+    );
+
+    // 付随する移動対象のタスクを一旦タスク一覧から省いて採番する
+    const filteredTasks = movedTasks.filter(
+      (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
+    );
+    const indexedFilteredTasks = this._index(filteredTasks, sections);
+
+    // 移動後のタスクを取得
+    const movedFirstTask = indexedFilteredTasks.find(
+      (task) => task.id === firstTask.id
+    );
+    if (!movedFirstTask) {
+      throw new Error();
+    }
+
+    // 移動後のタスクの直下に付随するタスク一覧を挿入
+    const insertedTasks = this._insertTasks(
+      indexedFilteredTasks,
+      sections,
+      otherTasks,
+      toSectionId,
+      movedFirstTask.index + 1
+    );
+
+    // 移動したタスクの index を最初の順序に更新
+    return this._updateTasks(
+      insertedTasks,
+      sections,
+      sortedMovingTasks.map((task) => ({
+        ...task,
+        index: task.index + movedFirstTask.index,
+      }))
+    );
+  }
+
   public static complete(
     prev: Task[],
     sections: Section[],
@@ -1046,4 +1119,24 @@ export class TasksStateHelper {
 
     return sortTasks(sections, indexedTasks);
   }
+
+  private static _insertTasks = (
+    prev: Task[],
+    sections: Section[],
+    tasksToInsert: Task[],
+    sectionId: string | null,
+    index: number
+  ): Task[] => {
+    // 挿入先のセクションのタスク一覧を取得
+    const sectionTasks = this._filterBySectionId(prev, sectionId);
+
+    // タスクを挿入して採番
+    sectionTasks.splice(
+      index,
+      0,
+      ...tasksToInsert.map((task) => ({ ...task, sectionId }))
+    );
+    const indexedSectionTasks = this._index(sectionTasks, sections);
+    return this._updateTasks(prev, sections, indexedSectionTasks);
+  };
 }
