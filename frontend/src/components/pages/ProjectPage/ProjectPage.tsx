@@ -39,7 +39,6 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 import {
   getTasksByRange,
-  moveTaskState,
   moveTasksState,
   updateOrAddTaskState,
   updateTasks,
@@ -64,7 +63,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const { project, projectInitialized } = useProjects();
   const { sections, sectionsInitialized, moveSection } = useSections();
-  const { incompletedTasks, tasksInitialized, completedTasks } = useTasks();
+  const { incompletedTasks, tasksInitialized, completedTasks, moveTask } =
+    useTasks();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -246,18 +246,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        setAllTasks((prev) => {
-          const next = moveTaskState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            taskId,
-            toSectionId,
-            toIndex
-          );
-          updateTasks(currentUser.uid, next);
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        });
+        moveTask(projectId, taskId, toSectionId, toIndex);
       } else {
         // 複数移動
         const firstTaskId = taskId;
@@ -279,7 +268,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         });
       }
     },
-    [currentUser.uid, sections, selectedTasks]
+    [currentUser.uid, moveTask, projectId, sections, selectedTasks]
   );
 
   useEffect(() => {
