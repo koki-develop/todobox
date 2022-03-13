@@ -916,9 +916,9 @@ export class TasksStateHelper {
     );
 
     // 移動対象のタスクを移動する
-    const movedTasks = moveTaskState(
-      sections,
+    const movedTasks = this.move(
       prev,
+      sections,
       firstTask.id,
       toSectionId,
       toIndex
