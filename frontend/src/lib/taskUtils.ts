@@ -18,7 +18,7 @@ import {
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section } from "@/models/section";
-import { Task, CreateTaskInput } from "@/models/task";
+import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { arrayMove, arrayMoveToArray } from "@/lib/arrayUtils";
 import { firestore } from "@/lib/firebase";
 
@@ -648,26 +648,29 @@ export class TasksRepository {
     return writeBatch(firestore);
   }
 
+  public static async commitBatch(batch: WriteBatch): Promise<void> {
+    await batch.commit();
+  }
+
   public static async updateTasks(
     userId: string,
     projectId: string,
-    tasks: Task[]
+    inputs: { [id: string]: UpdateTaskInput }
   ): Promise<void> {
     const batch = this.writeBatch();
-    this.updateTasksBatch(batch, userId, projectId, tasks);
-    await batch.commit();
+    this.updateTasksBatch(batch, userId, projectId, inputs);
+    await this.commitBatch(batch);
   }
 
   public static updateTasksBatch(
     batch: WriteBatch,
     userId: string,
     projectId: string,
-    tasks: Task[]
+    inputs: { [id: string]: UpdateTaskInput }
   ): void {
-    for (const task of tasks) {
-      const { id, ...data } = task;
+    for (const [id, input] of Object.entries(inputs)) {
       const ref = this._getTaskRef(userId, projectId, id);
-      batch.update(ref, { ...data });
+      batch.update(ref, { ...input });
     }
   }
 
