@@ -907,12 +907,12 @@ export class TasksStateHelper {
     }, [] as Task[]);
 
     // 全ての移動対象のタスクの順序を保持しておく
-    const sortedMovingTasks = indexTasksState(
-      sections,
+    const sortedMovingTasks = this._index(
       sortTasks(sections, [firstTask, ...otherTasks]).map((task) => ({
         ...task,
         sectionId: toSectionId,
-      }))
+      })),
+      sections
     );
 
     // 移動対象のタスクを移動する
@@ -928,7 +928,7 @@ export class TasksStateHelper {
     const filteredTasks = movedTasks.filter(
       (task) => !otherTasks.some((otherTask) => otherTask.id === task.id)
     );
-    const indexedFilteredTasks = indexTasksState(sections, filteredTasks);
+    const indexedFilteredTasks = this._index(filteredTasks, sections);
 
     // 移動後のタスクを取得
     const movedFirstTask = indexedFilteredTasks.find(
