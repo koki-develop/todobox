@@ -8,7 +8,8 @@ import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
-import { buildTask, separateTasks } from "@/lib/taskUtils";
+import { separateTasks } from "@/lib/taskUtils";
+import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskListProps = {
   projectId: string;
@@ -18,7 +19,6 @@ export type TaskListProps = {
 
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
-  onCreateTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
@@ -33,7 +33,6 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     selectedTasks,
     onCompleteTask,
     onIncompleteTask,
-    onCreateTask,
     onDeleteTask,
     onClickTask,
     onSelectTask,
@@ -41,6 +40,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   } = props;
 
   const theme = useTheme();
+
+  const { createTask } = useTasks();
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
@@ -61,7 +62,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   }, []);
 
   const handleCreateTask = useCallback(
-    (title: string, cont: boolean) => {
+    async (title: string, cont: boolean) => {
       if (!cont) {
         setInputtingTask(false);
       }
@@ -69,15 +70,10 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
         incompletedTasks.length === 0
           ? 0
           : incompletedTasks.slice(-1)[0].index + 1;
-      const task = buildTask({
-        projectId,
-        sectionId,
-        title,
-        index,
-      });
-      onCreateTask(task);
+
+      await createTask(projectId, { sectionId, title, index });
     },
-    [incompletedTasks, onCreateTask, projectId, sectionId]
+    [createTask, incompletedTasks, projectId, sectionId]
   );
 
   // TODO: リファクタ

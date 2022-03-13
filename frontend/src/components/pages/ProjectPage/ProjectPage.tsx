@@ -41,7 +41,6 @@ import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
 import {
   completeTaskState,
-  createTask,
   deleteTaskBatch,
   deleteTaskState,
   getTasksByRange,
@@ -225,22 +224,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         const [completed, incompleted] = separateTasks(next);
         return { completed, incompleted };
       });
-    },
-    [currentUser.uid, sections]
-  );
-
-  const handleCreateTask = useCallback(
-    (createdTask: Task) => {
-      setAllTasks((prev) => {
-        const next = updateOrAddTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          createdTask
-        );
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-      createTask(currentUser.uid, createdTask);
     },
     [currentUser.uid, sections]
   );
@@ -617,7 +600,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                     selectedTasks={selectedTasks}
                     onCompleteTask={handleCompleteTask}
                     onIncompleteTask={handleIncompleteTask}
-                    onCreateTask={handleCreateTask}
                     onDeleteTask={handleDeleteTask}
                     onClickTask={handleClickTask}
                     onSelectTask={handleSelectTask}
@@ -631,7 +613,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   selectedTasks={selectedTasks}
                   onCompleteTask={handleCompleteTask}
                   onIncompleteTask={handleIncompleteTask}
-                  onCreateTask={handleCreateTask}
                   onDeleteTask={handleDeleteTask}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
