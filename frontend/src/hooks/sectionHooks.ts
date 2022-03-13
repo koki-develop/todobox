@@ -44,10 +44,41 @@ export const useSections = () => {
     [currentUser, setSections]
   );
 
+  const deleteSection = useCallback(
+    async (projectId: string, sectionId: string) => {
+      if (!currentUser) return;
+      setSections((prev) => {
+        const next = SectionsStateHelper.delete(prev, sectionId);
+        const batch = SectionsRepository.writeBatch();
+        const updateInputs = next.reduce((result, current) => {
+          const { id, index } = current;
+          result[id] = { index: index };
+          return result;
+        }, {} as { [id: string]: UpdateSectionInput });
+        SectionsRepository.updateSectionsBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          updateInputs
+        );
+        SectionsRepository.deleteBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          sectionId
+        );
+        SectionsRepository.commitBatch(batch);
+        return next;
+      });
+    },
+    [currentUser, setSections]
+  );
+
   return {
     sectionsInitialized,
     sections,
     createSection,
     updateSection,
+    deleteSection,
   };
 };

@@ -6,4 +6,4 @@ export type Section = {
 
 export type CreateSectionInput = Omit<Section, "id">;
 
-export type UpdateSectionInput = Partial<Omit<Section, "id" | "index">>;
+export type UpdateSectionInput = Partial<Omit<Section, "id">>;

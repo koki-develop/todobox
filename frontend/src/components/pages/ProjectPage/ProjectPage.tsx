@@ -150,25 +150,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
    * section
    */
 
-  const handleDeleteSection = useCallback(
-    (deletedSection: Section) => {
-      setSections((prev) => {
-        const batch = writeBatch(firestore);
-        const next = deleteSectionState(prev, deletedSection.id);
-        updateSectionsBatch(batch, currentUser.uid, next);
-        deleteSectionBatch(
-          batch,
-          currentUser.uid,
-          projectId,
-          deletedSection.id
-        );
-        batch.commit();
-        return next;
-      });
-    },
-    [currentUser.uid, projectId]
-  );
-
   const handleDragEndSection = useCallback(
     (result: DropResult) => {
       const { source, destination } = result;
@@ -681,7 +662,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 <SectionList
                   projectId={projectId}
                   sections={sections}
-                  onDeleteSection={handleDeleteSection}
                   tasks={[...completedTasks, ...incompletedTasks]}
                   selectedTasks={selectedTasks}
                   onCompleteTask={handleCompleteTask}

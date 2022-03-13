@@ -26,7 +26,6 @@ export type SectionListItemProps = {
   tasks: Task[];
   selectedTasks: Task[];
 
-  onDelete: (section: Section) => void;
   onCompleteTask: (task: Task) => void;
   onIncompleteTask: (task: Task) => void;
   onCreateTask: (task: Task) => void;
@@ -43,7 +42,6 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     sections,
     tasks,
     selectedTasks,
-    onDelete,
     onCompleteTask,
     onIncompleteTask,
     onCreateTask,
@@ -53,7 +51,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     onMultiSelectTask,
   } = props;
 
-  const { updateSection } = useSections();
+  const { updateSection, deleteSection } = useSections();
 
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -95,10 +93,10 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     [projectId, section, updateSection]
   );
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback(async () => {
     setOpenMenu(false);
-    onDelete(section);
-  }, [onDelete, section]);
+    await deleteSection(projectId, section.id);
+  }, [deleteSection, projectId, section.id]);
 
   return (
     <Draggable

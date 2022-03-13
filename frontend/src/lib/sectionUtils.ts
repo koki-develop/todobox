@@ -13,6 +13,7 @@ import {
   Query,
   QuerySnapshot,
   DocumentReference,
+  runTransaction,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import {
@@ -219,6 +220,10 @@ export class SectionsRepository {
     return writeBatch(firestore);
   }
 
+  public static async commitBatch(batch: WriteBatch): Promise<void> {
+    await batch.commit();
+  }
+
   public static async create(
     userId: string,
     projectId: string,
@@ -243,10 +248,9 @@ export class SectionsRepository {
     batch: WriteBatch,
     userId: string,
     projectId: string,
-    sections: Section[]
+    inputs: { [id: string]: UpdateSectionInput }
   ): void {
-    for (const section of sections) {
-      const { id, ...data } = section;
+    for (const [id, input] of Object.entries(inputs)) {
       const ref = doc(
         firestore,
         "users",
@@ -256,11 +260,11 @@ export class SectionsRepository {
         "sections",
         id
       );
-      batch.update(ref, { ...data });
+      batch.update(ref, { ...input });
     }
   }
 
-  public static deleteSectionBatch(
+  public static deleteBatch(
     batch: WriteBatch,
     userId: string,
     projectId: string,
