@@ -15,7 +15,11 @@ import {
   DocumentReference,
 } from "firebase/firestore";
 import { ulid } from "ulid";
-import { Section, CreateSectionInput } from "@/models/section";
+import {
+  Section,
+  CreateSectionInput,
+  UpdateSectionInput,
+} from "@/models/section";
 import { arrayMove } from "@/lib/arrayUtils";
 import { firestore } from "@/lib/firebase";
 
@@ -221,6 +225,16 @@ export class SectionsRepository {
     await setDoc(ref, data);
   }
 
+  public static async update(
+    userId: string,
+    projectId: string,
+    sectionId: string,
+    input: UpdateSectionInput
+  ): Promise<void> {
+    const ref = this._getSectionRef(userId, projectId, sectionId);
+    await updateDoc(ref, { ...input });
+  }
+
   public static listenAll(
     userId: string,
     projectId: string,
@@ -275,6 +289,10 @@ export class SectionsRepository {
 export class SectionsStateHelper {
   public static create(prev: Section[], section: Section): Section[] {
     return this._addOrUpdate(prev, section);
+  }
+
+  public static update(prev: Section[], section: Section): Section[] {
+    return this._update(prev, section);
   }
 
   private static _addOrUpdate(prev: Section[], section: Section): Section[] {
