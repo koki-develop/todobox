@@ -735,6 +735,42 @@ export class TasksStateHelper {
     return this._addOrUpdate(prev, sections, task);
   }
 
+  public static complete(
+    prev: Task[],
+    sections: Section[],
+    taskId: string
+  ): Task[] {
+    const task = prev.find((task) => task.id === taskId);
+    if (!task) return prev;
+    return this._index(
+      this._update(prev, sections, {
+        ...task,
+        completedAt: new Date(),
+      }),
+      sections
+    );
+  }
+
+  public static incomplete(
+    prev: Task[],
+    sections: Section[],
+    taskId: string
+  ): Task[] {
+    const task = prev.find((task) => task.id === taskId);
+    if (!task) return prev;
+    const incompletedTasks = prev.filter((task) => !task.completedAt);
+    const index = (incompletedTasks.slice(-1)[0]?.index ?? -1) + 1;
+
+    return this._index(
+      this._update(prev, sections, {
+        ...task,
+        index,
+        completedAt: null,
+      }),
+      sections
+    );
+  }
+
   public static separateTasks(prev: Task[]): {
     incompleted: Task[];
     completed: Task[];
@@ -806,5 +842,56 @@ export class TasksStateHelper {
         return aSection.index - bSection.index;
       }
     });
+  }
+
+  private static _index(prev: Task[], sections: Section[]): Task[] {
+    type Group = {
+      sectionId: string | null;
+      completedTasks: Task[];
+      incompletedTasks: Task[];
+    };
+    const groups: Group[] = prev.reduce((result, current) => {
+      const group = result.find(
+        (group) => group.sectionId === current.sectionId
+      );
+      if (!group) {
+        if (current.completedAt) {
+          return [
+            ...result,
+            {
+              sectionId: current.sectionId,
+              completedTasks: [{ ...current, index: -1 }],
+              incompletedTasks: [],
+            },
+          ];
+        } else {
+          return [
+            ...result,
+            {
+              sectionId: current.sectionId,
+              completedTasks: [],
+              incompletedTasks: [current],
+            },
+          ];
+        }
+      } else {
+        if (current.completedAt) {
+          group.completedTasks.push({ ...current, index: -1 });
+        } else {
+          group.incompletedTasks.push(current);
+        }
+        return result;
+      }
+    }, [] as Group[]);
+
+    const indexedTasks: Task[] = groups.reduce((result, current) => {
+      return [
+        ...result,
+        ...current.completedTasks,
+        ...current.incompletedTasks.map((task, i) => ({ ...task, index: i })),
+      ];
+    }, [] as Task[]);
+
+    return sortTasks(sections, indexedTasks);
   }
 }
