@@ -2,13 +2,18 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentReference,
   onSnapshot,
   setDoc,
   Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
 import { ulid } from "ulid";
-import { Project, CreateProjectInput } from "@/models/project";
+import {
+  Project,
+  CreateProjectInput,
+  UpdateProjectInput,
+} from "@/models/project";
 import { firestore } from "@/lib/firebase";
 
 /*
@@ -105,3 +110,37 @@ export const deleteProject = async (
   const ref = doc(firestore, "users", userId, "projects", projectId);
   await deleteDoc(ref);
 };
+
+export class ProjectsRepository {
+  public static build(input: CreateProjectInput): Project {
+    const id = ulid();
+    return { id, ...input };
+  }
+
+  public static async create(userId: string, project: Project): Promise<void> {
+    const { id, ...data } = project;
+    const ref = this._getProjectRef(userId, id);
+    await setDoc(ref, data);
+  }
+
+  public static async update(
+    userId: string,
+    projectId: string,
+    input: UpdateProjectInput
+  ): Promise<void> {
+    const ref = this._getProjectRef(userId, projectId);
+    await updateDoc(ref, { ...input });
+  }
+
+  public static async delete(userId: string, projectId: string): Promise<void> {
+    const ref = this._getProjectRef(userId, projectId);
+    await deleteDoc(ref);
+  }
+
+  private static _getProjectRef(
+    userId: string,
+    projectId: string
+  ): DocumentReference {
+    return doc(firestore, "users", userId, "projects", projectId);
+  }
+}
