@@ -1,4 +1,3 @@
-import { Unsubscribe } from "firebase/auth";
 import {
   collection,
   deleteDoc,
@@ -10,6 +9,9 @@ import {
   updateDoc,
   WriteBatch,
   writeBatch,
+  Unsubscribe,
+  Query,
+  QuerySnapshot,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Section, CreateSectionInput } from "@/models/section";
@@ -202,3 +204,43 @@ export const deleteSectionBatch = (
   );
   batch.delete(ref);
 };
+
+export class SectionsRepository {
+  public static listenAll(
+    userId: string,
+    projectId: string,
+    callback: (sections: Section[]) => void
+  ): Unsubscribe {
+    const q = this._getSectionsQuery(userId, projectId);
+    return onSnapshot(q, (snapshot) => {
+      const sections = this._querySnapshotToSections(projectId, snapshot);
+      callback(sections);
+    });
+  }
+
+  private static _getSectionsQuery(userId: string, projectId: string): Query {
+    const ref = collection(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "sections"
+    );
+    return query(ref, orderBy("index"));
+  }
+
+  private static _querySnapshotToSections(
+    projectId: string,
+    snapshot: QuerySnapshot
+  ): Section[] {
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          projectId,
+          ...doc.data(),
+        } as Section)
+    );
+  }
+}
