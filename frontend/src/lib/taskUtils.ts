@@ -811,6 +811,17 @@ export class TasksStateHelper {
     );
   }
 
+  public static delete(
+    prev: Task[],
+    sections: Section[],
+    taskId: string
+  ): Task[] {
+    return this._index(
+      prev.filter((prevTask) => prevTask.id !== taskId),
+      sections
+    );
+  }
+
   public static separateTasks(prev: Task[]): {
     incompleted: Task[];
     completed: Task[];
