@@ -948,9 +948,9 @@ export class TasksStateHelper {
     );
 
     // 移動したタスクの index を最初の順序に更新
-    return updateTasksState(
-      sections,
+    return this._updateTasks(
       insertedTasks,
+      sections,
       sortedMovingTasks.map((task) => ({
         ...task,
         index: task.index + movedFirstTask.index,
