@@ -7,3 +7,7 @@ terraform {
     key                  = "terraform.tfstate"
   }
 }
+
+module "aws" {
+  source = "./modules/aws"
+}
