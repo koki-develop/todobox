@@ -244,6 +244,16 @@ export class SectionsRepository {
     await updateDoc(ref, { ...input });
   }
 
+  public static async updateSections(
+    userId: string,
+    projectId: string,
+    inputs: { [id: string]: UpdateSectionInput }
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    this.updateSectionsBatch(batch, userId, projectId, inputs);
+    await this.commitBatch(batch);
+  }
+
   public static updateSectionsBatch(
     batch: WriteBatch,
     userId: string,
