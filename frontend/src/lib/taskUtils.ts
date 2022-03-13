@@ -729,3 +729,57 @@ export class TasksRepository {
     );
   }
 }
+
+export class TasksStateHelper {
+  public static create(prev: Task[], sections: Section[], task: Task): Task[] {
+    return this._addOrUpdate(prev, sections, task);
+  }
+
+  private static _addOrUpdate(
+    prev: Task[],
+    sections: Section[],
+    task: Task
+  ): Task[] {
+    if (prev.some((prevSection) => prevSection.id === task.id)) {
+      return this._update(prev, sections, task);
+    } else {
+      return this._sort([...prev, task], sections);
+    }
+  }
+
+  private static _update(
+    prev: Task[],
+    sections: Section[],
+    task: Task
+  ): Task[] {
+    return this._sort(
+      prev.map((prevSection) => {
+        if (prevSection.id === task.id) {
+          return task;
+        } else {
+          return prevSection;
+        }
+      }),
+      sections
+    );
+  }
+
+  private static _sort(prev: Task[], sections: Section[]): Task[] {
+    return prev.concat().sort((a, b) => {
+      if (a.sectionId === b.sectionId) {
+        if (a.completedAt && b.completedAt) {
+          return b.completedAt.getTime() - a.completedAt.getTime();
+        }
+        if (a.completedAt) return 1;
+        if (b.completedAt) return -1;
+        return a.index - b.index;
+      } else {
+        const aSection = sections.find((section) => section.id === a.sectionId);
+        if (!aSection) return -1;
+        const bSection = sections.find((section) => section.id === b.sectionId);
+        if (!bSection) return 1;
+        return aSection.index - bSection.index;
+      }
+    });
+  }
+}
