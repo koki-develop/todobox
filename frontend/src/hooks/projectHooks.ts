@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useCurrentUser } from "@/components/model/user/userHooks";
 import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
 import { CreateProjectInput } from "@/models/project";
 import {
@@ -9,6 +8,7 @@ import {
   updateOrAddProjectState,
 } from "@/lib/projectUtils";
 import { useToast } from "@/hooks/useToast";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 export const useProjects = () => {
   const { currentUser } = useCurrentUser();

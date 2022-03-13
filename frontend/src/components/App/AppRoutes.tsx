@@ -5,9 +5,9 @@ import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
-import { useCurrentUser } from "@/components/model/user/userHooks";
 import Loading from "@/components/utils/Loading";
 import Layout from "@/components/Layout";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 type WithAuthOptions = {
   loginPage?: boolean;

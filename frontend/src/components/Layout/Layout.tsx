@@ -15,11 +15,11 @@ import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import React, { useCallback, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useCurrentUser } from "@/components/model/user/userHooks";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { auth } from "@/lib/firebase";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 const Layout: React.VFC = React.memo(() => {
   const { currentUser, initialized } = useCurrentUser();
