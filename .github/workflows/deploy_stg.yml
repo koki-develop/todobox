@@ -66,6 +66,8 @@ jobs:
           echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.STG_FIREBASE_STORAGE_BUCKET }}\""
           echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.STG_FIREBASE_MESSAGING_SENDER_ID }}\""
           echo "VITE_FIREBASE_APP_ID=\"${{ secrets.STG_FIREBASE_APP_ID }}\""
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
       - name: Build
         run: yarn run build
       - name: Upload to S3
