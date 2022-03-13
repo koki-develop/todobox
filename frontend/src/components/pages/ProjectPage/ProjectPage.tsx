@@ -39,14 +39,7 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
-import {
-  deleteSectionBatch,
-  deleteSectionState,
-  listenSections,
-  moveSectionState,
-  updateSections,
-  updateSectionsBatch,
-} from "@/lib/sectionUtils";
+import { listenSections } from "@/lib/sectionUtils";
 import {
   completeTaskState,
   createTask,
@@ -82,7 +75,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const theme = useTheme();
 
   const { project, projectInitialized } = useProjects();
-  const { sections, sectionsInitialized } = useSections();
+  const { sections, sectionsInitialized, moveSection } = useSections();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -152,20 +145,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const handleDragEndSection = useCallback(
     (result: DropResult) => {
-      const { source, destination } = result;
+      const { draggableId, source, destination } = result;
       if (!destination) return;
-
-      const fromIndex = source.index;
-      const toIndex = destination.index;
-      if (fromIndex === toIndex) return;
-
-      setSections((prev) => {
-        const next = moveSectionState(prev, fromIndex, toIndex);
-        updateSections(currentUser.uid, next);
-        return next;
-      });
+      if (source.index === destination.index) return;
+      moveSection(projectId, draggableId, destination.index);
     },
-    [currentUser.uid]
+    [moveSection, projectId]
   );
 
   useEffect(() => {
