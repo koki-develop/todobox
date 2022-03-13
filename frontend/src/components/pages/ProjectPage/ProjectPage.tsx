@@ -37,7 +37,7 @@ import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
-import { getTasksByRange } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/taskUtils";
 import { useProjects } from "@/hooks/projectHooks";
 import { useSections } from "@/hooks/sectionHooks";
 import { useTasks } from "@/hooks/taskHooks";
@@ -185,9 +185,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
         return;
       }
       const toTask = selectedTasks.slice(-1)[0];
-      const range = getTasksByRange(
-        sections,
+      const range = TasksStateHelper.getTasksByRange(
         incompletedTasks,
+        sections,
         selectedTask.id,
         toTask.id
       ).filter((task) => !task.completedAt);

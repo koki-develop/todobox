@@ -1041,6 +1041,25 @@ export class TasksStateHelper {
     );
   }
 
+  public static getTasksByRange(
+    prev: Task[],
+    sections: Section[],
+    fromTaskId: string,
+    toTaskId: string
+  ) {
+    const sortedTasks = this._sort(prev, sections);
+
+    const index1 = sortedTasks.findIndex((task) => task.id === fromTaskId);
+    if (index1 === -1) return [];
+    const index2 = sortedTasks.findIndex((task) => task.id === toTaskId);
+    if (index2 === -1) return [];
+
+    return sortedTasks.slice(
+      Math.min(index1, index2),
+      Math.max(index1, index2) + 1
+    );
+  }
+
   private static _filterBySectionId(
     tasks: Task[],
     sectionId: string | null
