@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { projectsInitializedState, projectsState } from "@/atoms/projectAtoms";
-import { listenProjects } from "@/lib/projectUtils";
+import { ProjectsRepository } from "@/lib/projectUtils";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export type ProjectsListenerProps = {
@@ -16,10 +16,13 @@ const ProjectsListener: React.VFC<ProjectsListenerProps> = React.memo(() => {
 
   useEffect(() => {
     if (!currentUser) return;
-    const unsubscribe = listenProjects(currentUser.uid, (projects) => {
-      setProjects(projects);
-      setProjectsInitialized(true);
-    });
+    const unsubscribe = ProjectsRepository.listenAll(
+      currentUser.uid,
+      (projects) => {
+        setProjects(projects);
+        setProjectsInitialized(true);
+      }
+    );
     return () => {
       setProjects([]);
       setProjectsInitialized(false);
