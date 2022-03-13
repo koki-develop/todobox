@@ -2,6 +2,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -24,6 +25,7 @@ import { useCurrentUser } from "@/hooks/userHooks";
 const Layout: React.VFC = React.memo(() => {
   const { currentUser, initialized } = useCurrentUser();
   const theme = useTheme();
+  const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [avatarButtonEl, setAvatarButtonEl] =
     useState<HTMLButtonElement | null>(null);
@@ -33,9 +35,8 @@ const Layout: React.VFC = React.memo(() => {
   const drawerWidth = 200;
 
   const drawerTransitionStyles: SxProps<Theme> = useMemo(() => {
-    if (!currentUser) {
-      return {};
-    }
+    if (!currentUser) return {};
+    if (isSmDown) return {};
     return {
       transition: (theme) =>
         theme.transitions.create(["margin", "width"], {
@@ -52,7 +53,7 @@ const Layout: React.VFC = React.memo(() => {
           }),
       }),
     };
-  }, [currentUser, openDrawer]);
+  }, [currentUser, isSmDown, openDrawer]);
 
   const handleClickAvatar = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -151,8 +152,9 @@ const Layout: React.VFC = React.memo(() => {
       {currentUser && (
         <Drawer
           open={openDrawer}
+          onClose={handleCloseDrawer}
           anchor="left"
-          variant="persistent"
+          variant={isSmDown ? "temporary" : "persistent"}
           sx={{ width: drawerWidth }}
         >
           <Box
