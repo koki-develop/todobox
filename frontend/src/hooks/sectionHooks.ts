@@ -44,6 +44,27 @@ export const useSections = () => {
     [currentUser, setSections]
   );
 
+  const moveSection = useCallback(
+    (projectId: string, sectionId: string, toIndex: number) => {
+      if (!currentUser) return;
+      setSections((prev) => {
+        const next = SectionsStateHelper.move(prev, sectionId, toIndex);
+        const updateInputs = next.reduce((result, current) => {
+          const { id, index } = current;
+          result[id] = { index };
+          return result;
+        }, {} as { [id: string]: UpdateSectionInput });
+        SectionsRepository.updateSections(
+          currentUser.uid,
+          projectId,
+          updateInputs
+        );
+        return next;
+      });
+    },
+    [currentUser, setSections]
+  );
+
   const deleteSection = useCallback(
     async (projectId: string, sectionId: string) => {
       if (!currentUser) return;
@@ -52,7 +73,7 @@ export const useSections = () => {
         const batch = SectionsRepository.writeBatch();
         const updateInputs = next.reduce((result, current) => {
           const { id, index } = current;
-          result[id] = { index: index };
+          result[id] = { index };
           return result;
         }, {} as { [id: string]: UpdateSectionInput });
         SectionsRepository.updateSectionsBatch(
@@ -80,5 +101,6 @@ export const useSections = () => {
     createSection,
     updateSection,
     deleteSection,
+    moveSection,
   };
 };
