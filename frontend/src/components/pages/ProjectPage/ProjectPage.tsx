@@ -25,6 +25,7 @@ import React, {
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
+import ProjectListener from "@/components/model/project/ProjectListener";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import SectionList from "@/components/model/section/SectionList";
 import TaskList from "@/components/model/task/TaskList";
@@ -34,11 +35,9 @@ import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { Project } from "@/models/project";
 import { Section } from "@/models/section";
 import { Task } from "@/models/task";
 import { firestore } from "@/lib/firebase";
-import { listenProject } from "@/lib/projectUtils";
 import {
   createSection,
   deleteSectionBatch,
@@ -68,6 +67,7 @@ import {
   listenCompletedTasks,
   separateTasks,
 } from "@/lib/taskUtils";
+import { useProjects } from "@/hooks/projectHooks";
 
 export type ProjectPageProps = {
   currentUser: User;
@@ -82,11 +82,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const { project, projectInitialized } = useProjects();
+
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
-  const [project, setProject] = useState<Project | null>(null);
   const [openProjectMenu, setOpenProjectMenu] = useState<boolean>(false);
   const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
     useState<boolean>(false);
@@ -125,8 +125,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     setOpenProjectForm(true);
   }, []);
 
-  const handleUpdatedProject = useCallback((updatedProject: Project) => {
-    setProject(updatedProject);
+  const handleUpdatedProject = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
 
@@ -146,14 +145,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const handleCloseProjectForm = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
-
-  useEffect(() => {
-    const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
-      setProject(project);
-      setProjectLoaded(true);
-    });
-    return unsubscribe;
-  }, [currentUser.uid, projectId]);
 
   /*
    * section
@@ -532,7 +523,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
 
   const loaded = useMemo(() => {
     return (
-      projectLoaded &&
+      projectInitialized &&
       sectionsLoaded &&
       incompletedTasksLoaded &&
       completedTasksLoaded
@@ -540,7 +531,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   }, [
     completedTasksLoaded,
     incompletedTasksLoaded,
-    projectLoaded,
+    projectInitialized,
     sectionsLoaded,
   ]);
 
@@ -566,6 +557,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         height: "100%",
       }}
     >
+      <ProjectListener projectId={projectId} />
       {!loaded && <Loading />}
       {loaded && !project && (
         <Box
@@ -586,14 +578,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           <ProjectModalForm
             open={openProjectForm}
             project={project}
-            userId={currentUser.uid}
             onUpdated={handleUpdatedProject}
             onClose={handleCloseProjectForm}
           />
           <ProjectDeleteConfirmModal
             open={openDeleteProjectConfirm}
             project={project}
-            userId={currentUser.uid}
             onCancel={handleCancelDeleteProject}
             onDeleted={handleDeletedProject}
           />
