@@ -10,6 +10,9 @@ import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
@@ -20,10 +23,12 @@ import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { auth } from "@/lib/firebase";
+import { useProjects } from "@/hooks/projectHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 const Layout: React.VFC = React.memo(() => {
   const { currentUser, initialized } = useCurrentUser();
+  const { projects, project: selectedProject } = useProjects();
   const theme = useTheme();
   const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -157,21 +162,50 @@ const Layout: React.VFC = React.memo(() => {
           variant={isSmDown ? "temporary" : "persistent"}
           sx={{ width: drawerWidth }}
         >
-          <Box
-            sx={{
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "flex-end",
-              height: headerHeight,
-              pr: 1,
-            }}
-          >
-            <IconButton size="small" onClick={handleCloseDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
+          <Box sx={{ height: headerHeight }}>
+            <Box
+              sx={{
+                alignItems: "center",
+                display: "flex",
+                justifyContent: "flex-end",
+                height: headerHeight,
+                pr: 1,
+              }}
+            >
+              <IconButton size="small" onClick={handleCloseDrawer}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Box>
           </Box>
           <Divider />
-          <Box sx={{ width: drawerWidth }}>hogefuga</Box>
+          <List disablePadding sx={{ width: drawerWidth }}>
+            <Link to="/projects">
+              <ListItemButton>
+                <ListItemText primary="ホーム" />
+              </ListItemButton>
+            </Link>
+            <Divider />
+            <ListItem>
+              <ListItemText primary="プロジェクト" />
+            </ListItem>
+          </List>
+          <Divider />
+          <List
+            dense
+            disablePadding
+            sx={{ flexGrow: 1, overflowY: "auto", width: drawerWidth }}
+          >
+            {projects.map((project) => (
+              <React.Fragment key={project.id}>
+                <Link to={`/projects/${project.id}`}>
+                  <ListItemButton selected={project.id === selectedProject?.id}>
+                    <ListItemText primary={project.name} />
+                  </ListItemButton>
+                </Link>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </List>
         </Drawer>
       )}
 
