@@ -1,7 +1,6 @@
-import { signOut, User } from "firebase/auth";
-import { httpsCallable } from "firebase/functions";
+import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
-import { auth, functions } from "@/lib/firebase";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 export type SettingsPageProps = {
   currentUser: User;
@@ -9,20 +8,16 @@ export type SettingsPageProps = {
 
 const SettingsPage: React.VFC<SettingsPageProps> = React.memo((props) => {
   const { currentUser } = props;
+  const { deleteAccount } = useCurrentUser();
 
   const [deleting, setDeleting] = useState<boolean>(false);
 
-  const handleClickDeleteAccount = useCallback(() => {
+  const handleClickDeleteAccount = useCallback(async () => {
     setDeleting(true);
-    const deleteUser = httpsCallable(functions, "deleteUser");
-    deleteUser()
-      .then(() => {
-        signOut(auth);
-      })
-      .finally(() => {
-        setDeleting(false);
-      });
-  }, []);
+    await deleteAccount().finally(() => {
+      setDeleting(false);
+    });
+  }, [deleteAccount]);
 
   return (
     <div>
