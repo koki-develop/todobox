@@ -16,18 +16,16 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
-import { signOut } from "firebase/auth";
 import React, { useCallback, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { auth } from "@/lib/firebase";
 import { useProjects } from "@/hooks/projectHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 const Layout: React.VFC = React.memo(() => {
-  const { currentUser, initialized } = useCurrentUser();
+  const { currentUser, initialized, logout } = useCurrentUser();
   const { projects, project: selectedProject } = useProjects();
   const theme = useTheme();
   const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
@@ -83,10 +81,10 @@ const Layout: React.VFC = React.memo(() => {
     setAvatarButtonEl(null);
   }, []);
 
-  const handleClickLogout = useCallback(() => {
+  const handleClickLogout = useCallback(async () => {
     setAvatarButtonEl(null);
-    signOut(auth);
-  }, []);
+    await logout();
+  }, [logout]);
 
   if (!initialized) {
     return <Outlet />;
