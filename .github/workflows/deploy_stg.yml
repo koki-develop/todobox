@@ -59,7 +59,11 @@ jobs:
       - name: Select workspace
         run: terraform workspace select stg
       - name: Terraform apply
-        run: terraform plan # TODO: apply にする
+        # TODO: apply にする
+        run: |
+          terraform plan \
+            -var 'basicauth_username=${{ secrets.STG_BASICAUTH_USERNAME }}' \
+            -var 'basicauth_password=${{ secrets.STG_BASICAUTH_PASSWORD }}'
 
   deploy_frontend:
     runs-on: ubuntu-latest
