@@ -59,9 +59,8 @@ jobs:
       - name: Select workspace
         run: terraform workspace select stg
       - name: Terraform apply
-        # TODO: apply にする
         run: |
-          terraform plan \
+          terraform apply -auto-approve \
             -var 'basicauth_username=${{ secrets.STG_BASICAUTH_USERNAME }}' \
             -var 'basicauth_password=${{ secrets.STG_BASICAUTH_PASSWORD }}'
 
