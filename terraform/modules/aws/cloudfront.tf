@@ -25,9 +25,12 @@ resource "aws_cloudfront_distribution" "frontend" {
       }
     }
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.basicauth.arn
+    dynamic "function_association" {
+      for_each = var.stage == "stg" ? [1] : []
+      content {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.basicauth.arn
+      }
     }
   }
 
