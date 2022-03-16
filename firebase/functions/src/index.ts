@@ -31,6 +31,21 @@ export const handleDeleteUser = functionBuilder.auth
     }
   });
 
+export const handleDeleteSection = functionBuilder.firestore
+  .document("users/{userId}/projects/{projectId}/sections/{sectionId}")
+  .onDelete(async (_snapshot, context) => {
+    const { userId, projectId, sectionId } = context.params;
+
+    const tasksSnapshot = await firestore
+      .collection(`users/${userId}/projects/${projectId}/tasks`)
+      .where("sectionId", "==", sectionId)
+      .get();
+
+    for (const doc of tasksSnapshot.docs) {
+      await doc.ref.delete();
+    }
+  });
+
 export const handleDeleteProject = functionBuilder.firestore
   .document("users/{userId}/projects/{projectId}")
   .onDelete(async (_snapshot, context) => {
