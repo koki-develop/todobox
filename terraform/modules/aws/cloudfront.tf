@@ -24,6 +24,11 @@ resource "aws_cloudfront_distribution" "frontend" {
         forward = "none"
       }
     }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.basicauth.arn
+    }
   }
 
   restrictions {
@@ -44,3 +49,16 @@ resource "aws_cloudfront_distribution" "frontend" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "frontend" {}
+
+resource "aws_cloudfront_function" "basicauth" {
+  name    = "${local.prefix}-basicauth"
+  runtime = "cloudfront-js-1.0"
+  publish = true
+  code = templatefile(
+    "${path.module}/basicauth.js",
+    {
+      authString = format("Basic %s", base64encode("${var.basicauth_username}:${var.basicauth_password}"))
+    }
+  )
+}
+

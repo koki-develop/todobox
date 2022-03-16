@@ -1,3 +1,13 @@
+variable "basicauth_username" {
+  type      = string
+  sensitive = true
+}
+
+variable "basicauth_password" {
+  type      = string
+  sensitive = true
+}
+
 terraform {
   backend "s3" {
     profile              = "default"
@@ -11,4 +21,7 @@ terraform {
 module "aws" {
   source = "./modules/aws"
   stage  = terraform.workspace
+
+  basicauth_username = var.basicauth_username
+  basicauth_password = var.basicauth_password
 }
