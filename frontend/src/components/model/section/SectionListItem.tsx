@@ -21,7 +21,6 @@ import SectionListItemInput from "./SectionListItemInput";
 
 export type SectionListItemProps = {
   projectId: string;
-  sections: Section[];
   section: Section;
   selectedTasks: Task[];
 
@@ -34,14 +33,13 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const {
     projectId,
     section,
-    sections,
     selectedTasks,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
   } = props;
 
-  const { updateSection, deleteSection } = useSections();
+  const { sections, updateSection, deleteSection } = useSections();
 
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
