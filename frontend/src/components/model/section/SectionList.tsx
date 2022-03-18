@@ -11,7 +11,6 @@ import { useSections } from "@/hooks/sectionHooks";
 
 export type SectionListProps = {
   projectId: string;
-  sections: Section[];
   tasks: Task[];
   selectedTasks: Task[];
 
@@ -23,7 +22,6 @@ export type SectionListProps = {
 const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
   const {
     projectId,
-    sections,
     tasks,
     selectedTasks,
     onClickTask,
@@ -31,7 +29,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     onMultiSelectTask,
   } = props;
 
-  const { createSection } = useSections();
+  const { sections, createSection } = useSections();
 
   const [inputtingNewSection, setInputtingNewSection] =
     useState<boolean>(false);
