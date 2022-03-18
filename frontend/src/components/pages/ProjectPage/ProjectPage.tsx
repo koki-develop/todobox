@@ -421,7 +421,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
                 </Box>
                 <SectionList
                   projectId={projectId}
-                  tasks={[...completedTasks, ...incompletedTasks]}
                   selectedTasks={selectedTasks}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}

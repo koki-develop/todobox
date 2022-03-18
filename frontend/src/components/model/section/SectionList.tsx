@@ -1,17 +1,16 @@
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import SectionListItem from "@/components/model/section/SectionListItem";
 import SectionListItemInput from "@/components/model/section/SectionListItemInput";
-import { CreateSectionInput, Section } from "@/models/section";
+import { CreateSectionInput } from "@/models/section";
 import { Task } from "@/models/task";
 import { useSections } from "@/hooks/sectionHooks";
 
 export type SectionListProps = {
   projectId: string;
-  tasks: Task[];
   selectedTasks: Task[];
 
   onClickTask: (task: Task) => void;
@@ -22,7 +21,6 @@ export type SectionListProps = {
 const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
   const {
     projectId,
-    tasks,
     selectedTasks,
     onClickTask,
     onSelectTask,
@@ -33,16 +31,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
 
   const [inputtingNewSection, setInputtingNewSection] =
     useState<boolean>(false);
-
-  const sectionsWithTasks: { section: Section; tasks: Task[] }[] =
-    useMemo(() => {
-      return sections.map((section) => {
-        return {
-          section,
-          tasks: tasks.filter((task) => task.sectionId === section.id),
-        };
-      });
-    }, [sections, tasks]);
 
   const handleStartCreateSection = useCallback(() => {
     setInputtingNewSection(true);
@@ -64,20 +52,18 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
     <Droppable droppableId="sections" type="sections">
       {(provided) => (
         <Box ref={provided.innerRef} {...provided.droppableProps}>
-          {sectionsWithTasks
-            .sort((a, b) => a.section.index - b.section.index)
-            .map((sectionWithTasks) => (
-              <SectionListItem
-                key={sectionWithTasks.section.id}
-                projectId={projectId}
-                section={sectionWithTasks.section}
-                sections={sections}
-                selectedTasks={selectedTasks}
-                onClickTask={onClickTask}
-                onSelectTask={onSelectTask}
-                onMultiSelectTask={onMultiSelectTask}
-              />
-            ))}
+          {sections.map((section) => (
+            <SectionListItem
+              key={section.id}
+              projectId={projectId}
+              section={section}
+              sections={sections}
+              selectedTasks={selectedTasks}
+              onClickTask={onClickTask}
+              onSelectTask={onSelectTask}
+              onMultiSelectTask={onMultiSelectTask}
+            />
+          ))}
           {provided.placeholder}
           {inputtingNewSection ? (
             <SectionListItemInput
