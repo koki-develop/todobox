@@ -234,10 +234,7 @@ export class TasksStateHelper {
     if (!movingTask) return prev;
 
     // 移動元のセクションのタスク一覧を取得
-    const fromSectionTasks = this._filterBySectionId(
-      prev,
-      movingTask.sectionId
-    );
+    const fromSectionTasks = this.filterBySectionId(prev, movingTask.sectionId);
 
     if (movingTask.sectionId === toSectionId) {
       // 同一セクション内の移動
@@ -252,7 +249,7 @@ export class TasksStateHelper {
     } else {
       // 異なるセクション間の移動
       // 移動先のタスク一覧を取得
-      const toSectionTasks = this._filterBySectionId(prev, toSectionId);
+      const toSectionTasks = this.filterBySectionId(prev, toSectionId);
 
       // タスクを移動
       const [updatedFromSectionTasks, updatedToSectionTasks] = arrayMoveToArray(
@@ -452,7 +449,7 @@ export class TasksStateHelper {
     );
   }
 
-  private static _filterBySectionId(
+  public static filterBySectionId(
     tasks: Task[],
     sectionId: string | null
   ): Task[] {
@@ -607,7 +604,7 @@ export class TasksStateHelper {
     const tasksToInsertClone = tasksToInsert.concat();
 
     // 挿入先のセクションのタスク一覧を取得
-    const sectionTasks = this._filterBySectionId(tasksClone, sectionId);
+    const sectionTasks = this.filterBySectionId(tasksClone, sectionId);
 
     // タスクを挿入して採番
     sectionTasks.splice(
