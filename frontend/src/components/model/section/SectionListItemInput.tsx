@@ -9,10 +9,10 @@ import {
   Section,
   UpdateSectionInput,
 } from "@/models/section";
+import { useSections } from "@/hooks/sectionHooks";
 
 export type SectionListItemInputProps = {
   section?: Section;
-  sections: Section[];
 
   onCreate?: (input: CreateSectionInput) => void;
   onUpdate?: (input: UpdateSectionInput) => void;
@@ -21,7 +21,9 @@ export type SectionListItemInputProps = {
 
 const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
   (props) => {
-    const { section, sections, onCreate, onUpdate, onCancel } = props;
+    const { section, onCreate, onUpdate, onCancel } = props;
+
+    const { sections } = useSections();
 
     const [name, setName] = useState<string>("");
 

@@ -39,7 +39,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     onMultiSelectTask,
   } = props;
 
-  const { sections, updateSection, deleteSection } = useSections();
+  const { updateSection, deleteSection } = useSections();
 
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -101,7 +101,6 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
           {editing ? (
             <SectionListItemInput
               section={section}
-              sections={sections}
               onUpdate={handleUpdate}
               onCancel={handleCancelEdit}
             />

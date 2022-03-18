@@ -66,7 +66,6 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
           {provided.placeholder}
           {inputtingNewSection ? (
             <SectionListItemInput
-              sections={sections}
               onCreate={handleCreateSection}
               onCancel={handleCancelCreateSection}
             />
