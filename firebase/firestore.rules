@@ -17,7 +17,7 @@ service cloud.firestore {
       match /projects/{projectId} {
         allow list, get: if loggedInWith(userId)
         allow create: if loggedInWith(userId) && createOnly(request.resource, ['name']);
-        allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name'])
+        allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name']);
         allow delete: if loggedInWith(userId);
 
         match /sections/{sectionId} {
