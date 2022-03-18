@@ -34,7 +34,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   const theme = useTheme();
 
   const {
-    tasks,
+    completedTasks,
+    incompletedTasks,
     createTask,
     deleteTask,
     deleteTasks,
@@ -44,18 +45,17 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
-  const sectionTasks = useMemo(() => {
-    return tasks.filter((task) => task.sectionId === sectionId);
-  }, [sectionId, tasks]);
-
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
   }, [sectionId]);
 
-  const { completed: completedTasks, incompleted: incompletedTasks } =
-    useMemo(() => {
-      return TasksStateHelper.separateTasks(sectionTasks);
-    }, [sectionTasks]);
+  const sectionCompletedTasks = useMemo(() => {
+    return TasksStateHelper.filterBySectionId(completedTasks, sectionId);
+  }, [completedTasks, sectionId]);
+
+  const sectionIncompletedTasks = useMemo(() => {
+    return TasksStateHelper.filterBySectionId(incompletedTasks, sectionId);
+  }, [incompletedTasks, sectionId]);
 
   const handleStartCreateTask = useCallback(() => {
     setInputtingTask(true);
@@ -124,7 +124,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             sx={{ mb: 2 }}
             {...provided.droppableProps}
           >
-            {incompletedTasks.map((task) => (
+            {sectionIncompletedTasks.map((task) => (
               <TaskDraggableListItem
                 key={task.id}
                 task={task}
@@ -167,7 +167,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
         )}
       </Droppable>
       <List disablePadding sx={{ mb: 2 }}>
-        {completedTasks.map((task) => (
+        {sectionCompletedTasks.map((task) => (
           <TaskListItem
             key={task.id}
             task={task}

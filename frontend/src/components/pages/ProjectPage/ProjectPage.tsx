@@ -289,6 +289,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
       <ProjectListener projectId={projectId} />
       <SectionsListener projectId={projectId} />
       <TasksListener projectId={projectId} withCompleted={showCompletedTasks} />
+
       {!loaded && <Loading />}
       {loaded && !project && (
         <Box
