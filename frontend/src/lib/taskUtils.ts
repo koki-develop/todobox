@@ -136,6 +136,34 @@ export class TasksRepository {
     });
   }
 
+  public static initializeCountersBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string
+  ): void {
+    for (let i = 0; i < 10; i++) {
+      const ref = this._getCounterRef(userId, projectId, i);
+      batch.set(ref, { count: 0 });
+    }
+  }
+
+  private static _getCounterRef(
+    userId: string,
+    projectId: string,
+    counterId: number
+  ): DocumentReference {
+    return doc(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "counters",
+      "tasks",
+      counterId.toString()
+    );
+  }
+
   private static _documentSnapshotToTask(
     snapshot: DocumentSnapshot
   ): Task | null {
