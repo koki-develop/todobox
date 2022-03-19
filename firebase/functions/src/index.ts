@@ -4,7 +4,7 @@ import * as functions from "firebase-functions";
 admin.initializeApp(functions.firebaseConfig() ?? undefined);
 
 const firestore = admin.firestore();
-const functionBuilder = functions.runWith({ timeoutSeconds: 300 });
+const functionBuilder = functions.runWith({ timeoutSeconds: 540 });
 
 export const deleteUser = functionBuilder.https.onCall(
   async (_data, context) => {
