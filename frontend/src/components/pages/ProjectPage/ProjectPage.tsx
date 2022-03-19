@@ -247,12 +247,12 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
   useEffect(() => {
     setSelectedTasks((prev) => {
       return prev.filter((prevSelectedTask) => {
-        return !completedTasks.some(
-          (completedTask) => completedTask.id === prevSelectedTask.id
+        return incompletedTasks.some(
+          (incompletedTask) => incompletedTask.id === prevSelectedTask.id
         );
       });
     });
-  }, [completedTasks]);
+  }, [incompletedTasks]);
 
   /*
    * other
