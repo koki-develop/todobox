@@ -73,13 +73,13 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
         setInputtingTask(false);
       }
       const index =
-        incompletedTasks.length === 0
+        sectionIncompletedTasks.length === 0
           ? 0
-          : incompletedTasks.slice(-1)[0].index + 1;
+          : sectionIncompletedTasks.slice(-1)[0].index + 1;
 
       await createTask(projectId, { sectionId, title, index });
     },
-    [createTask, incompletedTasks, projectId, sectionId]
+    [createTask, projectId, sectionId, sectionIncompletedTasks]
   );
 
   const handleCompleteTask = useCallback(
