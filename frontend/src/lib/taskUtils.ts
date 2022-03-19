@@ -4,12 +4,12 @@ import {
   doc,
   DocumentReference,
   DocumentSnapshot,
+  increment,
   onSnapshot,
   orderBy,
   Query,
   query,
   QuerySnapshot,
-  setDoc,
   Unsubscribe,
   updateDoc,
   where,
@@ -32,9 +32,21 @@ export class TasksRepository {
     projectId: string,
     task: Task
   ): Promise<void> {
+    const batch = this.writeBatch();
+    this.createBatch(batch, userId, projectId, task);
+    await this.commitBatch(batch);
+  }
+
+  public static createBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    task: Task
+  ): void {
     const { id, ...data } = task;
     const ref = this._getTaskRef(userId, projectId, id);
-    await setDoc(ref, data);
+    batch.set(ref, data);
+    this.incrementCounterBatch(batch, userId, projectId);
   }
 
   public static writeBatch(): WriteBatch {
@@ -136,6 +148,15 @@ export class TasksRepository {
     });
   }
 
+  public static incrementCounterBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string
+  ): void {
+    const ref = this._getRandomCounterShardRef(userId, projectId);
+    batch.update(ref, { count: increment(1) });
+  }
+
   public static initializeCounterBatch(
     batch: WriteBatch,
     userId: string,
@@ -163,6 +184,14 @@ export class TasksRepository {
       "shards",
       shardId.toString()
     );
+  }
+
+  private static _getRandomCounterShardRef(
+    userId: string,
+    projectId: string
+  ): DocumentReference {
+    const shardId = Math.floor(Math.random() * 10);
+    return this._getCounterShardRef(userId, projectId, shardId);
   }
 
   private static _documentSnapshotToTask(
