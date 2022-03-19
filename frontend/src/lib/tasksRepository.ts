@@ -148,6 +148,7 @@ export class TasksRepository {
     }
   }
 
+  // 参考: https://cloud.google.com/firestore/docs/solutions/counters
   public static initializeCounterBatch(
     batch: WriteBatch,
     userId: string,
