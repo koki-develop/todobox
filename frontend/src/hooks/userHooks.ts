@@ -1,4 +1,9 @@
-import { signOut } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInAnonymously,
+  signInWithRedirect,
+  signOut,
+} from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -14,6 +19,16 @@ export const useCurrentUser = () => {
 
   const initialized = useRecoilValue(currentUserInitializedState);
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+
+  const loginWithGoogle = useCallback(async () => {
+    await signInWithRedirect(auth, new GoogleAuthProvider());
+    showToast("ログインしました。", "success");
+  }, [showToast]);
+
+  const loginAnonymously = useCallback(async () => {
+    await signInAnonymously(auth);
+    showToast("ログインしました。", "success");
+  }, [showToast]);
 
   const logout = useCallback(async () => {
     await signOut(auth);
@@ -35,6 +50,8 @@ export const useCurrentUser = () => {
   return {
     initialized,
     currentUser,
+    loginWithGoogle,
+    loginAnonymously,
     logout,
     deleteAccount,
   };
