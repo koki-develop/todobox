@@ -78,7 +78,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
           ? 0
           : sectionIncompletedTasks.slice(-1)[0].index + 1;
 
-      await createTask(projectId, { sectionId, title, index });
+      await createTask(projectId, { sectionId, title, index, description: "" });
     },
     [createTask, projectId, sectionId, sectionIncompletedTasks]
   );
