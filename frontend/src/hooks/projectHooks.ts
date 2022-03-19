@@ -1,3 +1,4 @@
+import { writeBatch } from "firebase/firestore";
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -11,6 +12,7 @@ import {
   Project,
   UpdateProjectInput,
 } from "@/models/project";
+import { firestore } from "@/lib/firebase";
 import { ProjectsRepository } from "@/lib/projectsRepository";
 import { ProjectsStateHelper } from "@/lib/projectsStateHelper";
 import { TasksRepository } from "@/lib/tasksRepository";
@@ -29,19 +31,19 @@ export const useProjects = () => {
   const createProject = useCallback(
     async (input: CreateProjectInput) => {
       if (!currentUser) return;
+
       const project = ProjectsRepository.build(input);
-      const batch = ProjectsRepository.writeBatch();
-      await ProjectsRepository.createBatch(batch, currentUser.uid, project);
-      await TasksRepository.initializeCounterBatch(
+      const batch = writeBatch(firestore);
+      ProjectsRepository.createBatch(batch, currentUser.uid, project);
+      TasksRepository.initializeCounterBatch(
         batch,
         currentUser.uid,
         project.id
       );
-      await ProjectsRepository.commitBatch(batch);
+      await batch.commit();
+
+      setProjects((prev) => ProjectsStateHelper.create(prev, project));
       showToast("プロジェクトを作成しました。", "success");
-      setProjects((prev) => {
-        return ProjectsStateHelper.create(prev, project);
-      });
     },
     [currentUser, setProjects, showToast]
   );
@@ -49,19 +51,17 @@ export const useProjects = () => {
   const updateProject = useCallback(
     async (project: Project, input: UpdateProjectInput) => {
       if (!currentUser) return;
-      const updatedProject = { ...project, ...input };
+
       await ProjectsRepository.update(currentUser.uid, project.id, input);
-      showToast("プロジェクトを更新しました。", "success");
+      const updatedProject = { ...project, ...input };
+
       setProjects((prev) => {
         return ProjectsStateHelper.update(prev, updatedProject);
       });
-      setProject((prev) => {
-        if (prev?.id === updatedProject.id) {
-          return updatedProject;
-        } else {
-          return prev;
-        }
-      });
+      setProject((prev) =>
+        prev?.id === updatedProject.id ? updatedProject : prev
+      );
+      showToast("プロジェクトを更新しました。", "success");
     },
     [currentUser, setProject, setProjects, showToast]
   );
@@ -69,18 +69,12 @@ export const useProjects = () => {
   const deleteProject = useCallback(
     async (projectId: string) => {
       if (!currentUser) return;
+
       await ProjectsRepository.delete(currentUser.uid, projectId);
+
+      setProjects((prev) => ProjectsStateHelper.delete(prev, projectId));
+      setProject((prev) => (prev?.id === projectId ? null : prev));
       showToast("プロジェクトを削除しました。", "success");
-      setProjects((prev) => {
-        return ProjectsStateHelper.delete(prev, projectId);
-      });
-      setProject((prev) => {
-        if (prev?.id === projectId) {
-          return null;
-        } else {
-          return prev;
-        }
-      });
     },
     [currentUser, setProject, setProjects, showToast]
   );
