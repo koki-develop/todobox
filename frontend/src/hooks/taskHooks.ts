@@ -136,17 +136,18 @@ export const useTasks = () => {
           taskIds
         );
         const batch = writeBatch(firestore);
+        TasksRepository.decrementCounterBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          taskIds.length
+        );
         for (const taskId of taskIds) {
           TasksRepository.deleteBatch(
             batch,
             currentUser.uid,
             projectId,
             taskId
-          );
-          TasksRepository.decrementCounterBatch(
-            batch,
-            currentUser.uid,
-            projectId
           );
         }
         batch.commit();
