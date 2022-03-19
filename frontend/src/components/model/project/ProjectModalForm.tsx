@@ -9,7 +9,7 @@ import ModalCard from "@/components/utils/ModalCard";
 import ModalCardActions from "@/components/utils/ModalCardActions";
 import ModalCardHeader from "@/components/utils/ModalCardHeader";
 import { Project } from "@/models/project";
-import { useProjects } from "@/hooks/projectHooks";
+import { useProjects } from "@/hooks/projectsHooks";
 
 export type ProjectModalFormProps = {
   open: boolean;

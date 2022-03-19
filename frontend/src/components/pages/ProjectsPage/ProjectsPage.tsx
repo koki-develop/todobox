@@ -10,7 +10,7 @@ import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
-import { useProjects } from "@/hooks/projectHooks";
+import { useProjects } from "@/hooks/projectsHooks";
 
 export type ProjectsPageProps = {
   currentUser: User;

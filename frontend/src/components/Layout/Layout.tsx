@@ -21,7 +21,7 @@ import { Outlet } from "react-router-dom";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { useProjects } from "@/hooks/projectHooks";
+import { useProjects } from "@/hooks/projectsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 const Layout: React.VFC = React.memo(() => {
