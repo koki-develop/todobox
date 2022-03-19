@@ -12,6 +12,7 @@ import {
   UpdateProjectInput,
 } from "@/models/project";
 import { ProjectsRepository, ProjectsStateHelper } from "@/lib/projectUtils";
+import { TasksRepository } from "@/lib/taskUtils";
 import { useToast } from "@/hooks/useToast";
 import { useCurrentUser } from "@/hooks/userHooks";
 
@@ -28,7 +29,14 @@ export const useProjects = () => {
     async (input: CreateProjectInput) => {
       if (!currentUser) return;
       const project = ProjectsRepository.build(input);
-      await ProjectsRepository.create(currentUser.uid, project);
+      const batch = ProjectsRepository.writeBatch();
+      await ProjectsRepository.createBatch(batch, currentUser.uid, project);
+      await TasksRepository.initializeCounterBatch(
+        batch,
+        currentUser.uid,
+        project.id
+      );
+      await ProjectsRepository.commitBatch(batch);
       showToast("プロジェクトを作成しました。", "success");
       setProjects((prev) => {
         return ProjectsStateHelper.create(prev, project);

@@ -136,21 +136,21 @@ export class TasksRepository {
     });
   }
 
-  public static initializeCountersBatch(
+  public static initializeCounterBatch(
     batch: WriteBatch,
     userId: string,
     projectId: string
   ): void {
     for (let i = 0; i < 10; i++) {
-      const ref = this._getCounterRef(userId, projectId, i);
+      const ref = this._getCounterShardRef(userId, projectId, i);
       batch.set(ref, { count: 0 });
     }
   }
 
-  private static _getCounterRef(
+  private static _getCounterShardRef(
     userId: string,
     projectId: string,
-    counterId: number
+    shardId: number
   ): DocumentReference {
     return doc(
       firestore,
@@ -160,7 +160,8 @@ export class TasksRepository {
       projectId,
       "counters",
       "tasks",
-      counterId.toString()
+      "shards",
+      shardId.toString()
     );
   }
 
