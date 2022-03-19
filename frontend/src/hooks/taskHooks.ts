@@ -8,7 +8,8 @@ import {
   taskState,
 } from "@/atoms/taskAtom";
 import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
-import { TasksRepository, TasksStateHelper } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/taskUtils";
+import { TasksRepository } from "@/lib/tasksRepository";
 import { useSections } from "@/hooks/sectionHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 

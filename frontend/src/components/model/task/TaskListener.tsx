@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { taskInitializedState, taskState } from "@/atoms/taskAtom";
-import { TasksRepository } from "@/lib/taskUtils";
+import { TasksRepository } from "@/lib/tasksRepository";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export type TaskListenerProps = {

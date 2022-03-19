@@ -13,7 +13,7 @@ import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Project } from "@/models/project";
-import { TasksRepository } from "@/lib/taskUtils";
+import { TasksRepository } from "@/lib/tasksRepository";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export type ProjectCardProps = {

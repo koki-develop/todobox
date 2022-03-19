@@ -5,7 +5,7 @@ import {
   incompletedTasksInitializedState,
   tasksState,
 } from "@/atoms/taskAtom";
-import { TasksRepository } from "@/lib/taskUtils";
+import { TasksRepository } from "@/lib/tasksRepository";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export type TasksListenerProps = {

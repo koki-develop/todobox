@@ -13,7 +13,7 @@ import {
 } from "@/models/project";
 import { ProjectsRepository } from "@/lib/projectsRepository";
 import { ProjectsStateHelper } from "@/lib/projectsStateHelper";
-import { TasksRepository } from "@/lib/taskUtils";
+import { TasksRepository } from "@/lib/tasksRepository";
 import { useToast } from "@/hooks/useToast";
 import { useCurrentUser } from "@/hooks/userHooks";
 
