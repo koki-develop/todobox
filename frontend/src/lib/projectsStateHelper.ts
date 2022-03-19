@@ -13,6 +13,10 @@ export class ProjectsStateHelper {
     return this._delete(prev, projectId);
   }
 
+  /*
+   * private
+   */
+
   private static _update(prev: Project[], project: Project): Project[] {
     return prev.map((prevProject) => {
       if (prevProject.id !== project.id) {

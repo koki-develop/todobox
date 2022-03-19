@@ -245,6 +245,10 @@ export class TasksStateHelper {
     return tasks.filter((task) => task.sectionId === sectionId);
   }
 
+  /*
+   * private
+   */
+
   private static _addOrUpdate(
     prev: Task[],
     sections: Section[],

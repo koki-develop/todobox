@@ -30,6 +30,10 @@ export class SectionsStateHelper {
     );
   }
 
+  /*
+   * private
+   */
+
   private static _addOrUpdate(prev: Section[], section: Section): Section[] {
     if (prev.some((prevSection) => prevSection.id === section.id)) {
       return this._update(prev, section);
