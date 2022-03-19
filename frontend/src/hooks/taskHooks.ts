@@ -1,3 +1,4 @@
+import { writeBatch } from "firebase/firestore";
 import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -8,12 +9,11 @@ import {
   taskState,
 } from "@/atoms/taskAtom";
 import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
+import { firestore } from "@/lib/firebase";
 import { TasksRepository } from "@/lib/tasksRepository";
 import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useSections } from "@/hooks/sectionsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
-import { writeBatch } from "firebase/firestore";
-import { firestore } from "@/lib/firebase";
 
 // TODO: リファクタ
 export const useTasks = () => {
@@ -83,7 +83,11 @@ export const useTasks = () => {
   );
 
   const deleteTask = useCallback(
-    async (projectId: string, taskId: string) => {
+    async (
+      projectId: string,
+      taskId: string,
+      options?: { disableDecrementCounter: boolean }
+    ) => {
       if (!currentUser) return;
       setAllTasks((prev) => {
         const allTasks = TasksStateHelper.delete(
@@ -91,7 +95,8 @@ export const useTasks = () => {
           sections,
           taskId
         );
-        const batch = TasksRepository.writeBatch();
+
+        const batch = writeBatch(firestore);
         const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
           (result, current) => {
             const { id, completedAt, index } = current;
@@ -107,7 +112,14 @@ export const useTasks = () => {
           updateInputs
         );
         TasksRepository.deleteBatch(batch, currentUser.uid, projectId, taskId);
-        TasksRepository.commitBatch(batch);
+        if (!options?.disableDecrementCounter) {
+          TasksRepository.decrementCounterBatch(
+            batch,
+            currentUser.uid,
+            projectId
+          );
+        }
+        batch.commit();
         return TasksStateHelper.separateTasks(allTasks);
       });
     },

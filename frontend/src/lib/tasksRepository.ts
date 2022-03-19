@@ -145,7 +145,6 @@ export class TasksRepository {
   ): void {
     const ref = this._getTaskRef(userId, projectId, taskId);
     batch.delete(ref);
-    this.decrementCounterBatch(batch, userId, projectId);
   }
 
   public static async deleteTasks(
