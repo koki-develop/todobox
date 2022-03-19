@@ -94,16 +94,6 @@ export class TasksRepository {
     return { id: ulid(), completedAt: null, ...input };
   }
 
-  public static async create(
-    userId: string,
-    projectId: string,
-    task: Task
-  ): Promise<void> {
-    const batch = this.writeBatch();
-    this.createBatch(batch, userId, projectId, task);
-    await this.commitBatch(batch);
-  }
-
   public static createBatch(
     batch: WriteBatch,
     userId: string,
@@ -113,7 +103,6 @@ export class TasksRepository {
     const { id, ...data } = task;
     const ref = this._getTaskRef(userId, projectId, id);
     batch.set(ref, data);
-    this.incrementCounterBatch(batch, userId, projectId);
   }
 
   public static async update(

@@ -12,6 +12,8 @@ import { TasksRepository } from "@/lib/tasksRepository";
 import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useSections } from "@/hooks/sectionsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
+import { writeBatch } from "firebase/firestore";
+import { firestore } from "@/lib/firebase";
 
 // TODO: リファクタ
 export const useTasks = () => {
@@ -55,7 +57,10 @@ export const useTasks = () => {
         );
         return TasksStateHelper.separateTasks(allTasks);
       });
-      await TasksRepository.create(currentUser.uid, projectId, newTask);
+      const batch = writeBatch(firestore);
+      TasksRepository.createBatch(batch, currentUser.uid, projectId, newTask);
+      TasksRepository.incrementCounterBatch(batch, currentUser.uid, projectId);
+      await batch.commit();
     },
     [currentUser, sections, setAllTasks]
   );
