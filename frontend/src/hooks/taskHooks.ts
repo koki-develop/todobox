@@ -274,7 +274,19 @@ export const useTasks = () => {
           },
           {}
         );
-        TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
+        const batch = writeBatch(firestore);
+        TasksRepository.updateTasksBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          updateInputs
+        );
+        TasksRepository.incrementCounterBatch(
+          batch,
+          currentUser.uid,
+          projectId
+        );
+        batch.commit();
         return TasksStateHelper.separateTasks(allTasks);
       });
     },
