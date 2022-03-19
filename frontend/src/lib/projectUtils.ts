@@ -10,6 +10,8 @@ import {
   setDoc,
   Unsubscribe,
   updateDoc,
+  writeBatch,
+  WriteBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import {
@@ -54,6 +56,16 @@ export class ProjectsRepository {
     await setDoc(ref, data);
   }
 
+  public static createBatch(
+    batch: WriteBatch,
+    userId: string,
+    project: Project
+  ): void {
+    const { id, ...data } = project;
+    const ref = this._getProjectRef(userId, id);
+    batch.set(ref, data);
+  }
+
   public static async update(
     userId: string,
     projectId: string,
@@ -66,6 +78,14 @@ export class ProjectsRepository {
   public static async delete(userId: string, projectId: string): Promise<void> {
     const ref = this._getProjectRef(userId, projectId);
     await deleteDoc(ref);
+  }
+
+  public static writeBatch(): WriteBatch {
+    return writeBatch(firestore);
+  }
+
+  public static commitBatch(batch: WriteBatch): Promise<void> {
+    return batch.commit();
   }
 
   private static _documentSnapshotToProject(
