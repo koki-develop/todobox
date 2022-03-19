@@ -20,6 +20,12 @@ service cloud.firestore {
         allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name']);
         allow delete: if loggedInWith(userId);
 
+        match /counters/tasks/shards/{shardId} {
+          allow list, get: if loggedInWith(userId)
+          allow create: if loggedInWith(userId) && createOnly(request.resource, ['count']) && request.resource.data.count == 0;
+          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['count']);
+        }
+
         match /sections/{sectionId} {
           allow list, get: if loggedInWith(userId);
           allow create: if loggedInWith(userId) && createOnly(request.resource, ['name', 'index']);
