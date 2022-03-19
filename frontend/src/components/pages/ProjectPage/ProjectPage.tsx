@@ -55,13 +55,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
 
   const { project, projectInitialized } = useProjects();
   const { sections, sectionsInitialized, moveSection } = useSections();
-  const {
-    incompletedTasks,
-    tasksInitialized,
-    completedTasks,
-    moveTask,
-    moveTasks,
-  } = useTasks();
+  const { incompletedTasks, tasksInitialized, moveTask, moveTasks } =
+    useTasks();
 
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
