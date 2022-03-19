@@ -11,7 +11,8 @@ import {
   Project,
   UpdateProjectInput,
 } from "@/models/project";
-import { ProjectsRepository, ProjectsStateHelper } from "@/lib/projectUtils";
+import { ProjectsStateHelper } from "@/lib/projectUtils";
+import { ProjectsRepository } from "@/lib/projectsRepository";
 import { TasksRepository } from "@/lib/taskUtils";
 import { useToast } from "@/hooks/useToast";
 import { useCurrentUser } from "@/hooks/userHooks";
