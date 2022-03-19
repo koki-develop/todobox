@@ -147,16 +147,15 @@ export class TasksRepository {
     batch.delete(ref);
   }
 
-  public static async deleteTasks(
+  public static async deleteTasksBatch(
+    batch: WriteBatch,
     userId: string,
     projectId: string,
     taskIds: string[]
   ): Promise<void> {
-    const batch = this.writeBatch();
     for (const taskId of taskIds) {
       this.deleteBatch(batch, userId, projectId, taskId);
     }
-    await this.commitBatch(batch);
   }
 
   public static initializeCounterBatch(

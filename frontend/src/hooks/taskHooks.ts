@@ -126,6 +126,36 @@ export const useTasks = () => {
     [currentUser, sections, setAllTasks]
   );
 
+  const deleteTasks = useCallback(
+    async (projectId: string, taskIds: string[]) => {
+      if (!currentUser) return;
+      setAllTasks((prev) => {
+        const allTasks = TasksStateHelper.deleteTasks(
+          [...prev.incompleted, ...prev.completed],
+          sections,
+          taskIds
+        );
+        const batch = writeBatch(firestore);
+        for (const taskId of taskIds) {
+          TasksRepository.deleteBatch(
+            batch,
+            currentUser.uid,
+            projectId,
+            taskId
+          );
+          TasksRepository.decrementCounterBatch(
+            batch,
+            currentUser.uid,
+            projectId
+          );
+        }
+        batch.commit();
+        return TasksStateHelper.separateTasks(allTasks);
+      });
+    },
+    [currentUser, sections, setAllTasks]
+  );
+
   const moveTask = useCallback(
     async (
       projectId: string,
@@ -184,22 +214,6 @@ export const useTasks = () => {
           {}
         );
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
-        return TasksStateHelper.separateTasks(allTasks);
-      });
-    },
-    [currentUser, sections, setAllTasks]
-  );
-
-  const deleteTasks = useCallback(
-    async (projectId: string, taskIds: string[]) => {
-      if (!currentUser) return;
-      setAllTasks((prev) => {
-        const allTasks = TasksStateHelper.deleteTasks(
-          [...prev.incompleted, ...prev.completed],
-          sections,
-          taskIds
-        );
-        TasksRepository.deleteTasks(currentUser.uid, projectId, taskIds);
         return TasksStateHelper.separateTasks(allTasks);
       });
     },
