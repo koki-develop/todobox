@@ -192,7 +192,19 @@ export const useTasks = () => {
           result[id] = { completedAt, index };
           return result;
         }, {} as { [id: string]: UpdateTaskInput });
-        TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
+        const batch = TasksRepository.writeBatch();
+        TasksRepository.updateTasksBatch(
+          batch,
+          currentUser.uid,
+          projectId,
+          updateInputs
+        );
+        TasksRepository.decrementCounterBatch(
+          batch,
+          currentUser.uid,
+          projectId
+        );
+        TasksRepository.commitBatch(batch);
         return TasksStateHelper.separateTasks(allTasks);
       });
     },
