@@ -41,11 +41,11 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
   );
 
   useEffect(() => {
-    if (task) {
+    if (open && task) {
       setTitle(task.title);
       setDescription(task.description);
     }
-  }, [task]);
+  }, [open, task]);
 
   useEffect(() => {
     if (!task) return;
