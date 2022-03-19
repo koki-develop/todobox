@@ -109,6 +109,7 @@ export class TasksRepository {
   ): void {
     const ref = this._getTaskRef(userId, projectId, taskId);
     batch.delete(ref);
+    this.decrementCounterBatch(batch, userId, projectId);
   }
 
   public static listen(
@@ -155,6 +156,15 @@ export class TasksRepository {
   ): void {
     const ref = this._getRandomCounterShardRef(userId, projectId);
     batch.update(ref, { count: increment(1) });
+  }
+
+  public static decrementCounterBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string
+  ): void {
+    const ref = this._getRandomCounterShardRef(userId, projectId);
+    batch.update(ref, { count: increment(-1) });
   }
 
   public static initializeCounterBatch(
