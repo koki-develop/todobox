@@ -4,6 +4,7 @@ import List from "@mui/material/List";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
+import TaskDeleteConfirmModal from "@/components/model/task/TaskDeleteConfirmModal";
 import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem";
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
@@ -39,12 +40,12 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     completedTasks,
     incompletedTasks,
     createTask,
-    deleteTask,
-    deleteTasks,
     completeTask,
     incompleteTask,
   } = useTasks();
 
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState<boolean>(false);
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
   const droppableId = useMemo(() => {
@@ -96,30 +97,32 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     [incompleteTask, projectId]
   );
 
-  const handleDeleteTask = useCallback(
-    async (task: Task) => {
-      if (
-        selectedTasks.length > 1 &&
-        selectedTasks.some((selectedTask) => selectedTask.id === task.id)
-      ) {
-        // 複数削除
-        await deleteTasks(
-          projectId,
-          selectedTasks.map((task) => task.id)
-        );
-      } else {
-        // 単一削除
-        await deleteTask(projectId, task.id, {
-          disableDecrementCounter: Boolean(task.completedAt),
-        });
-      }
-    },
-    [deleteTask, deleteTasks, projectId, selectedTasks]
-  );
+  const handleDeleteTask = useCallback((task: Task) => {
+    setDeletingTask(task);
+    setOpenDeleteConfirm(true);
+  }, []);
+
+  const handleDeletedTask = useCallback(() => {
+    setOpenDeleteConfirm(false);
+  }, []);
+
+  const handleCancelDeleteTask = useCallback(() => {
+    setOpenDeleteConfirm(false);
+  }, []);
 
   // TODO: リファクタ
   return (
     <>
+      {deletingTask && (
+        <TaskDeleteConfirmModal
+          open={openDeleteConfirm}
+          projectId={projectId}
+          task={deletingTask}
+          selectedTasks={selectedTasks}
+          onDeleted={handleDeletedTask}
+          onCancel={handleCancelDeleteTask}
+        />
+      )}
       <Droppable droppableId={droppableId} type="tasks">
         {(provided, snapshot) => (
           <List

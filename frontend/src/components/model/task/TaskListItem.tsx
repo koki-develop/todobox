@@ -99,6 +99,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
     const handleDelete = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
+        setOpenMenu(false);
         onDelete(task);
       },
       [onDelete, task]
