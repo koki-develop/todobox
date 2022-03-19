@@ -3,23 +3,20 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import {
-  signInWithRedirect,
-  signInAnonymously,
-  GoogleAuthProvider,
-} from "firebase/auth";
 import React, { useCallback } from "react";
 import Field from "@/components/utils/Field";
-import { auth } from "@/lib/firebase";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 const LoginPage: React.VFC = React.memo(() => {
-  const handleClickLoginWithGoogle = useCallback(() => {
-    signInWithRedirect(auth, new GoogleAuthProvider());
-  }, []);
+  const { loginWithGoogle, loginAnonymously } = useCurrentUser();
 
-  const handleClickLoginAnonymously = useCallback(() => {
-    signInAnonymously(auth);
-  }, []);
+  const handleClickLoginWithGoogle = useCallback(async () => {
+    await loginWithGoogle();
+  }, [loginWithGoogle]);
+
+  const handleClickLoginAnonymously = useCallback(async () => {
+    await loginAnonymously();
+  }, [loginAnonymously]);
 
   return (
     <Container maxWidth="sm" sx={{ mt: 20 }}>
