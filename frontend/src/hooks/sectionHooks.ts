@@ -6,7 +6,8 @@ import {
   Section,
   UpdateSectionInput,
 } from "@/models/section";
-import { SectionsRepository, SectionsStateHelper } from "@/lib/sectionUtils";
+import { SectionsStateHelper } from "@/lib/sectionUtils";
+import { SectionsRepository } from "@/lib/sectionsRepository";
 import { useCurrentUser } from "./userHooks";
 
 export const useSections = () => {

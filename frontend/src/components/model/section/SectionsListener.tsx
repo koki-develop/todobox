@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { sectionsInitializedState, sectionsState } from "@/atoms/sectionAtoms";
-import { SectionsRepository } from "@/lib/sectionUtils";
+import { SectionsRepository } from "@/lib/sectionsRepository";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export type SectionsListenerProps = {
