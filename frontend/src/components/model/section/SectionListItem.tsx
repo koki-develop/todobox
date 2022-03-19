@@ -11,7 +11,6 @@ import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import SectionDeleteConfirmModal from "@/components/model/section/SectionDeleteConfirmModal";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import SectionListItemInput from "@/components/model/section/SectionListItemInput";
 import TaskList from "@/components/model/task/TaskList";
@@ -27,6 +26,7 @@ export type SectionListItemProps = {
   selectedTasks: Task[];
   showCompletedTasks: boolean;
 
+  onDelete: (section: Section) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -38,6 +38,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
     section,
     selectedTasks,
     showCompletedTasks,
+    onDelete,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -48,7 +49,6 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
-  const [openDeleteConfirm, setOpenDeleteConfirm] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
 
   const theme = useTheme();
@@ -88,16 +88,8 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
 
   const handleDelete = useCallback(() => {
     setOpenMenu(false);
-    setOpenDeleteConfirm(true);
-  }, []);
-
-  const handleDeleted = useCallback(() => {
-    setOpenDeleteConfirm(false);
-  }, []);
-
-  const handleCancelDelete = useCallback(() => {
-    setOpenDeleteConfirm(false);
-  }, []);
+    onDelete(section);
+  }, [onDelete, section]);
 
   return (
     <Draggable
@@ -118,71 +110,62 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
               onCancel={handleCancelEdit}
             />
           ) : (
-            <>
-              <SectionDeleteConfirmModal
-                open={openDeleteConfirm}
-                projectId={projectId}
-                section={section}
-                onCancel={handleCancelDelete}
-                onDeleted={handleDeleted}
-              />
-              <SectionListItemCard {...provided.dragHandleProps}>
-                <IconButton
-                  size="small"
-                  sx={{ mr: 1 }}
-                  onClick={expanded ? handleCollapse : handleExpand}
-                >
-                  {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                </IconButton>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    flexGrow: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  [{section.index}] {section.name}
-                </Typography>
-                <IconButton
-                  ref={menuButtonRef}
-                  onClick={handleOpenMenu}
-                  size="small"
-                >
-                  <MoreHorizIcon />
-                </IconButton>
-                <PopperList
-                  anchorEl={menuButtonRef.current}
-                  open={openMenu}
-                  onClose={handleCloseMenu}
-                  placement="bottom-end"
-                  clickAwayListenerProps={{
-                    mouseEvent: "onMouseDown",
-                  }}
-                >
-                  <PopperListItem onClick={handleEdit}>
-                    <ListItemIcon>
-                      <EditIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="セクションを編集" />
-                  </PopperListItem>
-                  <PopperListItem onClick={handleDelete}>
-                    <ListItemIcon>
-                      <DeleteIcon color="error" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="セクションを削除"
-                      primaryTypographyProps={{
-                        sx: {
-                          color: theme.palette.error.main,
-                        },
-                      }}
-                    />
-                  </PopperListItem>
-                </PopperList>
-              </SectionListItemCard>
-            </>
+            <SectionListItemCard {...provided.dragHandleProps}>
+              <IconButton
+                size="small"
+                sx={{ mr: 1 }}
+                onClick={expanded ? handleCollapse : handleExpand}
+              >
+                {expanded ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+              </IconButton>
+              <Typography
+                variant="h6"
+                sx={{
+                  flexGrow: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                [{section.index}] {section.name}
+              </Typography>
+              <IconButton
+                ref={menuButtonRef}
+                onClick={handleOpenMenu}
+                size="small"
+              >
+                <MoreHorizIcon />
+              </IconButton>
+              <PopperList
+                anchorEl={menuButtonRef.current}
+                open={openMenu}
+                onClose={handleCloseMenu}
+                placement="bottom-end"
+                clickAwayListenerProps={{
+                  mouseEvent: "onMouseDown",
+                }}
+              >
+                <PopperListItem onClick={handleEdit}>
+                  <ListItemIcon>
+                    <EditIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="セクションを編集" />
+                </PopperListItem>
+                <PopperListItem onClick={handleDelete}>
+                  <ListItemIcon>
+                    <DeleteIcon color="error" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="セクションを削除"
+                    primaryTypographyProps={{
+                      sx: {
+                        color: theme.palette.error.main,
+                      },
+                    }}
+                  />
+                </PopperListItem>
+              </PopperList>
+            </SectionListItemCard>
           )}
           {expanded && (
             <TaskList
