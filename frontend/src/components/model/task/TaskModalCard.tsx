@@ -24,6 +24,7 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
   const { task, taskInitialized, updateTask } = useTasks();
 
   const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   const handleChangeTitle = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,9 +33,17 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
     []
   );
 
+  const handleChangeDescription = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDescription(e.currentTarget.value);
+    },
+    []
+  );
+
   useEffect(() => {
     if (task) {
       setTitle(task.title);
+      setDescription(task.description);
     }
   }, [task]);
 
@@ -49,6 +58,17 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task, title]);
+
+  useEffect(() => {
+    if (!task) return;
+    if (task.description === description) return;
+    const timeoutId = setTimeout(async () => {
+      await updateTask(projectId, task, { description });
+    }, 500);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [description, projectId, task, updateTask]);
 
   return (
     <>
@@ -75,7 +95,14 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
                 />
               }
             />
-            <CardContent>TODO: description</CardContent>
+            <CardContent>
+              <TextField
+                fullWidth
+                multiline
+                value={description}
+                onChange={handleChangeDescription}
+              />
+            </CardContent>
           </>
         )}
       </ModalCard>
