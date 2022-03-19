@@ -13,6 +13,7 @@ import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useSections } from "@/hooks/sectionsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
+// TODO: リファクタ
 export const useTasks = () => {
   const { currentUser } = useCurrentUser();
   const { sections } = useSections();
@@ -86,11 +87,14 @@ export const useTasks = () => {
           taskId
         );
         const batch = TasksRepository.writeBatch();
-        const updateInputs = allTasks.reduce((result, current) => {
-          const { id, completedAt, index } = current;
-          result[id] = { completedAt, index };
-          return result;
-        }, {} as { [id: string]: UpdateTaskInput });
+        const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
+          (result, current) => {
+            const { id, completedAt, index } = current;
+            result[id] = { completedAt, index };
+            return result;
+          },
+          {}
+        );
         TasksRepository.updateTasksBatch(
           batch,
           currentUser.uid,
@@ -121,11 +125,14 @@ export const useTasks = () => {
           toSectionId,
           toIndex
         );
-        const updateInputs = allTasks.reduce((result, current) => {
-          const { id, index, sectionId } = current;
-          result[id] = { index, sectionId };
-          return result;
-        }, {} as { [id: string]: UpdateTaskInput });
+        const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
+          (result, current) => {
+            const { id, index, sectionId } = current;
+            result[id] = { index, sectionId };
+            return result;
+          },
+          {}
+        );
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
         return TasksStateHelper.separateTasks(allTasks);
       });
@@ -151,11 +158,14 @@ export const useTasks = () => {
           toSectionId,
           toIndex
         );
-        const updateInputs = allTasks.reduce((result, current) => {
-          const { id, index, sectionId } = current;
-          result[id] = { index, sectionId };
-          return result;
-        }, {} as { [id: string]: UpdateTaskInput });
+        const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
+          (result, current) => {
+            const { id, index, sectionId } = current;
+            result[id] = { index, sectionId };
+            return result;
+          },
+          {}
+        );
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
         return TasksStateHelper.separateTasks(allTasks);
       });
@@ -188,11 +198,14 @@ export const useTasks = () => {
           sections,
           taskId
         );
-        const updateInputs = allTasks.reduce((result, current) => {
-          const { id, completedAt, index } = current;
-          result[id] = { completedAt, index };
-          return result;
-        }, {} as { [id: string]: UpdateTaskInput });
+        const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
+          (result, current) => {
+            const { id, completedAt, index } = current;
+            result[id] = { completedAt, index };
+            return result;
+          },
+          {}
+        );
         const batch = TasksRepository.writeBatch();
         TasksRepository.updateTasksBatch(
           batch,
@@ -221,11 +234,14 @@ export const useTasks = () => {
           sections,
           taskId
         );
-        const updateInputs = allTasks.reduce((result, current) => {
-          const { id, completedAt, index } = current;
-          result[id] = { completedAt, index };
-          return result;
-        }, {} as { [id: string]: UpdateTaskInput });
+        const updateInputs = allTasks.reduce<{ [id: string]: UpdateTaskInput }>(
+          (result, current) => {
+            const { id, completedAt, index } = current;
+            result[id] = { completedAt, index };
+            return result;
+          },
+          {}
+        );
         TasksRepository.updateTasks(currentUser.uid, projectId, updateInputs);
         return TasksStateHelper.separateTasks(allTasks);
       });

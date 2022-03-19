@@ -76,13 +76,16 @@ export class TasksStateHelper {
     if (!firstTask) return prev;
 
     // 付随する移動対象のタスク一覧を取得
-    const otherTasks: Task[] = otherTaskIds.reduce((result, current) => {
-      const otherTask = prev.find((task) => task.id === current);
-      if (!otherTask) {
-        return result;
-      }
-      return [...result, otherTask];
-    }, [] as Task[]);
+    const otherTasks: Task[] = otherTaskIds.reduce<Task[]>(
+      (result, current) => {
+        const otherTask = prev.find((task) => task.id === current);
+        if (!otherTask) {
+          return result;
+        }
+        return [...result, otherTask];
+      },
+      []
+    );
 
     // 全ての移動対象のタスクの順序を保持しておく
     const sortedMovingTasks = this._index(
@@ -198,7 +201,10 @@ export class TasksStateHelper {
     incompleted: Task[];
     completed: Task[];
   } {
-    return prev.reduce(
+    return prev.reduce<{
+      incompleted: Task[];
+      completed: Task[];
+    }>(
       (result, current) => {
         if (current.completedAt) {
           return {
@@ -212,10 +218,7 @@ export class TasksStateHelper {
           };
         }
       },
-      { incompleted: [], completed: [] } as {
-        incompleted: Task[];
-        completed: Task[];
-      }
+      { incompleted: [], completed: [] }
     );
   }
 
@@ -266,7 +269,9 @@ export class TasksStateHelper {
     sections: Section[],
     tasks: Task[]
   ): Task[] {
-    const [tasksToAdd, tasksToUpdate]: [Task[], Task[]] = tasks.reduce(
+    const [tasksToAdd, tasksToUpdate]: [Task[], Task[]] = tasks.reduce<
+      [Task[], Task[]]
+    >(
       (result, current) => {
         if (prev.some((task) => task.id === current.id)) {
           return [result[0], [...result[1], current]];
@@ -274,7 +279,7 @@ export class TasksStateHelper {
           return [[...result[0], current], result[1]];
         }
       },
-      [[], []] as [Task[], Task[]]
+      [[], []]
     );
 
     return this._sort(
@@ -341,7 +346,7 @@ export class TasksStateHelper {
       completedTasks: Task[];
       incompletedTasks: Task[];
     };
-    const groups: Group[] = prev.reduce((result, current) => {
+    const groups: Group[] = prev.reduce<Group[]>((result, current) => {
       const group = result.find(
         (group) => group.sectionId === current.sectionId
       );
@@ -373,15 +378,15 @@ export class TasksStateHelper {
         }
         return result;
       }
-    }, [] as Group[]);
+    }, []);
 
-    const indexedTasks: Task[] = groups.reduce((result, current) => {
+    const indexedTasks: Task[] = groups.reduce<Task[]>((result, current) => {
       return [
         ...result,
         ...current.completedTasks,
         ...current.incompletedTasks.map((task, i) => ({ ...task, index: i })),
       ];
-    }, [] as Task[]);
+    }, []);
 
     return this._sort(indexedTasks, sections);
   }
