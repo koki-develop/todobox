@@ -49,8 +49,11 @@ export const handleDeleteSection = functionBuilder.firestore
     const shardRef = firestore.doc(
       `users/${userId}/projects/${projectId}/counters/tasks/shards/${shardId}`
     );
+    const decrementCount = tasksSnapshot.docs.filter(
+      (doc) => !Boolean(doc.data().completedAt)
+    ).length;
     batch.update(shardRef, {
-      count: admin.firestore.FieldValue.increment(-tasksSnapshot.size),
+      count: admin.firestore.FieldValue.increment(-decrementCount),
     });
     await batch.commit();
   });
