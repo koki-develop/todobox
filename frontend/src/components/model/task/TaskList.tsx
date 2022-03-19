@@ -109,7 +109,9 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
         );
       } else {
         // 単一削除
-        await deleteTask(projectId, task.id);
+        await deleteTask(projectId, task.id, {
+          disableDecrementCounter: Boolean(task.completedAt),
+        });
       }
     },
     [deleteTask, deleteTasks, projectId, selectedTasks]
