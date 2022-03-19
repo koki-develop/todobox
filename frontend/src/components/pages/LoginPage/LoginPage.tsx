@@ -1,4 +1,6 @@
 import GoogleIcon from "@mui/icons-material/Google";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
@@ -19,7 +21,14 @@ const LoginPage: React.VFC = React.memo(() => {
   }, [loginAnonymously]);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 20 }}>
+    <Container maxWidth="sm" sx={{ pt: 4 }}>
+      <Alert severity="warning" sx={{ justifyContent: "center", mb: 2 }}>
+        <AlertTitle sx={{ fontWeight: "bold" }}>
+          このアプリケーションはサンプルです。
+        </AlertTitle>
+        保存されたデータは定期的に削除されます。
+      </Alert>
+
       <Paper sx={{ p: 4 }} elevation={10}>
         <Field>
           <Typography sx={{ textAlign: "center" }} variant="h5">
