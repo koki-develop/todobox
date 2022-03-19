@@ -1,6 +1,7 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -162,7 +163,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
                 >
                   <PopperListItem onClick={handleEdit}>
                     <ListItemIcon>
-                      <DeleteIcon />
+                      <EditIcon />
                     </ListItemIcon>
                     <ListItemText primary="セクションを編集" />
                   </PopperListItem>
