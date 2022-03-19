@@ -41,9 +41,18 @@ export const handleDeleteSection = functionBuilder.firestore
       .where("sectionId", "==", sectionId)
       .get();
 
+    const batch = firestore.batch();
     for (const doc of tasksSnapshot.docs) {
-      await doc.ref.delete();
+      batch.delete(doc.ref);
     }
+    const shardId = Math.floor(Math.random() * 10);
+    const shardRef = firestore.doc(
+      `users/${userId}/projects/${projectId}/counters/tasks/shards/${shardId}`
+    );
+    batch.update(shardRef, {
+      count: admin.firestore.FieldValue.increment(-tasksSnapshot.size),
+    });
+    await batch.commit();
   });
 
 export const handleDeleteProject = functionBuilder.firestore
