@@ -171,10 +171,11 @@ export class TasksRepository {
   public static decrementCounterBatch(
     batch: WriteBatch,
     userId: string,
-    projectId: string
+    projectId: string,
+    count = 1
   ): void {
     const ref = this._getRandomCounterShardRef(userId, projectId);
-    batch.update(ref, { count: increment(-1) });
+    batch.update(ref, { count: increment(-count) });
   }
 
   /*
