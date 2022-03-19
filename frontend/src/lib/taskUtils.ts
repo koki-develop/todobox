@@ -149,6 +149,20 @@ export class TasksRepository {
     });
   }
 
+  public static listenCount(
+    userId: string,
+    projectId: string,
+    callback: (count: number) => void
+  ): Unsubscribe {
+    const ref = this._getCounterShardsRef(userId, projectId);
+    return onSnapshot(ref, (snapshot) => {
+      const count = snapshot.docs.reduce<number>((result, current) => {
+        return result + current.data().count;
+      }, 0);
+      callback(count);
+    });
+  }
+
   public static incrementCounterBatch(
     batch: WriteBatch,
     userId: string,
@@ -176,6 +190,22 @@ export class TasksRepository {
       const ref = this._getCounterShardRef(userId, projectId, i);
       batch.set(ref, { count: 0 });
     }
+  }
+
+  private static _getCounterShardsRef(
+    userId: string,
+    projectId: string
+  ): CollectionReference {
+    return collection(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "counters",
+      "tasks",
+      "shards"
+    );
   }
 
   private static _getCounterShardRef(
