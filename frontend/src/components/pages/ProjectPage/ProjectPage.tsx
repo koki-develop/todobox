@@ -415,6 +415,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
                     projectId={projectId}
                     sectionId={null}
                     selectedTasks={selectedTasks}
+                    showCompletedTasks={showCompletedTasks}
                     onClickTask={handleClickTask}
                     onSelectTask={handleSelectTask}
                     onMultiSelectTask={handleMultiSelectTask}
@@ -423,6 +424,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
                 <SectionList
                   projectId={projectId}
                   selectedTasks={selectedTasks}
+                  showCompletedTasks={showCompletedTasks}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}

@@ -12,6 +12,7 @@ import { useSections } from "@/hooks/sectionHooks";
 export type SectionListProps = {
   projectId: string;
   selectedTasks: Task[];
+  showCompletedTasks: boolean;
 
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
@@ -22,6 +23,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
   const {
     projectId,
     selectedTasks,
+    showCompletedTasks,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -58,6 +60,7 @@ const SectionList: React.VFC<SectionListProps> = React.memo((props) => {
               projectId={projectId}
               section={section}
               selectedTasks={selectedTasks}
+              showCompletedTasks={showCompletedTasks}
               onClickTask={onClickTask}
               onSelectTask={onSelectTask}
               onMultiSelectTask={onMultiSelectTask}

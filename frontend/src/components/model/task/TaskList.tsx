@@ -15,6 +15,7 @@ export type TaskListProps = {
   projectId: string;
   sectionId: string | null;
   selectedTasks: Task[];
+  showCompletedTasks: boolean;
 
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
@@ -26,6 +27,7 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
     projectId,
     sectionId,
     selectedTasks,
+    showCompletedTasks,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -166,21 +168,23 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
           </List>
         )}
       </Droppable>
-      <List disablePadding sx={{ mb: 2 }}>
-        {sectionCompletedTasks.map((task) => (
-          <TaskListItem
-            key={task.id}
-            task={task}
-            selectedTasks={selectedTasks}
-            onComplete={handleCompleteTask}
-            onIncomplete={handleIncompleteTask}
-            onDelete={handleDeleteTask}
-            onClick={onClickTask}
-            onSelect={onSelectTask}
-            onMultiSelect={onMultiSelectTask}
-          />
-        ))}
-      </List>
+      {showCompletedTasks && (
+        <List disablePadding sx={{ mb: 2 }}>
+          {sectionCompletedTasks.map((task) => (
+            <TaskListItem
+              key={task.id}
+              task={task}
+              selectedTasks={selectedTasks}
+              onComplete={handleCompleteTask}
+              onIncomplete={handleIncompleteTask}
+              onDelete={handleDeleteTask}
+              onClick={onClickTask}
+              onSelect={onSelectTask}
+              onMultiSelect={onMultiSelectTask}
+            />
+          ))}
+        </List>
+      )}
     </>
   );
 });
