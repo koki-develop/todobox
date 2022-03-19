@@ -22,16 +22,38 @@ import {
 import { firestore } from "@/lib/firebase";
 
 export class SectionsRepository {
-  public static build(input: CreateSectionInput): Section {
-    return { id: ulid(), ...input };
-  }
-
+  // TODO: 消す
   public static writeBatch(): WriteBatch {
     return writeBatch(firestore);
   }
 
+  // TODO: 消す
   public static async commitBatch(batch: WriteBatch): Promise<void> {
     await batch.commit();
+  }
+
+  /*
+   * read
+   */
+
+  public static listenAll(
+    userId: string,
+    projectId: string,
+    callback: (sections: Section[]) => void
+  ): Unsubscribe {
+    const q = this._getSectionsQuery(userId, projectId);
+    return onSnapshot(q, (snapshot) => {
+      const sections = this._querySnapshotToSections(snapshot);
+      callback(sections);
+    });
+  }
+
+  /*
+   * write
+   */
+
+  public static build(input: CreateSectionInput): Section {
+    return { id: ulid(), ...input };
   }
 
   public static async create(
@@ -86,17 +108,9 @@ export class SectionsRepository {
     batch.delete(ref);
   }
 
-  public static listenAll(
-    userId: string,
-    projectId: string,
-    callback: (sections: Section[]) => void
-  ): Unsubscribe {
-    const q = this._getSectionsQuery(userId, projectId);
-    return onSnapshot(q, (snapshot) => {
-      const sections = this._querySnapshotToSections(snapshot);
-      callback(sections);
-    });
-  }
+  /*
+   * private
+   */
 
   private static _getSectionRef(
     userId: string,

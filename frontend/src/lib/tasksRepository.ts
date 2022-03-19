@@ -21,94 +21,19 @@ import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { firestore } from "@/lib/firebase";
 
 export class TasksRepository {
-  public static build(input: CreateTaskInput) {
-    return { id: ulid(), completedAt: null, ...input };
-  }
-
-  public static async create(
-    userId: string,
-    projectId: string,
-    task: Task
-  ): Promise<void> {
-    const batch = this.writeBatch();
-    this.createBatch(batch, userId, projectId, task);
-    await this.commitBatch(batch);
-  }
-
-  public static createBatch(
-    batch: WriteBatch,
-    userId: string,
-    projectId: string,
-    task: Task
-  ): void {
-    const { id, ...data } = task;
-    const ref = this._getTaskRef(userId, projectId, id);
-    batch.set(ref, data);
-    this.incrementCounterBatch(batch, userId, projectId);
-  }
-
+  // TODO: 消す
   public static writeBatch(): WriteBatch {
     return writeBatch(firestore);
   }
 
+  // TODO: 消す
   public static async commitBatch(batch: WriteBatch): Promise<void> {
     await batch.commit();
   }
 
-  public static async update(
-    userId: string,
-    projectId: string,
-    taskId: string,
-    input: UpdateTaskInput
-  ): Promise<void> {
-    const ref = this._getTaskRef(userId, projectId, taskId);
-    await updateDoc(ref, { ...input });
-  }
-
-  public static async updateTasks(
-    userId: string,
-    projectId: string,
-    inputs: { [id: string]: UpdateTaskInput }
-  ): Promise<void> {
-    const batch = this.writeBatch();
-    this.updateTasksBatch(batch, userId, projectId, inputs);
-    await this.commitBatch(batch);
-  }
-
-  public static updateTasksBatch(
-    batch: WriteBatch,
-    userId: string,
-    projectId: string,
-    inputs: { [id: string]: UpdateTaskInput }
-  ): void {
-    for (const [id, input] of Object.entries(inputs)) {
-      const ref = this._getTaskRef(userId, projectId, id);
-      batch.update(ref, { ...input });
-    }
-  }
-
-  public static async deleteTasks(
-    userId: string,
-    projectId: string,
-    taskIds: string[]
-  ): Promise<void> {
-    const batch = this.writeBatch();
-    for (const taskId of taskIds) {
-      this.deleteBatch(batch, userId, projectId, taskId);
-    }
-    await this.commitBatch(batch);
-  }
-
-  public static deleteBatch(
-    batch: WriteBatch,
-    userId: string,
-    projectId: string,
-    taskId: string
-  ): void {
-    const ref = this._getTaskRef(userId, projectId, taskId);
-    batch.delete(ref);
-    this.decrementCounterBatch(batch, userId, projectId);
-  }
+  /*
+   * read
+   */
 
   public static listen(
     userId: string,
@@ -161,6 +86,102 @@ export class TasksRepository {
     });
   }
 
+  /*
+   * write
+   */
+
+  public static build(input: CreateTaskInput) {
+    return { id: ulid(), completedAt: null, ...input };
+  }
+
+  public static async create(
+    userId: string,
+    projectId: string,
+    task: Task
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    this.createBatch(batch, userId, projectId, task);
+    await this.commitBatch(batch);
+  }
+
+  public static createBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    task: Task
+  ): void {
+    const { id, ...data } = task;
+    const ref = this._getTaskRef(userId, projectId, id);
+    batch.set(ref, data);
+    this.incrementCounterBatch(batch, userId, projectId);
+  }
+
+  public static async update(
+    userId: string,
+    projectId: string,
+    taskId: string,
+    input: UpdateTaskInput
+  ): Promise<void> {
+    const ref = this._getTaskRef(userId, projectId, taskId);
+    await updateDoc(ref, { ...input });
+  }
+
+  public static async updateTasks(
+    userId: string,
+    projectId: string,
+    inputs: { [id: string]: UpdateTaskInput }
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    this.updateTasksBatch(batch, userId, projectId, inputs);
+    await this.commitBatch(batch);
+  }
+
+  public static updateTasksBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    inputs: { [id: string]: UpdateTaskInput }
+  ): void {
+    for (const [id, input] of Object.entries(inputs)) {
+      const ref = this._getTaskRef(userId, projectId, id);
+      batch.update(ref, { ...input });
+    }
+  }
+
+  public static deleteBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string,
+    taskId: string
+  ): void {
+    const ref = this._getTaskRef(userId, projectId, taskId);
+    batch.delete(ref);
+    this.decrementCounterBatch(batch, userId, projectId);
+  }
+
+  public static async deleteTasks(
+    userId: string,
+    projectId: string,
+    taskIds: string[]
+  ): Promise<void> {
+    const batch = this.writeBatch();
+    for (const taskId of taskIds) {
+      this.deleteBatch(batch, userId, projectId, taskId);
+    }
+    await this.commitBatch(batch);
+  }
+
+  public static initializeCounterBatch(
+    batch: WriteBatch,
+    userId: string,
+    projectId: string
+  ): void {
+    for (let i = 0; i < 10; i++) {
+      const ref = this._getCounterShardRef(userId, projectId, i);
+      batch.set(ref, { count: 0 });
+    }
+  }
+
   public static incrementCounterBatch(
     batch: WriteBatch,
     userId: string,
@@ -179,32 +200,9 @@ export class TasksRepository {
     batch.update(ref, { count: increment(-1) });
   }
 
-  public static initializeCounterBatch(
-    batch: WriteBatch,
-    userId: string,
-    projectId: string
-  ): void {
-    for (let i = 0; i < 10; i++) {
-      const ref = this._getCounterShardRef(userId, projectId, i);
-      batch.set(ref, { count: 0 });
-    }
-  }
-
-  private static _getCounterShardsRef(
-    userId: string,
-    projectId: string
-  ): CollectionReference {
-    return collection(
-      firestore,
-      "users",
-      userId,
-      "projects",
-      projectId,
-      "counters",
-      "tasks",
-      "shards"
-    );
-  }
+  /*
+   * private
+   */
 
   private static _getCounterShardRef(
     userId: string,
@@ -221,6 +219,22 @@ export class TasksRepository {
       "tasks",
       "shards",
       shardId.toString()
+    );
+  }
+
+  private static _getCounterShardsRef(
+    userId: string,
+    projectId: string
+  ): CollectionReference {
+    return collection(
+      firestore,
+      "users",
+      userId,
+      "projects",
+      projectId,
+      "counters",
+      "tasks",
+      "shards"
     );
   }
 

@@ -22,10 +22,19 @@ import {
 import { firestore } from "@/lib/firebase";
 
 export class ProjectsRepository {
-  public static build(input: CreateProjectInput): Project {
-    const id = ulid();
-    return { id, ...input };
+  // TODO: 消す
+  public static writeBatch(): WriteBatch {
+    return writeBatch(firestore);
   }
+
+  // TODO: 消す
+  public static commitBatch(batch: WriteBatch): Promise<void> {
+    return batch.commit();
+  }
+
+  /*
+   * read
+   */
 
   public static listen(
     userId: string,
@@ -48,6 +57,15 @@ export class ProjectsRepository {
       const projects = this._querySnapshotToProjects(snapshot);
       callback(projects);
     });
+  }
+
+  /*
+   * write
+   */
+
+  public static build(input: CreateProjectInput): Project {
+    const id = ulid();
+    return { id, ...input };
   }
 
   public static async create(userId: string, project: Project): Promise<void> {
@@ -80,13 +98,9 @@ export class ProjectsRepository {
     await deleteDoc(ref);
   }
 
-  public static writeBatch(): WriteBatch {
-    return writeBatch(firestore);
-  }
-
-  public static commitBatch(batch: WriteBatch): Promise<void> {
-    return batch.commit();
-  }
+  /*
+   * private
+   */
 
   private static _documentSnapshotToProject(
     snapshot: DocumentSnapshot
