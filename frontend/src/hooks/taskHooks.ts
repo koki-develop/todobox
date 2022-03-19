@@ -10,7 +10,7 @@ import {
 import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { TasksRepository } from "@/lib/tasksRepository";
 import { TasksStateHelper } from "@/lib/tasksStateHelper";
-import { useSections } from "@/hooks/sectionHooks";
+import { useSections } from "@/hooks/sectionsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 export const useTasks = () => {

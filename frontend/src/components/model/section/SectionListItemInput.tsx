@@ -9,7 +9,7 @@ import {
   Section,
   UpdateSectionInput,
 } from "@/models/section";
-import { useSections } from "@/hooks/sectionHooks";
+import { useSections } from "@/hooks/sectionsHooks";
 
 export type SectionListItemInputProps = {
   section?: Section;

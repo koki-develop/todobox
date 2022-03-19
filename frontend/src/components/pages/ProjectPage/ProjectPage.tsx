@@ -39,7 +39,7 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
 import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useProjects } from "@/hooks/projectsHooks";
-import { useSections } from "@/hooks/sectionHooks";
+import { useSections } from "@/hooks/sectionsHooks";
 import { useTasks } from "@/hooks/taskHooks";
 
 export type ProjectPageProps = {

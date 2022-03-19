@@ -16,7 +16,7 @@ import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Section, UpdateSectionInput } from "@/models/section";
 import { Task } from "@/models/task";
-import { useSections } from "@/hooks/sectionHooks";
+import { useSections } from "@/hooks/sectionsHooks";
 import SectionListItemInput from "./SectionListItemInput";
 
 export type SectionListItemProps = {

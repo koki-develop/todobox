@@ -7,7 +7,7 @@ import SectionListItem from "@/components/model/section/SectionListItem";
 import SectionListItemInput from "@/components/model/section/SectionListItemInput";
 import { CreateSectionInput } from "@/models/section";
 import { Task } from "@/models/task";
-import { useSections } from "@/hooks/sectionHooks";
+import { useSections } from "@/hooks/sectionsHooks";
 
 export type SectionListProps = {
   projectId: string;
