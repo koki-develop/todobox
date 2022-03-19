@@ -237,7 +237,7 @@ export const useTasks = () => {
           },
           {}
         );
-        const batch = TasksRepository.writeBatch();
+        const batch = writeBatch(firestore);
         TasksRepository.updateTasksBatch(
           batch,
           currentUser.uid,
@@ -249,7 +249,7 @@ export const useTasks = () => {
           currentUser.uid,
           projectId
         );
-        TasksRepository.commitBatch(batch);
+        batch.commit();
         return TasksStateHelper.separateTasks(allTasks);
       });
     },

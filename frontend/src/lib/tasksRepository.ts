@@ -13,24 +13,14 @@ import {
   Unsubscribe,
   updateDoc,
   where,
-  WriteBatch,
   writeBatch,
+  WriteBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import { Task, CreateTaskInput, UpdateTaskInput } from "@/models/task";
 import { firestore } from "@/lib/firebase";
 
 export class TasksRepository {
-  // TODO: 消す
-  public static writeBatch(): WriteBatch {
-    return writeBatch(firestore);
-  }
-
-  // TODO: 消す
-  public static async commitBatch(batch: WriteBatch): Promise<void> {
-    await batch.commit();
-  }
-
   /*
    * read
    */
@@ -120,9 +110,9 @@ export class TasksRepository {
     projectId: string,
     inputs: { [id: string]: UpdateTaskInput }
   ): Promise<void> {
-    const batch = this.writeBatch();
+    const batch = writeBatch(firestore);
     this.updateTasksBatch(batch, userId, projectId, inputs);
-    await this.commitBatch(batch);
+    await batch.commit();
   }
 
   public static updateTasksBatch(

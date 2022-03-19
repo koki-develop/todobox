@@ -1,3 +1,4 @@
+import { writeBatch } from "firebase/firestore";
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { sectionsInitializedState, sectionsState } from "@/atoms/sectionAtoms";
@@ -6,6 +7,7 @@ import {
   Section,
   UpdateSectionInput,
 } from "@/models/section";
+import { firestore } from "@/lib/firebase";
 import { SectionsRepository } from "@/lib/sectionsRepository";
 import { SectionsStateHelper } from "@/lib/sectionsStateHelper";
 import { useCurrentUser } from "./userHooks";
@@ -75,7 +77,7 @@ export const useSections = () => {
 
       setSections((prev) => {
         const next = SectionsStateHelper.delete(prev, sectionId);
-        const batch = SectionsRepository.writeBatch();
+        const batch = writeBatch(firestore);
         const updateInputs = next.reduce<{ [id: string]: UpdateSectionInput }>(
           (result, current) => {
             const { id, index } = current;
@@ -96,7 +98,7 @@ export const useSections = () => {
           projectId,
           sectionId
         );
-        SectionsRepository.commitBatch(batch);
+        batch.commit();
         return next;
       });
     },

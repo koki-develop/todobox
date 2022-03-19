@@ -10,7 +10,6 @@ import {
   setDoc,
   Unsubscribe,
   updateDoc,
-  writeBatch,
   WriteBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
@@ -22,16 +21,6 @@ import {
 import { firestore } from "@/lib/firebase";
 
 export class ProjectsRepository {
-  // TODO: 消す
-  public static writeBatch(): WriteBatch {
-    return writeBatch(firestore);
-  }
-
-  // TODO: 消す
-  public static commitBatch(batch: WriteBatch): Promise<void> {
-    return batch.commit();
-  }
-
   /*
    * read
    */

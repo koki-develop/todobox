@@ -7,11 +7,11 @@ import {
   setDoc,
   updateDoc,
   WriteBatch,
-  writeBatch,
   Unsubscribe,
   Query,
   QuerySnapshot,
   DocumentReference,
+  writeBatch,
 } from "firebase/firestore";
 import { ulid } from "ulid";
 import {
@@ -22,16 +22,6 @@ import {
 import { firestore } from "@/lib/firebase";
 
 export class SectionsRepository {
-  // TODO: 消す
-  public static writeBatch(): WriteBatch {
-    return writeBatch(firestore);
-  }
-
-  // TODO: 消す
-  public static async commitBatch(batch: WriteBatch): Promise<void> {
-    await batch.commit();
-  }
-
   /*
    * read
    */
@@ -81,9 +71,9 @@ export class SectionsRepository {
     projectId: string,
     inputs: { [id: string]: UpdateSectionInput }
   ): Promise<void> {
-    const batch = this.writeBatch();
+    const batch = writeBatch(firestore);
     this.updateSectionsBatch(batch, userId, projectId, inputs);
-    await this.commitBatch(batch);
+    await batch.commit();
   }
 
   public static updateSectionsBatch(
