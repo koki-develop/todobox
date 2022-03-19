@@ -35,8 +35,8 @@ service cloud.firestore {
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && createOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
+          allow create: if loggedInWith(userId) && createOnly(request.resource, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['sectionId', 'index', 'title', 'description', 'completedAt']);
           allow delete: if loggedInWith(userId);
         }
       }
