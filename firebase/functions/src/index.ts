@@ -25,10 +25,12 @@ export const handleDeleteUser = functionBuilder.auth
     const snapshot = await firestore
       .collection(`users/${user.uid}/projects`)
       .get();
-    const docs = snapshot.docs;
-    for (const doc of docs) {
-      await doc.ref.delete();
+
+    const batch = firestore.batch();
+    for (const doc of snapshot.docs) {
+      batch.delete(doc.ref);
     }
+    await batch.commit();
   });
 
 export const handleDeleteSection = functionBuilder.firestore
@@ -63,6 +65,11 @@ export const handleDeleteProject = functionBuilder.firestore
   .onDelete(async (_snapshot, context) => {
     const { userId, projectId } = context.params;
 
+    const batch = firestore.batch();
+
+    const tasksCounterShardsSnapshot = await firestore
+      .collection(`users/${userId}/projects/${projectId}/counters/tasks/shards`)
+      .get();
     const sectionsSnapshot = await firestore
       .collection(`users/${userId}/projects/${projectId}/sections`)
       .get();
@@ -70,10 +77,15 @@ export const handleDeleteProject = functionBuilder.firestore
       .collection(`users/${userId}/projects/${projectId}/tasks`)
       .get();
 
+    for (const doc of tasksCounterShardsSnapshot.docs) {
+      batch.delete(doc.ref);
+    }
     for (const doc of sectionsSnapshot.docs) {
-      await doc.ref.delete();
+      batch.delete(doc.ref);
     }
     for (const doc of tasksSnapshot.docs) {
-      await doc.ref.delete();
+      batch.delete(doc.ref);
     }
+
+    await batch.commit();
   });
