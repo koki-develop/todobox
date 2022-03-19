@@ -37,7 +37,7 @@ import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Task } from "@/models/task";
-import { TasksStateHelper } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useProjects } from "@/hooks/projectHooks";
 import { useSections } from "@/hooks/sectionHooks";
 import { useTasks } from "@/hooks/taskHooks";

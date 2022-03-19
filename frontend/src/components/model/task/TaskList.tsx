@@ -8,7 +8,7 @@ import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
-import { TasksStateHelper } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/tasksStateHelper";
 import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskListProps = {
