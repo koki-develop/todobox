@@ -1,8 +1,10 @@
 import GoogleIcon from "@mui/icons-material/Google";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import React, { useCallback } from "react";
@@ -22,41 +24,74 @@ const LoginPage: React.VFC = React.memo(() => {
 
   return (
     <Container maxWidth="xs" sx={{ pt: 4 }}>
-      <Alert severity="warning" sx={{ justifyContent: "center", mb: 4 }}>
-        <AlertTitle sx={{ fontWeight: "bold" }}>
-          このアプリケーションはサンプルです。
-        </AlertTitle>
-        保存されたデータは定期的に削除されます。
-      </Alert>
+      <Box sx={{ mb: 4 }}>
+        <Alert severity="warning" sx={{ justifyContent: "center" }}>
+          <AlertTitle sx={{ fontWeight: "bold" }}>
+            このアプリケーションはサンプルです。
+          </AlertTitle>
+          保存されたデータは定期的に削除されます。
+        </Alert>
+      </Box>
 
-      <Paper sx={{ p: 4, pt: 2 }} elevation={4}>
-        <Field>
-          <Typography sx={{ textAlign: "center" }} variant="h5">
-            Todo Box
-          </Typography>
-        </Field>
+      <Box sx={{ mb: 4 }}>
+        <Paper sx={{ p: 4, pt: 2 }} elevation={4}>
+          <Field>
+            <Typography sx={{ textAlign: "center" }} variant="h5">
+              Todo Box
+            </Typography>
+          </Field>
 
-        <Field>
-          <Button
-            fullWidth
-            startIcon={<GoogleIcon />}
-            variant="contained"
-            onClick={handleClickLoginWithGoogle}
+          <Field>
+            <Button
+              fullWidth
+              startIcon={<GoogleIcon />}
+              variant="contained"
+              onClick={handleClickLoginWithGoogle}
+            >
+              Google でログイン
+            </Button>
+          </Field>
+
+          <Field>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleClickLoginAnonymously}
+            >
+              ゲストログイン
+            </Button>
+          </Field>
+        </Paper>
+      </Box>
+
+      <Box
+        component="footer"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Field sx={{ textAlign: "center" }}>
+          &copy; 2022{" "}
+          <Link
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://koki.me"
           >
-            Google でログイン
-          </Button>
+            koki
+          </Link>
         </Field>
-
-        <Field>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleClickLoginAnonymously}
+        <Field sx={{ textAlign: "center" }}>
+          <Link
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://github.com/koki-develop/todo-box"
           >
-            ゲストログイン
-          </Button>
+            View on GitHub
+          </Link>
         </Field>
-      </Paper>
+      </Box>
     </Container>
   );
 });
