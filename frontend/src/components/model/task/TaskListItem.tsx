@@ -148,6 +148,10 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
+                ...(task.completedAt && {
+                  color: theme.palette.text.disabled,
+                  textDecoration: "line-through",
+                }),
               },
             }}
           />
