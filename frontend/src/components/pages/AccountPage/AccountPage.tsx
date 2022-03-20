@@ -8,11 +8,11 @@ import React, { useCallback, useState } from "react";
 import UserDeleteConfirmModal from "@/components/model/user/UserDeleteConfirmModal";
 import Field from "@/components/utils/Field";
 
-export type SettingsPageProps = {
+export type AccountPageProps = {
   currentUser: User;
 };
 
-const SettingsPage: React.VFC<SettingsPageProps> = React.memo(() => {
+const AccountPage: React.VFC<AccountPageProps> = React.memo(() => {
   const theme = useTheme();
 
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState<boolean>(false);
@@ -60,6 +60,6 @@ const SettingsPage: React.VFC<SettingsPageProps> = React.memo(() => {
   );
 });
 
-SettingsPage.displayName = "SettingsPage";
+AccountPage.displayName = "AccountPage";
 
-export default SettingsPage;
+export default AccountPage;

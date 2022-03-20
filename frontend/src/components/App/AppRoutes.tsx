@@ -1,10 +1,10 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import AccountPage from "@/components/pages/AccountPage";
 import LoginPage from "@/components/pages/LoginPage";
 import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
-import SettingsPage from "@/components/pages/SettingsPage";
 import Loading from "@/components/utils/Loading";
 import ProjectLayout from "@/components/ProjectLayout";
 import { useCurrentUser } from "@/hooks/userHooks";
@@ -46,7 +46,7 @@ const AppRoutes: React.VFC = React.memo(() => {
       <Route element={<ProjectLayout />}>
         <Route path="/projects" element={withAuth()(ProjectsPage)} />
         <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
-        <Route path="/settings" element={withAuth()(SettingsPage)} />
+        <Route path="/settings" element={withAuth()(AccountPage)} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
