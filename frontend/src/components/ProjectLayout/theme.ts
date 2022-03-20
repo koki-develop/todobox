@@ -56,7 +56,7 @@ export const theme = responsiveFontSizes(
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            backgroundColor: "#eee",
+            backgroundColor: "#f5f5f5",
           },
           a: {
             textDecoration: "none",
