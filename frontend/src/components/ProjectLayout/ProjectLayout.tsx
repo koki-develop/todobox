@@ -15,6 +15,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Typography from "@mui/material/Typography";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
@@ -107,7 +108,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
             height: headerHeight,
           }}
         >
-          <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ flexGrow: 1, alignItems: "center", display: "flex" }}>
             {currentUser && !openDrawer && (
               <IconButton
                 size="small"
@@ -117,7 +118,14 @@ const ProjectLayout: React.VFC = React.memo(() => {
                 <MenuIcon />
               </IconButton>
             )}
-            <Link to={currentUser ? "/projects" : "/"}>Todo Box</Link>
+            <Typography variant="h6" sx={{ fontFamily: "Anton" }}>
+              <Link
+                to={currentUser ? "/projects" : "/"}
+                sx={{ color: theme.palette.text.primary }}
+              >
+                Todo Box
+              </Link>
+            </Typography>
           </Box>
           {currentUser && (
             <Box>
