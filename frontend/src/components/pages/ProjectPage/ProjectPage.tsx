@@ -371,6 +371,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
               </Box>
             </Field>
           </Container>
+
           <Divider />
 
           {/* content */}
