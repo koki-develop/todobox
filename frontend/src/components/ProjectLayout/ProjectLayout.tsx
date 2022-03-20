@@ -1,4 +1,8 @@
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -6,12 +10,12 @@ import { useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -34,6 +38,8 @@ const ProjectLayout: React.VFC = React.memo(() => {
   const [avatarButtonEl, setAvatarButtonEl] =
     useState<HTMLButtonElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
+  const [openDrawerProjectList, setOpenDrawerProjectList] =
+    useState<boolean>(false);
 
   const headerHeight = 48;
   const drawerWidth = 200;
@@ -72,6 +78,10 @@ const ProjectLayout: React.VFC = React.memo(() => {
 
   const handleCloseDrawer = useCallback(() => {
     setOpenDrawer(false);
+  }, []);
+
+  const handleToggleDrawerProjectList = useCallback(() => {
+    setOpenDrawerProjectList((prev) => !prev);
   }, []);
 
   const handleCloseMenu = useCallback(() => {
@@ -196,33 +206,47 @@ const ProjectLayout: React.VFC = React.memo(() => {
           </Box>
           <Divider />
           <List disablePadding sx={{ width: drawerWidth }}>
-            <Link to="/projects">
+            <Link to="/projects" sx={{ color: theme.palette.text.primary }}>
               <ListItemButton>
+                <ListItemIcon>
+                  <HomeIcon />
+                </ListItemIcon>
                 <ListItemText primary="ホーム" />
               </ListItemButton>
             </Link>
             <Divider />
-            <ListItem>
+            <ListItemButton onClick={handleToggleDrawerProjectList}>
+              <ListItemIcon>
+                <AccountTreeIcon />
+              </ListItemIcon>
               <ListItemText primary="プロジェクト" />
-            </ListItem>
+              {openDrawerProjectList ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </ListItemButton>
           </List>
           <Divider />
-          <List
-            dense
-            disablePadding
-            sx={{ flexGrow: 1, overflowY: "auto", width: drawerWidth }}
+          <Box
+            sx={{
+              display: openDrawerProjectList ? undefined : "none",
+              flexGrow: 1,
+              overflowY: "auto",
+              width: drawerWidth,
+            }}
           >
-            {projects.map((project) => (
-              <React.Fragment key={project.id}>
-                <Link to={`/projects/${project.id}`}>
-                  <ListItemButton selected={project.id === selectedProject?.id}>
-                    <ListItemText primary={project.name} />
-                  </ListItemButton>
-                </Link>
-                <Divider />
-              </React.Fragment>
-            ))}
-          </List>
+            <List dense disablePadding>
+              {projects.map((project) => (
+                <React.Fragment key={project.id}>
+                  <Link to={`/projects/${project.id}`}>
+                    <ListItemButton
+                      selected={project.id === selectedProject?.id}
+                    >
+                      <ListItemText primary={project.name} />
+                    </ListItemButton>
+                  </Link>
+                  <Divider />
+                </React.Fragment>
+              ))}
+            </List>
+          </Box>
         </Drawer>
       )}
 
