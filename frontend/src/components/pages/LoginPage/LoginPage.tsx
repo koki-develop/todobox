@@ -56,6 +56,7 @@ const LoginPage: React.VFC = React.memo(() => {
           <Field>
             <Button
               fullWidth
+              color="black"
               variant="contained"
               onClick={handleClickLoginAnonymously}
             >
