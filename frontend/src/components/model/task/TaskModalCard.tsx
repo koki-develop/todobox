@@ -73,7 +73,18 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
   return (
     <>
       <TaskListener projectId={projectId} taskId={taskId} />
-      <ModalCard open={open} onClose={onClose}>
+      <ModalCard
+        open={open}
+        onClose={onClose}
+        cardProps={{
+          sx: {
+            display: "flex",
+            flexDirection: "column",
+            height: "calc(100vh - 144px)",
+            overflowY: "auto",
+          },
+        }}
+      >
         {!taskInitialized && (
           <CardContent>
             <Loading />
@@ -89,8 +100,15 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
                 <TextField
                   fullWidth
                   multiline
+                  placeholder="タスク名"
                   value={title}
-                  InputProps={{ sx: { ...theme.typography.h6 } }}
+                  variant="standard"
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: {
+                      ...theme.typography.h4,
+                    },
+                  }}
                   onChange={handleChangeTitle}
                 />
               }
@@ -99,7 +117,12 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
               <TextField
                 fullWidth
                 multiline
+                variant="standard"
+                placeholder="説明"
                 value={description}
+                InputProps={{
+                  disableUnderline: true,
+                }}
                 onChange={handleChangeDescription}
               />
             </CardContent>
