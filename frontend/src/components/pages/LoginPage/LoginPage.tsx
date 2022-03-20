@@ -39,7 +39,13 @@ const LoginPage: React.VFC = React.memo(() => {
       <Box sx={{ mb: 4 }}>
         <Paper sx={{ p: 4, pt: 2 }} elevation={4}>
           <Field>
-            <Typography sx={{ textAlign: "center" }} variant="h5">
+            <Typography
+              sx={{
+                fontFamily: "Anton",
+                textAlign: "center",
+              }}
+              variant="h4"
+            >
               Todo Box
             </Typography>
           </Field>
