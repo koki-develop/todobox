@@ -142,7 +142,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
             )}
           </IconButton>
           <ListItemText
-            primary={`[${task.index}] ${task.title}`}
+            primary={task.title}
             primaryTypographyProps={{
               sx: {
                 overflow: "hidden",

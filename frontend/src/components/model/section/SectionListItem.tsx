@@ -130,7 +130,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
                   whiteSpace: "nowrap",
                 }}
               >
-                [{section.index}] {section.name}
+                {section.name}
               </Typography>
               <IconButton
                 ref={menuButtonRef}
