@@ -127,6 +127,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
             border: "1px solid",
             borderColor: "divider",
             height: 38,
+            overflow: "hidden",
             pl: 1,
           }}
         >
@@ -140,7 +141,16 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
               <CheckCircleOutlineIcon fontSize="small" />
             )}
           </IconButton>
-          <ListItemText primary={`[${task.index}] ${task.title}`} />
+          <ListItemText
+            primary={`[${task.index}] ${task.title}`}
+            primaryTypographyProps={{
+              sx: {
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              },
+            }}
+          />
           <IconButton
             ref={menuButtonRef}
             className="moreIconButton"
