@@ -160,7 +160,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
                 placement="bottom-end"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
-                <Link to="/account">
+                <Link to="/account" sx={{ color: theme.palette.text.primary }}>
                   <PopperListItem onClick={handleClickAccount}>
                     <ListItemIcon>
                       <AccountCircleIcon />
