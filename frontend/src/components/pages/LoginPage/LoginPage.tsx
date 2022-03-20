@@ -4,6 +4,7 @@ import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -42,12 +43,15 @@ const LoginPage: React.VFC = React.memo(() => {
             <Typography
               sx={{
                 fontFamily: "Anton",
+                mb: 1,
                 textAlign: "center",
               }}
               variant="h4"
             >
               Todo Box
             </Typography>
+
+            <Divider />
           </Field>
 
           <Field>
@@ -83,7 +87,7 @@ const LoginPage: React.VFC = React.memo(() => {
           justifyContent: "center",
         }}
       >
-        <Field sx={{ textAlign: "center" }}>
+        <Box sx={{ textAlign: "center", mb: 1 }}>
           <Link
             target="_blank"
             rel="noreferrer noopener"
@@ -92,8 +96,8 @@ const LoginPage: React.VFC = React.memo(() => {
           >
             &copy;2022 koki
           </Link>
-        </Field>
-        <Field sx={{ textAlign: "center" }}>
+        </Box>
+        <Box sx={{ textAlign: "center" }}>
           <Link
             target="_blank"
             rel="noreferrer noopener"
@@ -102,7 +106,7 @@ const LoginPage: React.VFC = React.memo(() => {
           >
             View on GitHub
           </Link>
-        </Field>
+        </Box>
       </Box>
     </Container>
   );
