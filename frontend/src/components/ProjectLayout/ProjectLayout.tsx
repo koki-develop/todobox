@@ -10,7 +10,6 @@ import { useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
@@ -22,7 +21,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
@@ -34,6 +33,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
   const { projects, project: selectedProject } = useProjects();
   const theme = useTheme();
   const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
+  const location = useLocation();
 
   const [avatarButtonEl, setAvatarButtonEl] =
     useState<HTMLButtonElement | null>(null);
@@ -207,7 +207,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
           <Divider />
           <List disablePadding sx={{ width: drawerWidth }}>
             <Link to="/projects" sx={{ color: theme.palette.text.primary }}>
-              <ListItemButton>
+              <ListItemButton selected={location.pathname === "/projects"}>
                 <ListItemIcon>
                   <HomeIcon />
                 </ListItemIcon>
@@ -235,7 +235,10 @@ const ProjectLayout: React.VFC = React.memo(() => {
             <List dense disablePadding>
               {projects.map((project) => (
                 <React.Fragment key={project.id}>
-                  <Link to={`/projects/${project.id}`}>
+                  <Link
+                    to={`/projects/${project.id}`}
+                    sx={{ color: theme.palette.text.primary }}
+                  >
                     <ListItemButton
                       selected={project.id === selectedProject?.id}
                     >
