@@ -57,7 +57,16 @@ export const theme = responsiveFontSizes(
         styleOverrides: {
           a: {
             textDecoration: "none",
+            transition: "0.15s",
+            ":hover": {
+              opacity: 0.6,
+            },
           },
+        },
+      },
+      MuiLink: {
+        defaultProps: {
+          underline: "none",
         },
       },
       MuiListItemIcon: {

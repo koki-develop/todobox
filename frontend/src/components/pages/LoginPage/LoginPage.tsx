@@ -7,12 +7,15 @@ import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
 import React, { useCallback } from "react";
 import Field from "@/components/utils/Field";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 const LoginPage: React.VFC = React.memo(() => {
   const { loginWithGoogle, loginAnonymously } = useCurrentUser();
+
+  const theme = useTheme();
 
   const handleClickLoginWithGoogle = useCallback(async () => {
     await loginWithGoogle();
@@ -75,13 +78,13 @@ const LoginPage: React.VFC = React.memo(() => {
         }}
       >
         <Field sx={{ textAlign: "center" }}>
-          &copy; 2022{" "}
           <Link
             target="_blank"
             rel="noreferrer noopener"
             href="https://koki.me"
+            sx={{ color: theme.palette.text.primary }}
           >
-            koki
+            &copy;2022 koki
           </Link>
         </Field>
         <Field sx={{ textAlign: "center" }}>
@@ -89,6 +92,7 @@ const LoginPage: React.VFC = React.memo(() => {
             target="_blank"
             rel="noreferrer noopener"
             href="https://github.com/koki-develop/todo-box"
+            sx={{ color: theme.palette.text.primary }}
           >
             View on GitHub
           </Link>
