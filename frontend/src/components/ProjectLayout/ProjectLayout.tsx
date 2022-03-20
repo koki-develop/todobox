@@ -1,3 +1,4 @@
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -5,7 +6,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
@@ -88,7 +88,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
     setAvatarButtonEl(null);
   }, []);
 
-  const handleClickSettings = useCallback(() => {
+  const handleClickAccount = useCallback(() => {
     setAvatarButtonEl(null);
   }, []);
 
@@ -160,12 +160,12 @@ const ProjectLayout: React.VFC = React.memo(() => {
                 placement="bottom-end"
                 style={{ zIndex: theme.zIndex.appBar + 1 }}
               >
-                <Link to="/settings">
-                  <PopperListItem onClick={handleClickSettings}>
+                <Link to="/account">
+                  <PopperListItem onClick={handleClickAccount}>
                     <ListItemIcon>
-                      <SettingsIcon />
+                      <AccountCircleIcon />
                     </ListItemIcon>
-                    <ListItemText primary="設定" />
+                    <ListItemText primary="アカウント" />
                   </PopperListItem>
                 </Link>
                 <PopperListItem onClick={handleClickLogout}>

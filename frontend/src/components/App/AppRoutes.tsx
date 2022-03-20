@@ -46,7 +46,7 @@ const AppRoutes: React.VFC = React.memo(() => {
       <Route element={<ProjectLayout />}>
         <Route path="/projects" element={withAuth()(ProjectsPage)} />
         <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
-        <Route path="/settings" element={withAuth()(AccountPage)} />
+        <Route path="/account" element={withAuth()(AccountPage)} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
