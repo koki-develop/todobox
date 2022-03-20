@@ -21,18 +21,18 @@ const LoginPage: React.VFC = React.memo(() => {
   }, [loginAnonymously]);
 
   return (
-    <Container maxWidth="sm" sx={{ pt: 4 }}>
-      <Alert severity="warning" sx={{ justifyContent: "center", mb: 2 }}>
+    <Container maxWidth="xs" sx={{ pt: 4 }}>
+      <Alert severity="warning" sx={{ justifyContent: "center", mb: 4 }}>
         <AlertTitle sx={{ fontWeight: "bold" }}>
           このアプリケーションはサンプルです。
         </AlertTitle>
         保存されたデータは定期的に削除されます。
       </Alert>
 
-      <Paper sx={{ p: 4 }} elevation={10}>
+      <Paper sx={{ p: 4, pt: 2 }} elevation={4}>
         <Field>
           <Typography sx={{ textAlign: "center" }} variant="h5">
-            TODO BOX
+            Todo Box
           </Typography>
         </Field>
 
