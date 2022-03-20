@@ -97,7 +97,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
       draggableId={section.id}
       index={section.index}
     >
-      {(provided) => (
+      {(provided, snapshot) => (
         <Box
           ref={provided.innerRef}
           {...provided.draggableProps}
@@ -110,7 +110,10 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
               onCancel={handleCancelEdit}
             />
           ) : (
-            <SectionListItemCard {...provided.dragHandleProps}>
+            <SectionListItemCard
+              {...provided.dragHandleProps}
+              dragging={snapshot.isDragging}
+            >
               <IconButton
                 size="small"
                 sx={{ mr: 1 }}
