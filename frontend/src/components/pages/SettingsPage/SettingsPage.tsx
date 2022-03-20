@@ -30,7 +30,6 @@ const SettingsPage: React.VFC<SettingsPageProps> = React.memo(() => {
       <UserDeleteConfirmModal
         open={openDeleteConfirm}
         onCancel={handleCloseDeleteConfirm}
-        onDeleted={handleCloseDeleteConfirm}
       />
       <Field>
         <Alert

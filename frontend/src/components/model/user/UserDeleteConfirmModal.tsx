@@ -11,7 +11,7 @@ export type UserDeleteConfirmModalProps = {
   open: boolean;
 
   onCancel: () => void;
-  onDeleted: () => void;
+  onDeleted?: () => void;
 };
 
 const UserDeleteConfirmModal: React.VFC<UserDeleteConfirmModalProps> =
@@ -26,10 +26,11 @@ const UserDeleteConfirmModal: React.VFC<UserDeleteConfirmModalProps> =
       setDeleting(true);
       deleteAccount()
         .then(() => {
-          onDeleted();
+          onDeleted?.();
         })
-        .finally(() => {
+        .catch((err) => {
           setDeleting(false);
+          throw err;
         });
     }, [deleteAccount, onDeleted]);
 
