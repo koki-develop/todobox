@@ -21,6 +21,12 @@ declare module "@mui/material/Button" {
 export const theme = responsiveFontSizes(
   createTheme({
     palette: {
+      primary: {
+        main: "#ffffff",
+        light: "#ffffff",
+        dark: "#a8a8a8",
+        contrastText: "#ffffff",
+      },
       google: {
         main: "#4285F4",
         light: "#679df6",
