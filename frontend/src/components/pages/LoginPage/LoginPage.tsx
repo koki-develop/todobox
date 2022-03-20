@@ -44,11 +44,12 @@ const LoginPage: React.VFC = React.memo(() => {
           <Field>
             <Button
               fullWidth
+              color="google"
               startIcon={<GoogleIcon />}
               variant="contained"
               onClick={handleClickLoginWithGoogle}
             >
-              Google でログイン
+              Google アカウントでログイン
             </Button>
           </Field>
 
