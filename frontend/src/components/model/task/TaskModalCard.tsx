@@ -1,5 +1,6 @@
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
+import Input from "@mui/material/Input";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useEffect, useState } from "react";
 import TaskListener from "@/components/model/task/TaskListener";
@@ -97,31 +98,39 @@ const TaskModalCard: React.VFC<TaskModalCardProps> = React.memo((props) => {
           <>
             <ModalCardHeader
               title={
-                <TextField
+                <Input
                   fullWidth
                   multiline
+                  disableUnderline
                   placeholder="タスク名"
                   value={title}
-                  variant="standard"
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      ...theme.typography.h4,
-                    },
+                  sx={{
+                    ...theme.typography.h4,
                   }}
                   onChange={handleChangeTitle}
                 />
               }
             />
-            <CardContent>
-              <TextField
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
+            >
+              <Input
                 fullWidth
                 multiline
-                variant="standard"
+                disableUnderline
                 placeholder="説明"
                 value={description}
-                InputProps={{
-                  disableUnderline: true,
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                }}
+                inputProps={{
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                  },
                 }}
                 onChange={handleChangeDescription}
               />
