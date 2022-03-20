@@ -20,7 +20,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { SxProps, Theme, useTheme } from "@mui/material/styles";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
@@ -96,6 +96,12 @@ const ProjectLayout: React.VFC = React.memo(() => {
     setAvatarButtonEl(null);
     await logout();
   }, [logout]);
+
+  useEffect(() => {
+    if (isSmDown) {
+      setOpenDrawer(false);
+    }
+  }, [isSmDown, location.pathname]);
 
   if (!initialized) {
     return <Outlet />;
