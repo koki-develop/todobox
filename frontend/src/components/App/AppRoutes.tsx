@@ -6,7 +6,7 @@ import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 import Loading from "@/components/utils/Loading";
-import Layout from "@/components/Layout";
+import ProjectLayout from "@/components/ProjectLayout";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 type WithAuthOptions = {
@@ -43,7 +43,7 @@ const AppRoutes: React.VFC = React.memo(() => {
   return (
     <Routes>
       <Route path="/" element={withAuth({ loginPage: true })(LoginPage)} />
-      <Route element={<Layout />}>
+      <Route element={<ProjectLayout />}>
         <Route path="/projects" element={withAuth()(ProjectsPage)} />
         <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
         <Route path="/settings" element={withAuth()(SettingsPage)} />

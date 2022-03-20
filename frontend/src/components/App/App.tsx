@@ -4,9 +4,9 @@ import { SnackbarProvider } from "notistack";
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import { theme } from "@/components/Layout/theme";
 import ProjectsListener from "@/components/model/project/ProjectsListener";
 import CurrentUserListener from "@/components/model/user/CurrentUserListener";
+import { theme } from "@/components/ProjectLayout/theme";
 import AppRoutes from "./AppRoutes";
 
 const App: React.VFC = React.memo(() => {

@@ -24,7 +24,7 @@ import PopperListItem from "@/components/utils/PopperListItem";
 import { useProjects } from "@/hooks/projectsHooks";
 import { useCurrentUser } from "@/hooks/userHooks";
 
-const Layout: React.VFC = React.memo(() => {
+const ProjectLayout: React.VFC = React.memo(() => {
   const { currentUser, initialized, logout } = useCurrentUser();
   const { projects, project: selectedProject } = useProjects();
   const theme = useTheme();
@@ -222,6 +222,6 @@ const Layout: React.VFC = React.memo(() => {
   );
 });
 
-Layout.displayName = "Layout";
+ProjectLayout.displayName = "ProjectLayout";
 
-export default Layout;
+export default ProjectLayout;
