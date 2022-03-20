@@ -115,13 +115,24 @@ const ProjectLayout: React.VFC = React.memo(() => {
                 sx={{ mr: 1 }}
                 onClick={handleOpenDrawer}
               >
-                <MenuIcon />
+                <MenuIcon
+                  sx={{
+                    color: theme.palette.primary.contrastText,
+                  }}
+                />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ fontFamily: "Anton" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "Anton",
+              }}
+            >
               <Link
                 to={currentUser ? "/projects" : "/"}
-                sx={{ color: theme.palette.text.primary }}
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                }}
               >
                 Todo Box
               </Link>
