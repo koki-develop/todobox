@@ -60,7 +60,7 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo(() => {
   }, []);
 
   return (
-    <Container sx={{ pt: 2 }} maxWidth="md">
+    <Container sx={{ py: 2 }} maxWidth="md">
       {!projectsInitialized && <Loading />}
       {projectsInitialized && (
         <Box>

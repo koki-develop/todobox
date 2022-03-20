@@ -95,7 +95,7 @@ const ProjectLayout: React.VFC = React.memo(() => {
     <Box
       sx={{
         height: "100vh",
-        paddingTop: `${headerHeight}px`,
+        pt: `${headerHeight}px`,
       }}
     >
       {/* header */}
