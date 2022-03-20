@@ -328,7 +328,6 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
             <Field
               sx={{
                 alignItems: "center",
-                backgroundColor: "white",
                 display: "flex",
                 height: headerHeight,
                 position: "sticky",
@@ -375,7 +374,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
           <Divider />
 
           {/* content */}
-          <Container maxWidth="lg" sx={{ flexGrow: 1, overflowY: "auto" }}>
+          <Container
+            maxWidth="lg"
+            sx={{ flexGrow: 1, overflowY: "auto", pb: 2 }}
+          >
             <Box sx={{ display: "flex", my: 1, justifyContent: "flex-end" }}>
               <Button
                 ref={completedFilterMenuButtonRef}
