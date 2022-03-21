@@ -70,11 +70,19 @@ describe("/users/{userId}", () => {
       await assertFails(docRef.set({}));
       await assertFails(docRef.set({ unknownField: "VALUE" }));
       await assertFails(docRef.set({ name: 1 }));
+      await assertFails(docRef.set({ name: "" }));
+      await assertFails(docRef.set({ name: "  " }));
+      await assertFails(docRef.set({ name: "a".repeat(31) }));
+      await assertFails(docRef.set({ name: "a".repeat(50) }));
+      await assertSucceeds(docRef.set({ name: "a".repeat(30) }));
       await assertSucceeds(docRef.set({ name: "PROJECT_NAME" }));
       // update
       await assertFails(docRef.update({}));
       await assertFails(docRef.update({ unknownField: "VALUE" }));
       await assertFails(docRef.update({ name: 1 }));
+      await assertFails(docRef.update({ name: "a".repeat(31) }));
+      await assertFails(docRef.update({ name: "a".repeat(50) }));
+      await assertSucceeds(docRef.update({ name: "a".repeat(30) }));
       await assertSucceeds(docRef.update({ name: "UPDATED_PROJECT_NAME" }));
       // delete
       await assertSucceeds(docRef.delete());
