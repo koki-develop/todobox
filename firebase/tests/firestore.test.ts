@@ -1,6 +1,10 @@
-import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
+import {
+  assertSucceeds,
+  assertFails,
+  initializeTestEnvironment,
+} from "@firebase/rules-unit-testing";
 import fs from "fs";
-import { it, describe, expect, beforeEach } from "vitest";
+import { it, describe, beforeEach } from "vitest";
 
 const PROJECT_ID = "test-todo-box";
 
@@ -35,20 +39,40 @@ const getUnauthenticatedFirestore = async () => {
   return context.firestore();
 };
 
-describe("/users/{userId}", () => {
-  describe("/projects/{projectId}", () => {
-    it.todo("pending");
-  });
+beforeEach(async () => {
+  const testEnv = await getTestEnvironment();
+  await testEnv.clearFirestore();
+});
 
-  describe("/counters/tasks/shards/{shardId}", () => {
-    it.todo("pending");
-  });
+describe("/users/{userId}/projects/{projectId}", () => {
+  describe("authenticated", async () => {
+    const uid = "USER_ID";
+    const collectionPath = `users/${uid}/projects`;
 
-  describe("/sections/{sectionId}", () => {
-    it.todo("pending");
+    it("should be able to to read own projects", async () => {
+      const db = await getAuthenticatedFirestore(uid);
+      await assertSucceeds(db.collection(collectionPath).get());
+      await assertSucceeds(
+        db.collection(collectionPath).doc("PROJECT_ID").get()
+      );
+    });
+    it("should not be able to read own projects from another user", async () => {
+      const anotherUid = "ANOTHER_USER_ID";
+      const db = await getAuthenticatedFirestore(anotherUid);
+      await assertFails(db.collection(collectionPath).get());
+      await assertFails(db.collection(collectionPath).doc("PROJECT_ID").get());
+    });
   });
+});
 
-  describe("/tasks/{taskId}", () => {
-    it.todo("pending");
-  });
+describe("/users/{userId}/counters/tasks/shards/{shardId}", () => {
+  it.todo("pending");
+});
+
+describe("/users/{userId}/sections/{sectionId}", () => {
+  it.todo("pending");
+});
+
+describe("/users/{userId}/tasks/{taskId}", () => {
+  it.todo("pending");
 });
