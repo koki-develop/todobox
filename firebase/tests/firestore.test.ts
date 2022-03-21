@@ -113,7 +113,7 @@ describe("/users/{userId}", () => {
         projectId,
         "counters/tasks/shards"
       );
-      const sharedId = "SHARD_ID";
+      const sharedId = "1";
 
       it("should be able to access to own counter shards", async () => {
         const db = await getAuthenticatedFirestore(uid);
@@ -124,9 +124,16 @@ describe("/users/{userId}", () => {
         // get
         await assertSucceeds(docRef.get());
         // create
+        await assertFails(collectionRef.doc("INVALID_ID").set({ count: 0 }));
+        await assertFails(collectionRef.doc("-1").set({ count: 0 }));
+        await assertFails(collectionRef.doc("10").set({ count: 0 }));
+        await assertFails(docRef.set({ count: 1 }));
+        await assertFails(docRef.set({ count: -1 }));
+        await assertFails(docRef.set({ count: "COUNT" }));
         await assertSucceeds(docRef.set({ count: 0 }));
         // update
-        await assertSucceeds(docRef.set({ count: 1 }));
+        await assertFails(docRef.update({ count: "COUNT" }));
+        await assertSucceeds(docRef.update({ count: 1 }));
         // delete
         await assertFails(docRef.delete());
       });
