@@ -4,6 +4,7 @@ import {
   initializeTestEnvironment,
 } from "@firebase/rules-unit-testing";
 import fs from "fs";
+import path from "path";
 import { it, describe, beforeEach } from "vitest";
 
 const PROJECT_ID = "test-todo-box";
@@ -46,12 +47,13 @@ beforeEach(async () => {
 
 describe("/users/{userId}", () => {
   const uid = "USER_ID";
+  const anotherUid = "ANOTHER_USER_ID";
 
   describe("/projects/{projectId}", () => {
     const projectId = "PROJECT_ID";
     const projectsCollectionPath = `users/${uid}/projects`;
 
-    it("should be able to access to own project", async () => {
+    it("should be able to access to own projects", async () => {
       const db = await getAuthenticatedFirestore(uid);
       const collectionRef = db.collection(projectsCollectionPath);
       const docRef = collectionRef.doc(projectId);
@@ -72,8 +74,8 @@ describe("/users/{userId}", () => {
       // delete
       await assertSucceeds(docRef.delete());
     });
+
     it("should not be able to access to own projects from another user", async () => {
-      const anotherUid = "ANOTHER_USER_ID";
       const db = await getAuthenticatedFirestore(anotherUid);
       const collectionRef = db.collection(projectsCollectionPath);
       const docRef = collectionRef.doc(projectId);
@@ -88,6 +90,7 @@ describe("/users/{userId}", () => {
       // delete
       await assertFails(docRef.delete());
     });
+
     it("should not be able to access to own projects from unauthenticated user", async () => {
       const db = await getUnauthenticatedFirestore();
       const collectionRef = db.collection(projectsCollectionPath);
@@ -105,7 +108,28 @@ describe("/users/{userId}", () => {
     });
 
     describe("/counters/tasks/shards/{shardId}", () => {
-      it.todo("pending");
+      const shardsCollectionPath = path.join(
+        projectsCollectionPath,
+        projectId,
+        "counters/tasks/shards"
+      );
+      const sharedId = "SHARD_ID";
+
+      it("should be able to access to own counter shards", async () => {
+        const db = await getAuthenticatedFirestore(uid);
+        const collectionRef = db.collection(shardsCollectionPath);
+        const docRef = collectionRef.doc(sharedId);
+        // list
+        await assertSucceeds(collectionRef.get());
+        // get
+        await assertSucceeds(docRef.get());
+        // create
+        await assertSucceeds(docRef.set({ count: 0 }));
+        // update
+        await assertSucceeds(docRef.set({ count: 1 }));
+        // delete
+        await assertFails(docRef.delete());
+      });
     });
 
     describe("/sections/{sectionId}", () => {
