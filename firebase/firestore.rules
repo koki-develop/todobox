@@ -8,8 +8,8 @@ service cloud.firestore {
     return data.keys().hasOnly(keys) && data.keys().hasAll(keys);
   }
 
-  function updateOnly(resource, keys) {
-    return resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+  function hasAffectedKeys(data, keys) {
+    return data.diff(resource.data).affectedKeys().hasOnly(keys);
   }
 
   match /databases/{database}/documents {
@@ -17,26 +17,26 @@ service cloud.firestore {
       match /projects/{projectId} {
         allow list, get: if loggedInWith(userId);
         allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['name']) && request.resource.data.get('name', '') is string;
-        allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name']);
+        allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['name']);
         allow delete: if loggedInWith(userId);
 
         match /counters/tasks/shards/{shardId} {
           allow list, get: if loggedInWith(userId)
           allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['count']) && request.resource.data.count == 0;
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['count']);
+          allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['count']);
         }
 
         match /sections/{sectionId} {
           allow list, get: if loggedInWith(userId);
           allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['name', 'index']);
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name', 'index']);
+          allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['name', 'index']);
           allow delete: if loggedInWith(userId);
         }
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
           allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+          allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
           allow delete: if loggedInWith(userId);
         }
       }
