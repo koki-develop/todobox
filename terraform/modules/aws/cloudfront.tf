@@ -28,7 +28,7 @@ resource "aws_cloudfront_distribution" "frontend" {
     }
 
     dynamic "function_association" {
-      for_each = var.stage == "stg" ? [1] : []
+      for_each = var.stage != "prod" ? [1] : []
       content {
         event_type   = "viewer-request"
         function_arn = aws_cloudfront_function.basicauth.arn
