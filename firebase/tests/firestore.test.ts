@@ -272,11 +272,140 @@ describe("/users/{userId}", () => {
     });
 
     describe("/tasks/{taskId}", () => {
-      it.todo("should be able to access to own tasks");
-      it.todo("should not be able to access to own tasks from another user");
-      it.todo(
-        "should not be able to access to own tasks from unauthenticated user"
+      const tasksCollectionPath = path.join(
+        projectsCollectionPath,
+        projectId,
+        "tasks"
       );
+      const taskId = "TASK_ID";
+      const sectionId = "SECTION_ID";
+
+      beforeEach(async () => {
+        const db = await getAuthenticatedFirestore(uid);
+        const sectionsCollectionPath = path.join(
+          projectsCollectionPath,
+          projectId,
+          "sections"
+        );
+        await assertSucceeds(
+          db
+            .collection(sectionsCollectionPath)
+            .doc(sectionId)
+            .set({ name: "SECTION_NAME", index: 0 })
+        );
+      });
+
+      it("should be able to access to own tasks", async () => {
+        const db = await getAuthenticatedFirestore(uid);
+        const collectionRef = db.collection(tasksCollectionPath);
+        const docRef = collectionRef.doc(taskId);
+        // list
+        await assertSucceeds(collectionRef.get());
+        // get
+        await assertSucceeds(docRef.get());
+        // create
+        await assertFails(
+          docRef.set({
+            sectionId: "NOT_EXISTS_SECTION_ID",
+            index: 0,
+            title: "TASK_TITLE",
+            description: "TASK_DESCRIPTION",
+            completedAt: null,
+          })
+        );
+        await assertSucceeds(
+          docRef.set({
+            sectionId: sectionId,
+            index: 0,
+            title: "TASK_TITLE",
+            description: "TASK_DESCRIPTION",
+            completedAt: null,
+          })
+        );
+        await assertSucceeds(
+          docRef.set({
+            sectionId: null,
+            index: 0,
+            title: "TASK_TITLE",
+            description: "TASK_DESCRIPTION",
+            completedAt: null,
+          })
+        );
+        // update
+        await assertSucceeds(
+          docRef.update({
+            sectionId: null,
+            index: 1,
+            title: "UPDATED_TASK_TITLE",
+            description: "UPDATED_TASK_DESCRIPTION",
+            completedAt: new Date(),
+          })
+        );
+        // delete
+        await assertSucceeds(docRef.delete());
+      });
+      it("should not be able to access to own tasks from another user", async () => {
+        const db = await getAuthenticatedFirestore(anotherUid);
+        const collectionRef = db.collection(tasksCollectionPath);
+        const docRef = collectionRef.doc(taskId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(
+          docRef.set({
+            sectionId: null,
+            index: 0,
+            title: "TASK_TITLE",
+            description: "TASK_DESCRIPTION",
+            completedAt: null,
+          })
+        );
+        // update
+        await assertFails(
+          docRef.update({
+            sectionId: null,
+            index: 1,
+            title: "UPDATED_TASK_TITLE",
+            description: "UPDATED_TASK_DESCRIPTION",
+            completedAt: new Date(),
+          })
+        );
+        // delete
+        await assertFails(docRef.delete());
+      });
+      it("should not be able to access to own tasks from unauthenticated user", async () => {
+        const db = await getAuthenticatedFirestore(anotherUid);
+        const collectionRef = db.collection(tasksCollectionPath);
+        const docRef = collectionRef.doc(taskId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(
+          docRef.set({
+            sectionId: null,
+            index: 0,
+            title: "TASK_TITLE",
+            description: "TASK_DESCRIPTION",
+            completedAt: null,
+          })
+        );
+        // update
+        await assertFails(
+          docRef.update({
+            sectionId: null,
+            index: 1,
+            title: "UPDATED_TASK_TITLE",
+            description: "UPDATED_TASK_DESCRIPTION",
+            completedAt: new Date(),
+          })
+        );
+        // delete
+        await assertFails(docRef.delete());
+      });
     });
   });
 });

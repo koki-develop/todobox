@@ -68,12 +68,71 @@ service cloud.firestore {
     );
   }
 
-  function validateCreateTaskInput(data) {
-    return hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+  function validateCreateTaskInput(database, userId, projectId, data) {
+    return hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+    (
+      // sectionId
+      data.sectionId == null || (
+        data.sectionId is string &&
+        exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(data.sectionId))
+      )
+    ) &&
+    (
+      // index
+      data.index is int &&
+      data.index >= 0
+    ) &&
+    (
+      // title
+      data.title is string &&
+      data.title.size() <= 255
+    ) &&
+    (
+      // description
+      data.description is string &&
+      data.description.size() <= 1000
+    ) &&
+    (
+      // completedAt
+      data.completedAt == null
+    );
   }
 
-  function validateUpdateTaskInput(data) {
-    return hasAnyAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+  function validateUpdateTaskInput(database, userId, projectId, data) {
+    return hasAnyAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+    (
+      // sectionId
+      !data.keys().hasAny(['sectionId']) || (
+      data.sectionId == null || (
+        data.sectionId is string &&
+        exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(data.sectionId))
+      ))
+    ) &&
+    (
+      // index
+      !data.keys().hasAny(['index']) || (
+      data.index is int &&
+      data.index >= 0)
+    ) &&
+    (
+      // title
+      !data.keys().hasAny(['title']) || (
+      data.title is string &&
+      data.title.size() <= 255)
+    ) &&
+    (
+      // description
+      !data.keys().hasAny(['description']) || (
+      data.description is string &&
+      data.description.size() <= 1000)
+    ) &&
+    (
+      // completedAt
+      !data.keys().hasAny(['completedAt']) || (
+      data.completedAt == null || (
+        data.completedAt is timestamp
+      ))
+    );
   }
 
   function validateCreateCounterShardInput(id, data) {
@@ -117,8 +176,8 @@ service cloud.firestore {
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && validateCreateTaskInput(request.resource.data)
-          allow update: if loggedInWith(userId) && validateUpdateTaskInput(request.resource.data)
+          allow create: if loggedInWith(userId) && validateCreateTaskInput(database, userId, projectId, request.resource.data)
+          allow update: if loggedInWith(userId) && validateUpdateTaskInput(database, userId, projectId, request.resource.data)
           allow delete: if loggedInWith(userId);
         }
       }
