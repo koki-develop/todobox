@@ -134,6 +134,7 @@ describe("/users/{userId}", () => {
         // update
         await assertFails(docRef.update({ count: "COUNT" }));
         await assertSucceeds(docRef.update({ count: 1 }));
+        await assertSucceeds(docRef.update({ count: -1 }));
         // delete
         await assertFails(docRef.delete());
       });
