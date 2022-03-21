@@ -91,6 +91,7 @@ jobs:
 
   deploy_firebase:
     runs-on: ubuntu-latest
+    environment: stg
     defaults:
       run:
         working-directory: firebase
@@ -121,6 +122,7 @@ jobs:
 
   deploy_infra:
     runs-on: ubuntu-latest
+    environment: stg
     defaults:
       run:
         working-directory: terraform
@@ -149,6 +151,7 @@ jobs:
 
   deploy_frontend:
     runs-on: ubuntu-latest
+    environment: stg
     defaults:
       run:
         working-directory: frontend
