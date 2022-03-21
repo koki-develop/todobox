@@ -5,7 +5,7 @@ import {
 } from "@firebase/rules-unit-testing";
 import fs from "fs";
 import path from "path";
-import { it, describe, beforeEach } from "vitest";
+import { afterAll, it, describe, beforeEach } from "vitest";
 
 const PROJECT_ID = "test-todo-box";
 
@@ -43,6 +43,11 @@ const getUnauthenticatedFirestore = async () => {
 beforeEach(async () => {
   const testEnv = await getTestEnvironment();
   await testEnv.clearFirestore();
+});
+
+afterAll(async () => {
+  const testEnv = await getTestEnvironment();
+  await testEnv.cleanup();
 });
 
 describe("/users/{userId}", () => {
