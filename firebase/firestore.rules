@@ -9,7 +9,7 @@ service cloud.firestore {
   }
 
   function hasAffectedKeys(data, keys) {
-    return data.diff(resource.data).affectedKeys().hasAny(keys);
+    return data.diff(resource.data).affectedKeys().hasOnly(keys) && data.diff(resource.data).affectedKeys().hasAny(keys);
   }
 
   function validateCreateProjectInput(data) {
@@ -24,19 +24,39 @@ service cloud.firestore {
     return hasAffectedKeys(data, ['name']) &&
     // name
     (
-    !data.keys().hasAny(['name']) ||(
+    !data.keys().hasAny(['name']) || (
     data.name is string &&
     data.name.trim() != "" &&
-    data.name.size() <= 30
-    ));
+    data.name.size() <= 30)
+    );
   }
 
   function validateCreateSectionInput(data) {
-    return hasKeys(data, ['name', 'index']);
+    return hasKeys(data, ['name', 'index']) &&
+    // name
+    data.name is string &&
+    data.name.trim() != "" &&
+    data.name.size() <= 255 &&
+    // index
+    data.index is int &&
+    data.index >= 0;
   }
 
   function validateUpdateSectionInput(data) {
-    return hasAffectedKeys(data, ['name', 'index']);
+    return hasAffectedKeys(data, ['name', 'index']) &&
+    // name
+    (
+    !data.keys().hasAny(['name']) || (
+    data.name is string &&
+    data.name.trim() != "" &&
+    data.name.size() <= 255)
+    ) &&
+    // index
+    (
+    !data.keys().hasAny(['index']) || (
+    data.index is int &&
+    data.index >= 0)
+    );
   }
 
   function validateCreateCounterShardInput(id, data) {

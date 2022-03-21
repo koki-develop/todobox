@@ -68,7 +68,9 @@ describe("/users/{userId}", () => {
       await assertSucceeds(docRef.get());
       // create
       await assertFails(docRef.set({}));
-      await assertFails(docRef.set({ unknownField: "VALUE" }));
+      await assertFails(
+        docRef.set({ name: "PROJECT_NAME", unknownField: "VALUE" })
+      );
       await assertFails(docRef.set({ name: 1 }));
       await assertFails(docRef.set({ name: "" }));
       await assertFails(docRef.set({ name: "  " }));
@@ -78,7 +80,9 @@ describe("/users/{userId}", () => {
       await assertSucceeds(docRef.set({ name: "PROJECT_NAME" }));
       // update
       await assertFails(docRef.update({}));
-      await assertFails(docRef.update({ unknownField: "VALUE" }));
+      await assertFails(
+        docRef.update({ name: "UPDATED_PROJECT_NAME", unknownField: "VALUE" })
+      );
       await assertFails(docRef.update({ name: 1 }));
       await assertFails(docRef.update({ name: "a".repeat(31) }));
       await assertFails(docRef.update({ name: "a".repeat(50) }));
@@ -184,11 +188,87 @@ describe("/users/{userId}", () => {
     });
 
     describe("/sections/{sectionId}", () => {
-      it.todo("should be able to access to own sections");
-      it.todo("should not be able to access to own sections from another user");
-      it.todo(
-        "should not be able to access to own sections from unauthenticated user"
+      const sectionsCollectionPath = path.join(
+        projectsCollectionPath,
+        projectId,
+        "sections"
       );
+      const sectionId = "SECTION_ID";
+
+      it("should be able to access to own sections", async () => {
+        const db = await getAuthenticatedFirestore(uid);
+        const collectionRef = db.collection(sectionsCollectionPath);
+        const docRef = collectionRef.doc(sectionId);
+        // list
+        await assertSucceeds(collectionRef.get());
+        // get
+        await assertSucceeds(docRef.get());
+        // create
+        await assertFails(
+          docRef.set({ name: "SECTION_NAME", index: 0, unknownField: "VALUE" })
+        );
+        await assertFails(docRef.set({ name: "SECTION_NAME" }));
+        await assertFails(docRef.set({ name: 0, index: 0 }));
+        await assertFails(docRef.set({ name: "", index: 0 }));
+        await assertFails(docRef.set({ name: "  ", index: 0 }));
+        await assertFails(docRef.set({ name: "a".repeat(256), index: 0 }));
+        await assertFails(docRef.set({ name: "a".repeat(500), index: 0 }));
+        await assertFails(docRef.set({ index: 0 }));
+        await assertFails(docRef.set({ name: "SECTION_NAME", index: "INDEX" }));
+        await assertFails(docRef.set({ name: "SECTION_NAME", index: -1 }));
+        await assertSucceeds(docRef.set({ name: "a".repeat(255), index: 0 }));
+        await assertSucceeds(docRef.set({ name: "SECTION_NAME", index: 0 }));
+        // update
+        await assertFails(docRef.update({}));
+        await assertFails(
+          docRef.update({
+            name: "UPDATED_SECTION_NAME",
+            index: 1,
+            unknownField: "VALUE",
+          })
+        );
+        await assertSucceeds(docRef.update({ name: "UPDATED_SECTION_NAME" }));
+        await assertSucceeds(docRef.update({ index: 1 }));
+        await assertSucceeds(
+          docRef.update({ name: "RE_UPDATED_SECTION_NAME", index: 2 })
+        );
+        // delete
+        await assertSucceeds(docRef.delete());
+      });
+      it("should not be able to access to own sections from another user", async () => {
+        const db = await getAuthenticatedFirestore(anotherUid);
+        const collectionRef = db.collection(sectionsCollectionPath);
+        const docRef = collectionRef.doc(sectionId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(docRef.set({ name: "a".repeat(255), index: 0 }));
+        // update
+        await assertFails(
+          docRef.update({ name: "UPDATED_SECTION_NAME", index: 1 })
+        );
+        // delete
+        await assertFails(docRef.delete());
+      });
+      it("should not be able to access to own sections from unauthenticated user", async () => {
+        const db = await getUnauthenticatedFirestore();
+        const collectionRef = db.collection(sectionsCollectionPath);
+        const docRef = collectionRef.doc(sectionId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(docRef.set({ name: "a".repeat(255), index: 0 }));
+        // update
+        await assertFails(
+          docRef.update({ name: "UPDATED_SECTION_NAME", index: 1 })
+        );
+        // delete
+        await assertFails(docRef.delete());
+      });
     });
 
     describe("/tasks/{taskId}", () => {
