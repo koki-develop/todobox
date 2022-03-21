@@ -272,10 +272,10 @@ describe("/users/{userId}", () => {
     });
 
     describe("/tasks/{taskId}", () => {
-      it.todo("should be able to access to own sections");
-      it.todo("should not be able to access to own sections from another user");
+      it.todo("should be able to access to own tasks");
+      it.todo("should not be able to access to own tasks from another user");
       it.todo(
-        "should not be able to access to own sections from unauthenticated user"
+        "should not be able to access to own tasks from unauthenticated user"
       );
     });
   });

@@ -68,6 +68,14 @@ service cloud.firestore {
     );
   }
 
+  function validateCreateTaskInput(data) {
+    return hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+  }
+
+  function validateUpdateTaskInput(data) {
+    return hasAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+  }
+
   function validateCreateCounterShardInput(id, data) {
     return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].hasAny([id]) &&
       hasKeys(data, ['count']) &&
@@ -109,8 +117,8 @@ service cloud.firestore {
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
-          allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+          allow create: if loggedInWith(userId) && validateCreateTaskInput(request.resource.data)
+          allow update: if loggedInWith(userId) && validateUpdateTaskInput(request.resource.data)
           allow delete: if loggedInWith(userId);
         }
       }
