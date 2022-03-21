@@ -10,7 +10,7 @@ service cloud.firestore {
       data.keys().hasAll(keys);
   }
 
-  function hasAffectedKeys(data, keys) {
+  function hasAnyAffectedKeys(data, keys) {
     return data.diff(resource.data).affectedKeys().hasOnly(keys) &&
       data.diff(resource.data).affectedKeys().hasAny(keys);
   }
@@ -26,7 +26,7 @@ service cloud.firestore {
   }
 
   function validateUpdateProjectInput(data) {
-    return hasAffectedKeys(data, ['name']) &&
+    return hasAnyAffectedKeys(data, ['name']) &&
     (
       // name
       !data.keys().hasAny(['name']) || (
@@ -52,7 +52,7 @@ service cloud.firestore {
   }
 
   function validateUpdateSectionInput(data) {
-    return hasAffectedKeys(data, ['name', 'index']) &&
+    return hasAnyAffectedKeys(data, ['name', 'index']) &&
     (
       // name
       !data.keys().hasAny(['name']) || (
@@ -73,7 +73,7 @@ service cloud.firestore {
   }
 
   function validateUpdateTaskInput(data) {
-    return hasAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
+    return hasAnyAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']);
   }
 
   function validateCreateCounterShardInput(id, data) {
