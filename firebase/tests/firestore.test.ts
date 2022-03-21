@@ -143,6 +143,36 @@ describe("/users/{userId}", () => {
         // delete
         await assertFails(docRef.delete());
       });
+      it("should not be able to access to own counter shards from another user", async () => {
+        const db = await getAuthenticatedFirestore(anotherUid);
+        const collectionRef = db.collection(shardsCollectionPath);
+        const docRef = collectionRef.doc(sharedId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(docRef.set({ count: 0 }));
+        // update
+        await assertFails(docRef.update({ count: 1 }));
+        // delete
+        await assertFails(docRef.delete());
+      });
+      it("should not be able to access to own counter shards from unauthenticated user", async () => {
+        const db = await getUnauthenticatedFirestore();
+        const collectionRef = db.collection(shardsCollectionPath);
+        const docRef = collectionRef.doc(sharedId);
+        // list
+        await assertFails(collectionRef.get());
+        // get
+        await assertFails(docRef.get());
+        // create
+        await assertFails(docRef.set({ count: 0 }));
+        // update
+        await assertFails(docRef.update({ count: 1 }));
+        // delete
+        await assertFails(docRef.delete());
+      });
     });
 
     describe("/sections/{sectionId}", () => {
