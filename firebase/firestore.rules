@@ -9,7 +9,7 @@ service cloud.firestore {
   }
 
   function hasAffectedKeys(data, keys) {
-    return data.diff(resource.data).affectedKeys().hasOnly(keys);
+    return data.diff(resource.data).affectedKeys().hasAny(keys);
   }
 
   match /databases/{database}/documents {
@@ -17,7 +17,7 @@ service cloud.firestore {
       match /projects/{projectId} {
         allow list, get: if loggedInWith(userId);
         allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['name']) && request.resource.data.get('name', '') is string;
-        allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['name']);
+        allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['name']) && request.resource.data.name is string;
         allow delete: if loggedInWith(userId);
 
         match /counters/tasks/shards/{shardId} {
