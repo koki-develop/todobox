@@ -22,6 +22,18 @@ service cloud.firestore {
     (!hasKeys(data, ['name']) || data.name is string);
   }
 
+  function validateCreateCounterShardInput(data) {
+    return hasKeys(data, ['count']) &&
+    data.count is int &&
+    data.count == 0;
+  }
+
+  function validateUpdateCounterShardInput(data) {
+    return hasKeys(data, ['count']) &&
+    data.count is int;
+  }
+
+
   match /databases/{database}/documents {
     match /users/{userId} {
       match /projects/{projectId} {
@@ -32,8 +44,8 @@ service cloud.firestore {
 
         match /counters/tasks/shards/{shardId} {
           allow list, get: if loggedInWith(userId)
-          allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['count']) && request.resource.data.count == 0;
-          allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['count']);
+          allow create: if loggedInWith(userId) && validateCreateCounterShardInput(request.resource.data);
+          allow update: if loggedInWith(userId) && validateUpdateCounterShardInput(request.resource.data);
         }
 
         match /sections/{sectionId} {
