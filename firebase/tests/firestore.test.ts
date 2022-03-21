@@ -103,17 +103,17 @@ describe("/users/{userId}", () => {
       // delete
       await assertFails(docRef.delete());
     });
+
+    describe("/counters/tasks/shards/{shardId}", () => {
+      it.todo("pending");
+    });
+
+    describe("/sections/{sectionId}", () => {
+      it.todo("pending");
+    });
+
+    describe("/tasks/{taskId}", () => {
+      it.todo("pending");
+    });
   });
-});
-
-describe("/users/{userId}/counters/tasks/shards/{shardId}", () => {
-  it.todo("pending");
-});
-
-describe("/users/{userId}/sections/{sectionId}", () => {
-  it.todo("pending");
-});
-
-describe("/users/{userId}/tasks/{taskId}", () => {
-  it.todo("pending");
 });
