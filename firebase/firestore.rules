@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   function loggedInWith(userId) {
-    return request.auth != null && request.auth.uid == userId
+    return request.auth != null && request.auth.uid == userId;
   }
 
   function hasKeys(data, keys) {
@@ -15,7 +15,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
       match /projects/{projectId} {
-        allow list, get: if loggedInWith(userId)
+        allow list, get: if loggedInWith(userId);
         allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['name']) && request.resource.data.get('name', '') is string;
         allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name']);
         allow delete: if loggedInWith(userId);
