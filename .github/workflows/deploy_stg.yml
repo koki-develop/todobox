@@ -87,8 +87,8 @@ jobs:
       - name: Exec terraform plan
         run: |
           terraform plan \
-            -var 'basicauth_username=${{ secrets.STG_BASICAUTH_USERNAME }}' \
-            -var 'basicauth_password=${{ secrets.STG_BASICAUTH_PASSWORD }}'
+            -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
+            -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
 
   deploy_infra:
     runs-on: ubuntu-latest
@@ -121,8 +121,8 @@ jobs:
       - name: Exec terraform apply
         run: |
           terraform apply -auto-approve \
-            -var 'basicauth_username=${{ secrets.STG_BASICAUTH_USERNAME }}' \
-            -var 'basicauth_password=${{ secrets.STG_BASICAUTH_PASSWORD }}'
+            -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
+            -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
 
   test_frontend:
     runs-on: ubuntu-latest
@@ -183,12 +183,12 @@ jobs:
       - name: Create dotenv
         run: |
           echo "VITE_STAGE=\"stg\""                                                                     > .env
-          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.STG_FIREBASE_API_KEY }}\""                         >> .env
-          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.STG_FIREBASE_AUTH_DOMAIN }}\""                 >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.STG_FIREBASE_PROJECT_ID }}\""                   >> .env
-          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.STG_FIREBASE_STORAGE_BUCKET }}\""           >> .env
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.STG_FIREBASE_MESSAGING_SENDER_ID }}\"" >> .env
-          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.STG_FIREBASE_APP_ID }}\""                           >> .env
+          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.FIREBASE_API_KEY }}\""                         >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.FIREBASE_AUTH_DOMAIN }}\""                 >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.FIREBASE_PROJECT_ID }}\""                   >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.FIREBASE_STORAGE_BUCKET }}\""           >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}\"" >> .env
+          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.FIREBASE_APP_ID }}\""                           >> .env
 
       - name: Save Yarn Cache
         uses: ./.github/actions/save-yarn-cache
