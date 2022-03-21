@@ -85,7 +85,7 @@ jobs:
         run: terraform workspace select stg
       - name: Terraform plan
         run: |
-          terraform plan -auto-approve \
+          terraform plan \
             -var 'basicauth_username=${{ secrets.STG_BASICAUTH_USERNAME }}' \
             -var 'basicauth_password=${{ secrets.STG_BASICAUTH_PASSWORD }}'
 
