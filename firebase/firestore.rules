@@ -23,7 +23,8 @@ service cloud.firestore {
   function validateUpdateProjectInput(data) {
     return hasAffectedKeys(data, ['name']) &&
     // name
-    (!hasKeys(data, ['name']) || (
+    (
+    !data.keys().hasAny(['name']) ||(
     data.name is string &&
     data.name.trim() != "" &&
     data.name.size() <= 30
