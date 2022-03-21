@@ -48,19 +48,40 @@ describe("/users/{userId}/projects/{projectId}", () => {
   describe("authenticated", async () => {
     const uid = "USER_ID";
     const collectionPath = `users/${uid}/projects`;
+    const projectId = "PROJECT_ID";
 
-    it("should be able to to read own projects", async () => {
+    it("should be able to access to own project", async () => {
       const db = await getAuthenticatedFirestore(uid);
-      await assertSucceeds(db.collection(collectionPath).get());
-      await assertSucceeds(
-        db.collection(collectionPath).doc("PROJECT_ID").get()
-      );
+      const collectionRef = db.collection(collectionPath);
+      const docRef = collectionRef.doc(projectId);
+      // list
+      await assertSucceeds(collectionRef.get());
+      // get
+      await assertSucceeds(docRef.get());
+      // create
+      await assertFails(docRef.set({}));
+      await assertFails(docRef.set({ name: 1 }));
+      await assertSucceeds(docRef.set({ name: "PROJECT_NAME" }));
+      // update
+      await assertSucceeds(docRef.update({ name: "UPDATED_PROJECT_NAME" }));
+      // delete
+      await assertSucceeds(docRef.delete());
     });
-    it("should not be able to read own projects from another user", async () => {
+    it("should not be able to access to own projects from another user", async () => {
       const anotherUid = "ANOTHER_USER_ID";
       const db = await getAuthenticatedFirestore(anotherUid);
-      await assertFails(db.collection(collectionPath).get());
-      await assertFails(db.collection(collectionPath).doc("PROJECT_ID").get());
+      const collectionRef = db.collection(collectionPath);
+      const docRef = collectionRef.doc(projectId);
+      // list
+      await assertFails(collectionRef.get());
+      // get
+      await assertFails(docRef.get());
+      // create
+      await assertFails(docRef.set({ name: "PROJECT_NAME" }));
+      // update
+      await assertFails(docRef.update({ name: "UPDATED_PROJECT_NAME" }));
+      // delete
+      await assertFails(docRef.delete());
     });
   });
 });
