@@ -184,11 +184,19 @@ describe("/users/{userId}", () => {
     });
 
     describe("/sections/{sectionId}", () => {
-      it.todo("pending");
+      it.todo("should be able to access to own sections");
+      it.todo("should not be able to access to own sections from another user");
+      it.todo(
+        "should not be able to access to own sections from unauthenticated user"
+      );
     });
 
     describe("/tasks/{taskId}", () => {
-      it.todo("pending");
+      it.todo("should be able to access to own sections");
+      it.todo("should not be able to access to own sections from another user");
+      it.todo(
+        "should not be able to access to own sections from unauthenticated user"
+      );
     });
   });
 });
