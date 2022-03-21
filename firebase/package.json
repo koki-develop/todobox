@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "firebase emulators:start --import ./data --export-on-exit ./data --only auth,functions,firestore,storage",
-    "test:firestore": "firebase emulators:exec --only firestore \"yarn run vitest\"",
+    "test": "vitest --reporter verbose",
+    "test:firestore": "firebase emulators:exec --only firestore \"yarn run test\"",
     "deploy": "firebase deploy --force"
   },
   "devDependencies": {
