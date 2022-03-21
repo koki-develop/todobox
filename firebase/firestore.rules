@@ -12,12 +12,22 @@ service cloud.firestore {
     return data.diff(resource.data).affectedKeys().hasAny(keys);
   }
 
+  function validateCreateProjectInput(data) {
+    return hasKeys(data, ['name']) &&
+    data.name is string;
+  }
+
+  function validateUpdateProjectInput(data) {
+    return hasAffectedKeys(data, ['name']) &&
+    (!hasKeys(data, ['name']) || data.name is string);
+  }
+
   match /databases/{database}/documents {
     match /users/{userId} {
       match /projects/{projectId} {
         allow list, get: if loggedInWith(userId);
-        allow create: if loggedInWith(userId) && hasKeys(request.resource.data, ['name']) && request.resource.data.get('name', '') is string;
-        allow update: if loggedInWith(userId) && hasAffectedKeys(request.resource.data, ['name']) && request.resource.data.name is string;
+        allow create: if loggedInWith(userId) && validateCreateProjectInput(request.resource.data);
+        allow update: if loggedInWith(userId) && validateUpdateProjectInput(request.resource.data);
         allow delete: if loggedInWith(userId);
 
         match /counters/tasks/shards/{shardId} {
