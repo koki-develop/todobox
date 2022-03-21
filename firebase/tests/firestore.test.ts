@@ -44,15 +44,16 @@ beforeEach(async () => {
   await testEnv.clearFirestore();
 });
 
-describe("/users/{userId}/projects/{projectId}", () => {
-  describe("authenticated", async () => {
-    const uid = "USER_ID";
-    const collectionPath = `users/${uid}/projects`;
+describe("/users/{userId}", () => {
+  const uid = "USER_ID";
+
+  describe("/projects/{projectId}", () => {
     const projectId = "PROJECT_ID";
+    const projectsCollectionPath = `users/${uid}/projects`;
 
     it("should be able to access to own project", async () => {
       const db = await getAuthenticatedFirestore(uid);
-      const collectionRef = db.collection(collectionPath);
+      const collectionRef = db.collection(projectsCollectionPath);
       const docRef = collectionRef.doc(projectId);
       // list
       await assertSucceeds(collectionRef.get());
@@ -74,7 +75,22 @@ describe("/users/{userId}/projects/{projectId}", () => {
     it("should not be able to access to own projects from another user", async () => {
       const anotherUid = "ANOTHER_USER_ID";
       const db = await getAuthenticatedFirestore(anotherUid);
-      const collectionRef = db.collection(collectionPath);
+      const collectionRef = db.collection(projectsCollectionPath);
+      const docRef = collectionRef.doc(projectId);
+      // list
+      await assertFails(collectionRef.get());
+      // get
+      await assertFails(docRef.get());
+      // create
+      await assertFails(docRef.set({ name: "PROJECT_NAME" }));
+      // update
+      await assertFails(docRef.update({ name: "UPDATED_PROJECT_NAME" }));
+      // delete
+      await assertFails(docRef.delete());
+    });
+    it("should not be able to access to own projects from unauthenticated user", async () => {
+      const db = await getUnauthenticatedFirestore();
+      const collectionRef = db.collection(projectsCollectionPath);
       const docRef = collectionRef.doc(projectId);
       // list
       await assertFails(collectionRef.get());
