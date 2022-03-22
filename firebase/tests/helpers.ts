@@ -1,36 +1,24 @@
 import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
 import fs from "fs";
 import firebase from "firebase/compat";
-
-const FIREBASE_PROJECT_ID = "test-todo-box";
+import { getTestEnvironment } from "./helpers/firebase";
 
 export type DbOptions = {
   authenticateWith?: string;
 };
 
-const _getTestEnvironment = async () => {
-  const firestoreRules = fs.readFileSync("firestore.rules", "utf8");
-
-  return await initializeTestEnvironment({
-    projectId: FIREBASE_PROJECT_ID,
-    firestore: {
-      rules: firestoreRules,
-    },
-  });
-};
-
 export const cleanup = async () => {
-  const env = await _getTestEnvironment();
+  const env = await getTestEnvironment();
   await env.cleanup();
 };
 
 export const clearDb = async () => {
-  const env = await _getTestEnvironment();
+  const env = await getTestEnvironment();
   await env.clearFirestore();
 };
 
 export const getDb = async (options?: DbOptions) => {
-  const env = await _getTestEnvironment();
+  const env = await getTestEnvironment();
   const context = (() => {
     if (options?.authenticateWith) {
       return env.authenticatedContext(options.authenticateWith);
