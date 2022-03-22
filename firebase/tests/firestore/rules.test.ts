@@ -7,51 +7,25 @@ import fs from "fs";
 import path from "path";
 import firebase from "firebase/compat";
 import { afterAll, it, describe, beforeEach } from "vitest";
+import {
+  cleanup,
+  clearDb,
+  getDb,
+  listProjects,
+  getProject,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../helpers";
 
-const PROJECT_ID = "test-todo-box";
+type AssertResult = "success" | "fail";
 
 /*
- * helpers
+ * assertion
  */
 
-const getTestEnvironment = async () => {
-  const firestoreRules = fs.readFileSync("firestore.rules", "utf8");
-
-  return await initializeTestEnvironment({
-    projectId: PROJECT_ID,
-    firestore: {
-      rules: firestoreRules,
-    },
-  });
-};
-
-const getAuthenticatedContext = async (uid: string) => {
-  const testEnv = await getTestEnvironment();
-  return testEnv.authenticatedContext(uid);
-};
-
-const getUnauthenticatedContext = async () => {
-  const testEnv = await getTestEnvironment();
-  return testEnv.unauthenticatedContext();
-};
-
-const getAuthenticatedFirestore = async (uid: string) => {
-  const context = await getAuthenticatedContext(uid);
-  return context.firestore();
-};
-
-const getUnauthenticatedFirestore = async () => {
-  const context = await getUnauthenticatedContext();
-  return context.firestore();
-};
-
-const listProjects = (db: firebase.firestore.Firestore, uid: string) => {
-  const collectionRef = db.collection(`users/${uid}/projects`);
-  return collectionRef.get();
-};
-
 const assertListProjects = (
-  expected: "success" | "fail",
+  expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string
 ) => {
@@ -66,17 +40,8 @@ const assertListProjects = (
   }
 };
 
-const getProject = (
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string
-) => {
-  const docRef = db.collection(`users/${uid}/projects`).doc(projectId);
-  return docRef.get();
-};
-
 const assertGetProject = (
-  expected: "success" | "fail",
+  expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
@@ -92,18 +57,8 @@ const assertGetProject = (
   }
 };
 
-const createProject = (
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string,
-  input: unknown
-) => {
-  const docRef = db.collection(`users/${uid}/projects`).doc(projectId);
-  return docRef.set(input);
-};
-
 const assertCreateProject = (
-  expected: "success" | "fail",
+  expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
@@ -124,18 +79,8 @@ const assertCreateProject = (
   }
 };
 
-const updateProject = (
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string,
-  input: unknown
-) => {
-  const docRef = db.collection(`users/${uid}/projects`).doc(projectId);
-  return docRef.update(input);
-};
-
 const assertUpdateProject = (
-  expected: "success" | "fail",
+  expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
@@ -156,17 +101,8 @@ const assertUpdateProject = (
   }
 };
 
-const deleteProject = (
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string
-) => {
-  const docRef = db.collection(`users/${uid}/projects`).doc(projectId);
-  return docRef.delete();
-};
-
 const assertDeleteProject = (
-  expected: "success" | "fail",
+  expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
@@ -187,13 +123,11 @@ const assertDeleteProject = (
  */
 
 beforeEach(async () => {
-  const testEnv = await getTestEnvironment();
-  await testEnv.clearFirestore();
+  await clearDb();
 });
 
 afterAll(async () => {
-  const testEnv = await getTestEnvironment();
-  await testEnv.cleanup();
+  await cleanup();
 });
 
 describe("Firestore Security Rules", () => {
@@ -202,17 +136,17 @@ describe("Firestore Security Rules", () => {
   describe("projects", () => {
     describe("list", () => {
       describe("from myself", async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         assertListProjects("success", db, dummyUid);
       });
 
       describe("from another user", async () => {
-        const db = await getAuthenticatedFirestore("ANOTHER_USER_ID");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         assertListProjects("fail", db, dummyUid);
       });
 
       describe("from unauthenticated user", async () => {
-        const db = await getUnauthenticatedFirestore();
+        const db = await getDb();
         assertListProjects("fail", db, dummyUid);
       });
     });
@@ -221,17 +155,17 @@ describe("Firestore Security Rules", () => {
       const dummyProjectId = "PROJECT_ID";
 
       describe("from myself", async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         assertGetProject("success", db, dummyUid, dummyProjectId);
       });
 
       describe("from another user", async () => {
-        const db = await getAuthenticatedFirestore("ANOTHER_USER_ID");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         assertGetProject("fail", db, dummyUid, dummyProjectId);
       });
 
       describe("from unauthenticated user", async () => {
-        const db = await getUnauthenticatedFirestore();
+        const db = await getDb();
         assertGetProject("fail", db, dummyUid, dummyProjectId);
       });
     });
@@ -258,7 +192,7 @@ describe("Firestore Security Rules", () => {
       ];
 
       describe("from myself", async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         describe("with valid input", async () => {
           for (const input of validInputs) {
             assertCreateProject("success", db, dummyUid, dummyProjectId, input);
@@ -272,13 +206,13 @@ describe("Firestore Security Rules", () => {
       });
 
       describe("from another user", async () => {
-        const db = await getAuthenticatedFirestore("ANOTHER_USER_ID");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         const input = validInputs[0];
         assertCreateProject("fail", db, dummyUid, dummyProjectId, input);
       });
 
       describe("from unauthenticated user", async () => {
-        const db = await getUnauthenticatedFirestore();
+        const db = await getDb();
         const input = validInputs[0];
         assertCreateProject("fail", db, dummyUid, dummyProjectId, input);
       });
@@ -306,14 +240,14 @@ describe("Firestore Security Rules", () => {
       ];
 
       beforeEach(async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         await assertSucceeds(
           createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
         );
       });
 
       describe("from myself", async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         describe("with valid input", () => {
           for (const input of validInputs) {
             assertUpdateProject("success", db, dummyUid, dummyProjectId, input);
@@ -327,13 +261,13 @@ describe("Firestore Security Rules", () => {
       });
 
       describe("from another user", async () => {
-        const db = await getAuthenticatedFirestore("ANOTHER_USER");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         const input = validInputs[0];
         assertUpdateProject("fail", db, dummyUid, dummyProjectId, input);
       });
 
       describe("from unauthenticated user", async () => {
-        const db = await getUnauthenticatedFirestore();
+        const db = await getDb();
         const input = validInputs[0];
         assertUpdateProject("fail", db, dummyUid, dummyProjectId, input);
       });
@@ -343,22 +277,22 @@ describe("Firestore Security Rules", () => {
       const dummyProjectId = "PROJECT_ID";
 
       beforeEach(async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         await assertSucceeds(
           createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
         );
       });
 
       describe("from myself", async () => {
-        const db = await getAuthenticatedFirestore(dummyUid);
+        const db = await getDb({ authenticateWith: dummyUid });
         assertDeleteProject("success", db, dummyUid, dummyProjectId);
       });
       describe("from another user", async () => {
-        const db = await getAuthenticatedFirestore("ANOTHER_USER_ID");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         assertDeleteProject("fail", db, dummyUid, dummyProjectId);
       });
       describe("from unauthenticated user", async () => {
-        const db = await getUnauthenticatedFirestore();
+        const db = await getDb();
         assertDeleteProject("fail", db, dummyUid, dummyProjectId);
       });
     });
@@ -368,7 +302,7 @@ describe("Firestore Security Rules", () => {
     const dummyProjectId = "PROJECT_ID";
 
     beforeEach(async () => {
-      const db = await getAuthenticatedFirestore(dummyUid);
+      const db = await getDb({ authenticateWith: dummyUid });
       await assertSucceeds(
         createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
       );
@@ -445,7 +379,7 @@ describe("Firestore Security Rules", () => {
     const dummyProjectId = "PROJECT_ID";
 
     beforeEach(async () => {
-      const db = await getAuthenticatedFirestore(dummyUid);
+      const db = await getDb({ authenticateWith: dummyUid });
       await assertSucceeds(
         createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
       );
@@ -522,7 +456,7 @@ describe("Firestore Security Rules", () => {
     const dummyProjectId = "PROJECT_ID";
 
     beforeEach(async () => {
-      const db = await getAuthenticatedFirestore(dummyUid);
+      const db = await getDb({ authenticateWith: dummyUid });
       await assertSucceeds(
         createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
       );
