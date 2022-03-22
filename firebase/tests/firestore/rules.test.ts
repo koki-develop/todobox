@@ -286,8 +286,24 @@ describe("Firestore Security Rules", () => {
 
     describe("update", () => {
       const dummyProjectId = "PROJECT_ID";
-      const validInputs = [{ name: "UPDATED_PROJECT" }];
-      const invalidInputs = [{}];
+      const validInputs = [
+        { name: "UPDATED_PROJECT_NAME" },
+        { name: "  UPDATED_PROJECT_NAME  " },
+        { name: "a".repeat(30) },
+      ];
+      const invalidInputs = [
+        {},
+        { name: 1 },
+        { name: false },
+        { name: ["UPDATED_PROJECT_NAME"] },
+        { name: { name: "UPDATED_PROJECT_NAME" } },
+        { unknownField: "VALUE" },
+        { name: "UPDATED_PROJECT_NAME", unknownField: "VALUE" },
+        { name: "" },
+        { name: "  " },
+        { name: "a".repeat(31) },
+        { name: "a".repeat(50) },
+      ];
 
       beforeEach(async () => {
         const db = await getAuthenticatedFirestore(dummyUid);
