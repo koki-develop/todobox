@@ -50,6 +50,182 @@ afterAll(async () => {
   await testEnv.cleanup();
 });
 
+describe("Firestore Security Rules", () => {
+  describe("projects", () => {
+    describe("list", () => {
+      it.todo("should be able to list own projects");
+      it.todo("should not be able to list own projects from another user");
+      it.todo(
+        "should not be able to list own projects from unauthenticated user"
+      );
+    });
+    describe("get", () => {
+      it.todo("should be able to get own project");
+      it.todo("should not be able to get own project from another user");
+      it.todo(
+        "should not be able to get own project from unauthenticated user"
+      );
+    });
+    describe("create", () => {
+      it.todo("should be able to create own project with valid input");
+      it.todo("should not be able to create own project with invalid input");
+      it.todo("should not be able to create own project from another user");
+      it.todo(
+        "should not be able to create own project from unauthenticated user"
+      );
+    });
+    describe("update", () => {
+      it.todo("should be able to update own project with valid input");
+      it.todo("should not be able to update own project with invalid input");
+      it.todo("should not be able to update own project from another user");
+      it.todo(
+        "should not be able to update own project from unauthenticated user"
+      );
+    });
+    describe("delete", () => {
+      it.todo("should be able to delete own project");
+      it.todo("should not be able to delete own project from another user");
+      it.todo(
+        "should not be able to delete own project from unauthenticated user"
+      );
+    });
+  });
+
+  describe("task counter shards", () => {
+    describe("list", () => {
+      it.todo("should be able to list own task counter shards");
+      it.todo(
+        "should not be able to list own task counter shards from another user"
+      );
+      it.todo(
+        "should not be able to list own task counter shards from unauthenticated user"
+      );
+    });
+    describe("get", () => {
+      it.todo("should be able to get own task counter shard");
+      it.todo(
+        "should not be able to get own task counter shard from another user"
+      );
+      it.todo(
+        "should not be able to get own task counter shard from unauthenticated user"
+      );
+    });
+    describe("create", () => {
+      it.todo(
+        "should be able to create own task counter shard with valid input"
+      );
+      it.todo(
+        "should not be able to create own task counter shard with invalid input"
+      );
+      it.todo(
+        "should not be able to create own task counter shard from another user"
+      );
+      it.todo(
+        "should not be able to create own task counter shard from unauthenticated user"
+      );
+    });
+    describe("update", () => {
+      it.todo(
+        "should be able to update own task counter shard with valid input"
+      );
+      it.todo(
+        "should not be able to update own task counter shard with invalid input"
+      );
+      it.todo(
+        "should not be able to update own task counter shard from another user"
+      );
+      it.todo(
+        "should not be able to update own task counter shard from unauthenticated user"
+      );
+    });
+    describe("delete", () => {
+      it.todo("should not be able to delete own task counter shard");
+      it.todo(
+        "should not be able to delete own task counter shard from another user"
+      );
+      it.todo(
+        "should not be able to delete own task counter shard from unauthenticated user"
+      );
+    });
+  });
+
+  describe("sections", () => {
+    describe("list", () => {
+      it.todo("should be able to list own sections");
+      it.todo("should not be able to list own sections from another user");
+      it.todo(
+        "should not be able to list own sections from unauthenticated user"
+      );
+    });
+    describe("get", () => {
+      it.todo("should be able to get own section");
+      it.todo("should not be able to get own section from another user");
+      it.todo(
+        "should not be able to get own section from unauthenticated user"
+      );
+    });
+    describe("create", () => {
+      it.todo("should be able to create own section with valid input");
+      it.todo("should not be able to create own section with invalid input");
+      it.todo("should not be able to create own section from another user");
+      it.todo(
+        "should not be able to create own section from unauthenticated user"
+      );
+    });
+    describe("update", () => {
+      it.todo("should be able to update own section with valid input");
+      it.todo("should not be able to update own section with invalid input");
+      it.todo("should not be able to update own section from another user");
+      it.todo(
+        "should not be able to update own section from unauthenticated user"
+      );
+    });
+    describe("delete", () => {
+      it.todo("should be able to delete own section");
+      it.todo("should not be able to delete own section from another user");
+      it.todo(
+        "should not be able to delete own section from unauthenticated user"
+      );
+    });
+  });
+
+  describe("tasks", () => {
+    describe("list", () => {
+      it.todo("should be able to list own tasks");
+      it.todo("should not be able to list own tasks from another user");
+      it.todo("should not be able to list own tasks from unauthenticated user");
+    });
+    describe("get", () => {
+      it.todo("should be able to get own task");
+      it.todo("should not be able to get own task from another user");
+      it.todo("should not be able to get own task from unauthenticated user");
+    });
+    describe("create", () => {
+      it.todo("should be able to create own task with valid input");
+      it.todo("should not be able to create own task with invalid input");
+      it.todo("should not be able to create own task from another user");
+      it.todo(
+        "should not be able to create own task from unauthenticated user"
+      );
+    });
+    describe("update", () => {
+      it.todo("should be able to update own task with valid input");
+      it.todo("should not be able to update own task with invalid input");
+      it.todo("should not be able to update own task from another user");
+      it.todo(
+        "should not be able to update own task from unauthenticated user"
+      );
+    });
+    describe("delete", () => {
+      it.todo("should be able to delete own task");
+      it.todo("should not be able to delete own task from another user");
+      it.todo(
+        "should not be able to delete own task from unauthenticated user"
+      );
+    });
+  });
+});
+
 describe("/users/{userId}", () => {
   const uid = "USER_ID";
   const anotherUid = "ANOTHER_USER_ID";
