@@ -11,7 +11,7 @@ import {
   createProject,
   updateProject,
   deleteProject,
-} from "../helpers";
+} from "../helpers/projects/db";
 import { clearDb, getDb } from "../helpers/db";
 import { cleanupTestEnvironment } from "../helpers/firebase";
 
