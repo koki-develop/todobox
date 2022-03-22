@@ -349,60 +349,79 @@ describe("Firestore Security Rules", () => {
   });
 
   describe("task counter shards", () => {
+    const dummyProjectId = "PROJECT_ID";
+
+    beforeEach(async () => {
+      const db = await getAuthenticatedFirestore(dummyUid);
+      await assertSucceeds(
+        createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
+      );
+    });
+
     describe("list", () => {
-      it.todo("should be able to list own task counter shards");
-      it.todo(
-        "should not be able to list own task counter shards from another user"
-      );
-      it.todo(
-        "should not be able to list own task counter shards from unauthenticated user"
-      );
+      describe("from myself", async () => {
+        it.todo("pending");
+      });
+      describe("from another user", async () => {
+        it.todo("pending");
+      });
+      describe("from unauthenticated user", async () => {
+        it.todo("pending");
+      });
     });
     describe("get", () => {
-      it.todo("should be able to get own task counter shard");
-      it.todo(
-        "should not be able to get own task counter shard from another user"
-      );
-      it.todo(
-        "should not be able to get own task counter shard from unauthenticated user"
-      );
+      describe("from myself", async () => {
+        it.todo("pending");
+      });
+      describe("from another user", async () => {
+        it.todo("pending");
+      });
+      describe("from unauthenticated user", async () => {
+        it.todo("pending");
+      });
     });
     describe("create", () => {
-      it.todo(
-        "should be able to create own task counter shard with valid input"
-      );
-      it.todo(
-        "should not be able to create own task counter shard with invalid input"
-      );
-      it.todo(
-        "should not be able to create own task counter shard from another user"
-      );
-      it.todo(
-        "should not be able to create own task counter shard from unauthenticated user"
-      );
+      describe("from myself", async () => {
+        describe("with valid input", () => {
+          it.todo("pending");
+        });
+        describe("with invalid input", () => {
+          it.todo("pending");
+        });
+      });
+      describe("from another user", async () => {
+        it.todo("pending");
+      });
+      describe("from unauthenticated user", async () => {
+        it.todo("pending");
+      });
     });
     describe("update", () => {
-      it.todo(
-        "should be able to update own task counter shard with valid input"
-      );
-      it.todo(
-        "should not be able to update own task counter shard with invalid input"
-      );
-      it.todo(
-        "should not be able to update own task counter shard from another user"
-      );
-      it.todo(
-        "should not be able to update own task counter shard from unauthenticated user"
-      );
+      describe("from myself", async () => {
+        describe("with valid input", () => {
+          it.todo("pending");
+        });
+        describe("with invalid input", () => {
+          it.todo("pending");
+        });
+      });
+      describe("from another user", async () => {
+        it.todo("pending");
+      });
+      describe("from unauthenticated user", async () => {
+        it.todo("pending");
+      });
     });
     describe("delete", () => {
-      it.todo("should not be able to delete own task counter shard");
-      it.todo(
-        "should not be able to delete own task counter shard from another user"
-      );
-      it.todo(
-        "should not be able to delete own task counter shard from unauthenticated user"
-      );
+      describe("from myself", async () => {
+        it.todo("pending");
+      });
+      describe("from another user", async () => {
+        it.todo("pending");
+      });
+      describe("from unauthenticated user", async () => {
+        it.todo("pending");
+      });
     });
   });
 
