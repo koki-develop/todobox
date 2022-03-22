@@ -1,123 +1,15 @@
-import {
-  assertSucceeds,
-  assertFails,
-  initializeTestEnvironment,
-} from "@firebase/rules-unit-testing";
-import firebase from "firebase/compat";
+import { assertSucceeds } from "@firebase/rules-unit-testing";
 import { afterAll, it, describe, beforeEach } from "vitest";
+import { createProject } from "../helpers/projects/db";
 import {
-  listProjects,
-  getProject,
-  createProject,
-  updateProject,
-  deleteProject,
-} from "../helpers/projects/db";
+  assertListProjects,
+  assertGetProject,
+  assertCreateProject,
+  assertUpdateProject,
+  assertDeleteProject,
+} from "../helpers/projects/assertions";
 import { clearDb, getDb } from "../helpers/db";
 import { cleanupTestEnvironment } from "../helpers/firebase";
-
-type AssertResult = "success" | "fail";
-
-/*
- * assertion
- */
-
-const assertListProjects = (
-  expected: AssertResult,
-  db: firebase.firestore.Firestore,
-  uid: string
-) => {
-  if (expected === "success") {
-    it("should be able to list projects", async () => {
-      await assertSucceeds(listProjects(db, uid));
-    });
-  } else {
-    it("should not be able to list projects", async () => {
-      await assertFails(listProjects(db, uid));
-    });
-  }
-};
-
-const assertGetProject = (
-  expected: AssertResult,
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string
-) => {
-  if (expected === "success") {
-    it("should be able to get project", async () => {
-      await assertSucceeds(getProject(db, uid, projectId));
-    });
-  } else {
-    it("should not be able to get project", async () => {
-      await assertFails(getProject(db, uid, projectId));
-    });
-  }
-};
-
-const assertCreateProject = (
-  expected: AssertResult,
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string,
-  input: unknown
-) => {
-  if (expected === "success") {
-    it(`should be able to create project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertSucceeds(createProject(db, uid, projectId, input));
-    });
-  } else {
-    it(`should not be able to create project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertFails(createProject(db, uid, projectId, input));
-    });
-  }
-};
-
-const assertUpdateProject = (
-  expected: AssertResult,
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string,
-  input: unknown
-) => {
-  if (expected === "success") {
-    it(`should be able to update project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertSucceeds(updateProject(db, uid, projectId, input));
-    });
-  } else {
-    it(`should not be able to update project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertFails(updateProject(db, uid, projectId, input));
-    });
-  }
-};
-
-const assertDeleteProject = (
-  expected: AssertResult,
-  db: firebase.firestore.Firestore,
-  uid: string,
-  projectId: string
-) => {
-  if (expected === "success") {
-    it("should be able to delete project", async () => {
-      await assertSucceeds(deleteProject(db, uid, projectId));
-    });
-  } else {
-    it("should not be able to delete project", async () => {
-      await assertFails(deleteProject(db, uid, projectId));
-    });
-  }
-};
-
-/*
- * tests
- */
 
 beforeEach(async () => {
   await clearDb();
