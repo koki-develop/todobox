@@ -13,3 +13,8 @@ export const getTestEnvironment = async () => {
     },
   });
 };
+
+export const cleanupTestEnvironment = async () => {
+  const env = await getTestEnvironment();
+  await env.cleanup();
+};

@@ -3,20 +3,17 @@ import {
   assertFails,
   initializeTestEnvironment,
 } from "@firebase/rules-unit-testing";
-import fs from "fs";
-import path from "path";
 import firebase from "firebase/compat";
 import { afterAll, it, describe, beforeEach } from "vitest";
 import {
-  cleanup,
-  clearDb,
-  getDb,
   listProjects,
   getProject,
   createProject,
   updateProject,
   deleteProject,
 } from "../helpers";
+import { clearDb, getDb } from "../helpers/db";
+import { cleanupTestEnvironment } from "../helpers/firebase";
 
 type AssertResult = "success" | "fail";
 
@@ -127,7 +124,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await cleanup();
+  await cleanupTestEnvironment();
 });
 
 describe("Firestore Security Rules", () => {

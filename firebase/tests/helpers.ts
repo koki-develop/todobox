@@ -1,33 +1,4 @@
-import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
-import fs from "fs";
 import firebase from "firebase/compat";
-import { getTestEnvironment } from "./helpers/firebase";
-
-export type DbOptions = {
-  authenticateWith?: string;
-};
-
-export const cleanup = async () => {
-  const env = await getTestEnvironment();
-  await env.cleanup();
-};
-
-export const clearDb = async () => {
-  const env = await getTestEnvironment();
-  await env.clearFirestore();
-};
-
-export const getDb = async (options?: DbOptions) => {
-  const env = await getTestEnvironment();
-  const context = (() => {
-    if (options?.authenticateWith) {
-      return env.authenticatedContext(options.authenticateWith);
-    } else {
-      return env.unauthenticatedContext();
-    }
-  })();
-  return context.firestore();
-};
 
 export const listProjects = async (
   db: firebase.firestore.Firestore,
