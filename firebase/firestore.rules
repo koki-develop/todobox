@@ -12,8 +12,7 @@ service cloud.firestore {
   }
 
   function hasAnyAffectedKeys(data, keys) {
-    return data.diff(resource.data).affectedKeys().hasOnly(keys) &&
-      data.diff(resource.data).affectedKeys().hasAny(keys);
+    return data.diff(resource.data).affectedKeys().hasOnly(keys);
   }
 
   function validateCreateProjectInput(data) {

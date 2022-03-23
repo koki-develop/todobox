@@ -137,8 +137,6 @@ describe("Firestore Security Rules", () => {
         { name: "a".repeat(30) },
       ];
       const invalidInputs = [
-        // フィールドが足りないパターン
-        {},
         // 型が正しくないパターン
         { name: 1 },
         { name: false },
@@ -388,8 +386,6 @@ describe("Firestore Security Rules", () => {
       const dummyShardId = "0";
       const validInputs = [{ count: 1 }];
       const invalidInputs = [
-        // フィールドが足りないパターン
-        {},
         // 型が正しくないパターン
         { count: "0" },
         { count: false },
@@ -665,8 +661,6 @@ describe("Firestore Security Rules", () => {
         { index: 10 },
       ];
       const invalidInputs = [
-        // フィールドが足りないパターン
-        {},
         // 型が正しくないパターン
         { name: 1, index: 1 },
         { name: false, index: 1 },
