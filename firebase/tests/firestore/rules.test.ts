@@ -1,5 +1,5 @@
 import { assertSucceeds } from "@firebase/rules-unit-testing";
-import { afterAll, it, describe, beforeEach } from "vitest";
+import { afterAll, describe, beforeEach } from "vitest";
 import { createProject } from "../helpers/projects/db";
 import {
   assertListProjects,
