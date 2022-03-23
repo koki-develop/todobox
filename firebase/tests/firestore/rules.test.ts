@@ -31,6 +31,7 @@ import {
 } from "../helpers/tasks/assertions";
 import { clearDb, getDb } from "../helpers/db";
 import { cleanupTestEnvironment } from "../helpers/firebase";
+import { deleteKeys } from "../helpers/utils";
 
 beforeEach(async () => {
   await clearDb();
@@ -880,17 +881,69 @@ describe("Firestore Security Rules", () => {
 
     describe("create", () => {
       const dummyTaskId = "TASK_ID";
+      const dummySectionId = "SECTION_ID";
       // TODO: テストケース追加
+      const validInputBase = {
+        title: "TASK_TITLE",
+        sectionId: null,
+        description: "TASK_DESCRIPTION",
+        index: 0,
+        completedAt: null,
+      };
       const validInputs = [
-        {
-          title: "TASK_TITLE",
-          sectionId: null,
-          description: "TASK_DESCRIPTION",
-          index: 0,
-          completedAt: null,
-        },
+        { ...validInputBase },
+        { ...validInputBase, sectionId: dummySectionId },
+        { ...validInputBase, index: 1 },
+        { ...validInputBase, index: 10 },
       ];
-      const invalidInputs = [{}];
+      const invalidInputs = [
+        // フィールドが足りないパターン
+        {},
+        deleteKeys(validInputBase, "title"),
+        deleteKeys(validInputBase, "sectionId"),
+        deleteKeys(validInputBase, "description"),
+        deleteKeys(validInputBase, "index"),
+        deleteKeys(validInputBase, "completedAt"),
+        // 型が正しくないパターン
+        { ...validInputBase, title: 1 },
+        { ...validInputBase, title: false },
+        { ...validInputBase, title: ["TASK_TITLE"] },
+        { ...validInputBase, title: { title: "TASK_TITLE" } },
+        { ...validInputBase, sectionId: 1 },
+        { ...validInputBase, sectionId: false },
+        { ...validInputBase, sectionId: [dummySectionId] },
+        { ...validInputBase, sectionId: { sectionId: dummySectionId } },
+        { ...validInputBase, description: 1 },
+        { ...validInputBase, description: false },
+        { ...validInputBase, description: ["TASK_DESCRIPTION"] },
+        { ...validInputBase, description: { description: "TASK_DESCRIPTION" } },
+        { ...validInputBase, index: "0" },
+        { ...validInputBase, index: false },
+        { ...validInputBase, index: [0] },
+        { ...validInputBase, index: { index: 0 } },
+        { ...validInputBase, completedAt: "COMPLETED_AT" },
+        { ...validInputBase, completedAt: 0 },
+        { ...validInputBase, completedAt: false },
+        { ...validInputBase, completedAt: [new Date()] },
+        { ...validInputBase, completedAt: { completedAt: new Date() } },
+        // 値が無効なパターン
+        { ...validInputBase, index: -1 },
+        { ...validInputBase, index: -10 },
+        { ...validInputBase, title: "a".repeat(256) },
+        { ...validInputBase, title: "a".repeat(500) },
+        { ...validInputBase, description: "a".repeat(1001) },
+        { ...validInputBase, completedAt: new Date() },
+      ];
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createSection(db, dummyUid, dummyProjectId, dummySectionId, {
+            name: "SECTION_NAME",
+            index: 0,
+          })
+        );
+      });
 
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
