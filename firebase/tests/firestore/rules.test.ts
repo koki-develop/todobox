@@ -16,8 +16,13 @@ import {
   assertUpdateSection,
   assertDeleteSection,
 } from "../helpers/sections/assertions";
-import { createTasksCounterShard } from "../helpers/tasks/db";
+import { createTask, createTasksCounterShard } from "../helpers/tasks/db";
 import {
+  assertListTasks,
+  assertGetTask,
+  assertCreateTask,
+  assertUpdateTask,
+  assertDeleteTask,
   assertListTasksCounterShards,
   assertGetTasksCounterShard,
   assertCreateTasksCounterShard,
@@ -58,6 +63,13 @@ describe("Firestore Security Rules", () => {
 
     describe("get", () => {
       const dummyProjectId = "PROJECT_ID";
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createProject(db, dummyUid, dummyProjectId, { name: "PROJECT_NAME" })
+        );
+      });
 
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -244,6 +256,15 @@ describe("Firestore Security Rules", () => {
 
     describe("get", () => {
       const dummyShardId = "0";
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createTasksCounterShard(db, dummyUid, dummyProjectId, dummyShardId, {
+            count: 0,
+          })
+        );
+      });
 
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -537,6 +558,16 @@ describe("Firestore Security Rules", () => {
     describe("get", () => {
       const dummySectionId = "SECTION_ID";
 
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createSection(db, dummyUid, dummyProjectId, dummySectionId, {
+            name: "SECTION_NAME",
+            index: 0,
+          })
+        );
+      });
+
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
         assertGetSection(
@@ -627,7 +658,7 @@ describe("Firestore Security Rules", () => {
       });
 
       describe("from another user", async () => {
-        const db = await getDb({ authenticateWith: "ANOTHER_USER" });
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         assertCreateSection(
           "fail",
           db,
@@ -800,83 +831,225 @@ describe("Firestore Security Rules", () => {
 
     describe("list", () => {
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertListTasks("success", db, dummyUid, dummyProjectId);
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertListTasks("fail", db, dummyUid, dummyProjectId);
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertListTasks("fail", db, dummyUid, dummyProjectId);
       });
     });
 
     describe("get", () => {
+      const dummyTaskId = "TASK_ID";
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createTask(db, dummyUid, dummyProjectId, dummyTaskId, {
+            title: "TASK_TITLE",
+            sectionId: null,
+            description: "TASK_DESCRIPTION",
+            index: 0,
+            completedAt: null,
+          })
+        );
+      });
+
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertGetTask("success", db, dummyUid, dummyProjectId, dummyTaskId);
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertGetTask("fail", db, dummyUid, dummyProjectId, dummyTaskId);
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertGetTask("fail", db, dummyUid, dummyProjectId, dummyTaskId);
       });
     });
 
     describe("create", () => {
+      const dummyTaskId = "TASK_ID";
+      // TODO: テストケース追加
+      const validInputs = [
+        {
+          title: "TASK_TITLE",
+          sectionId: null,
+          description: "TASK_DESCRIPTION",
+          index: 0,
+          completedAt: null,
+        },
+      ];
+      const invalidInputs = [{}];
+
       describe("from myself", async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+
         describe("with valid input", () => {
-          it.todo("pending");
+          for (const input of validInputs) {
+            assertCreateTask(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummyTaskId,
+              input
+            );
+          }
         });
 
         describe("with invalid input", () => {
-          it.todo("pending");
+          for (const input of invalidInputs) {
+            assertCreateTask(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummyTaskId,
+              input
+            );
+          }
         });
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertCreateTask(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummyTaskId,
+          validInputs[0]
+        );
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertCreateTask(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummyTaskId,
+          validInputs[0]
+        );
       });
     });
 
     describe("update", () => {
+      const dummyTaskId = "TASK_ID";
+      // TODO: テストケース追加
+      const validInputs = [{ title: "UPDATED_TASK" }];
+      const invalidInputs = [{ title: 1 }];
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createTask(db, dummyUid, dummyProjectId, dummyTaskId, {
+            title: "TASK_TITLE",
+            sectionId: null,
+            description: "TASK_DESCRIPTION",
+            index: 0,
+            completedAt: null,
+          })
+        );
+      });
+
       describe("from myself", async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+
         describe("with valid input", () => {
-          it.todo("pending");
+          for (const input of validInputs) {
+            assertUpdateTask(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummyTaskId,
+              input
+            );
+          }
         });
 
         describe("with invalid input", () => {
-          it.todo("pending");
+          for (const input of invalidInputs) {
+            assertUpdateTask(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummyTaskId,
+              input
+            );
+          }
         });
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertUpdateTask(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummyTaskId,
+          validInputs[0]
+        );
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertUpdateTask(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummyTaskId,
+          validInputs[0]
+        );
       });
     });
 
     describe("delete", () => {
+      const dummyTaskId = "TASK_ID";
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createTask(db, dummyUid, dummyProjectId, dummyTaskId, {
+            title: "TASK_TITLE",
+            sectionId: null,
+            description: "TASK_DESCRIPTION",
+            index: 0,
+            completedAt: null,
+          })
+        );
+      });
+
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertDeleteTask("success", db, dummyUid, dummyProjectId, dummyTaskId);
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertDeleteTask("fail", db, dummyUid, dummyProjectId, dummyTaskId);
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertDeleteTask("fail", db, dummyUid, dummyProjectId, dummyTaskId);
       });
     });
   });
