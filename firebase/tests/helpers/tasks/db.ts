@@ -1,57 +1,52 @@
 import firebase from "firebase/compat";
 
-export const listTasksCounterShards = async (
+export const listTasksCounterShards = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
 ) => {
-  const shardsRef = await _getTasksCounterShardsRef(db, uid, projectId);
-  return shardsRef.get();
+  return _getTasksCounterShardsRef(db, uid, projectId).get();
 };
 
-export const getTasksCounterShard = async (
+export const getTasksCounterShard = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   shardId: string
 ) => {
-  const shardRef = await _getTasksCounterShardRef(db, uid, projectId, shardId);
-  return shardRef.get();
+  return _getTasksCounterShardRef(db, uid, projectId, shardId).get();
 };
 
-export const createTasksCounterShard = async (
+export const createTasksCounterShard = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   shardId: string,
   input: unknown
 ) => {
-  const shardRef = await _getTasksCounterShardRef(db, uid, projectId, shardId);
-  return shardRef.set(input);
+  return _getTasksCounterShardRef(db, uid, projectId, shardId).set(input);
 };
 
-export const updateTasksCounterShard = async (
+export const updateTasksCounterShard = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   shardId: string,
   input: unknown
 ) => {
-  const shardRef = await _getTasksCounterShardRef(db, uid, projectId, shardId);
-  return shardRef.update(input);
+  return _getTasksCounterShardRef(db, uid, projectId, shardId).update(input);
 };
 
-export const deleteTasksCounterShard = async (
+export const deleteTasksCounterShard = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   shardId: string
 ) => {
-  const shardRef = await _getTasksCounterShardRef(db, uid, projectId, shardId);
-  return shardRef.delete();
+  return _getTasksCounterShardRef(db, uid, projectId, shardId).delete();
 };
 
-const _getTasksCounterShardsRef = async (
+const _getTasksCounterShardsRef = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
@@ -61,12 +56,11 @@ const _getTasksCounterShardsRef = async (
   );
 };
 
-const _getTasksCounterShardRef = async (
+const _getTasksCounterShardRef = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   shardId: string
 ) => {
-  const shardsRef = await _getTasksCounterShardsRef(db, uid, projectId);
-  return shardsRef.doc(shardId);
+  return _getTasksCounterShardsRef(db, uid, projectId).doc(shardId);
 };

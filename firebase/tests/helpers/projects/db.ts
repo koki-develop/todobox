@@ -1,63 +1,51 @@
 import firebase from "firebase/compat";
 
-export const listProjects = async (
-  db: firebase.firestore.Firestore,
-  uid: string
-) => {
-  const projectsRef = await _getProjectsRef(db, uid);
-  return projectsRef.get();
+export const listProjects = (db: firebase.firestore.Firestore, uid: string) => {
+  return _getProjectsRef(db, uid).get();
 };
 
-export const getProject = async (
+export const getProject = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
 ) => {
-  const projectRef = await _getProjectRef(db, uid, projectId);
-  return projectRef.get();
+  return _getProjectRef(db, uid, projectId).get();
 };
 
-export const createProject = async (
+export const createProject = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   input: unknown
 ) => {
-  const projectRef = await _getProjectRef(db, uid, projectId);
-  return projectRef.set(input);
+  return _getProjectRef(db, uid, projectId).set(input);
 };
 
-export const updateProject = async (
+export const updateProject = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   input: unknown
 ) => {
-  const projectRef = await _getProjectRef(db, uid, projectId);
-  return projectRef.update(input);
+  return _getProjectRef(db, uid, projectId).update(input);
 };
 
-export const deleteProject = async (
+export const deleteProject = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
 ) => {
-  const projectRef = await _getProjectRef(db, uid, projectId);
-  return projectRef.delete();
+  return _getProjectRef(db, uid, projectId).delete();
 };
 
-const _getProjectsRef = async (
-  db: firebase.firestore.Firestore,
-  uid: string
-) => {
+const _getProjectsRef = (db: firebase.firestore.Firestore, uid: string) => {
   return db.collection(`users/${uid}/projects`);
 };
 
-const _getProjectRef = async (
+const _getProjectRef = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
 ) => {
-  const projectsRef = await _getProjectsRef(db, uid);
-  return projectsRef.doc(projectId);
+  return _getProjectsRef(db, uid).doc(projectId);
 };

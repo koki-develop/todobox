@@ -1,57 +1,52 @@
 import firebase from "firebase/compat";
 
-export const listSections = async (
+export const listSections = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
 ) => {
-  const sectionsRef = await _getSectionsRef(db, uid, projectId);
-  return sectionsRef.get();
+  return _getSectionsRef(db, uid, projectId).get();
 };
 
-export const getSection = async (
+export const getSection = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   sectionId: string
 ) => {
-  const sectionRef = await _getSectionRef(db, uid, projectId, sectionId);
-  return sectionRef.get();
+  return _getSectionRef(db, uid, projectId, sectionId).get();
 };
 
-export const createSection = async (
+export const createSection = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   sectionId: string,
   input: unknown
 ) => {
-  const sectionRef = await _getSectionRef(db, uid, projectId, sectionId);
-  return sectionRef.set(input);
+  return _getSectionRef(db, uid, projectId, sectionId).set(input);
 };
 
-export const updateSection = async (
+export const updateSection = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   sectionId: string,
   input: unknown
 ) => {
-  const sectionRef = await _getSectionRef(db, uid, projectId, sectionId);
-  return sectionRef.update(input);
+  return _getSectionRef(db, uid, projectId, sectionId).update(input);
 };
 
-export const deleteSection = async (
+export const deleteSection = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   sectionId: string
 ) => {
-  const sectionRef = await _getSectionRef(db, uid, projectId, sectionId);
-  return sectionRef.delete();
+  return _getSectionRef(db, uid, projectId, sectionId).delete();
 };
 
-const _getSectionsRef = async (
+const _getSectionsRef = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string
@@ -59,12 +54,12 @@ const _getSectionsRef = async (
   return db.collection(`users/${uid}/projects/${projectId}/sections`);
 };
 
-const _getSectionRef = async (
+const _getSectionRef = (
   db: firebase.firestore.Firestore,
   uid: string,
   projectId: string,
   sectionId: string
 ) => {
-  const sectionsRef = await _getSectionsRef(db, uid, projectId);
+  const sectionsRef = _getSectionsRef(db, uid, projectId);
   return sectionsRef.doc(sectionId);
 };
