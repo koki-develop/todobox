@@ -83,13 +83,17 @@ describe("Firestore Security Rules", () => {
         { name: "a".repeat(30) },
       ];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
+        // 型が正しくないパターン
         { name: 1 },
         { name: false },
         { name: ["PROJECT_NAME"] },
         { name: { name: "PROJECT_NAME" } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
         { name: "PROJECT_NAME", unknownField: "VALUE" },
+        // 値が無効なパターン
         { name: "" },
         { name: "  " },
         { name: "a".repeat(31) },
@@ -133,13 +137,17 @@ describe("Firestore Security Rules", () => {
         { name: "a".repeat(30) },
       ];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
+        // 型が正しくないパターン
         { name: 1 },
         { name: false },
         { name: ["UPDATED_PROJECT_NAME"] },
         { name: { name: "UPDATED_PROJECT_NAME" } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
-        { name: "UPDATED_PROJECT_NAME", unknownField: "VALUE" },
+        { name: "UPDATED_PROJECT", unknownField: "VALUE" },
+        // 値が無効なパターン
         { name: "" },
         { name: "  " },
         { name: "a".repeat(31) },
@@ -278,11 +286,21 @@ describe("Firestore Security Rules", () => {
       const invalidIds = ["SHARD_ID", "10", "11", "100"];
       const validInputs = [{ count: 0 }];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
+        // 型が正しくないパターン
+        { count: "0" },
+        { count: false },
+        { count: [0] },
+        { count: { count: 0 } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
-        { count: 1 },
-        { count: -1 },
         { count: 0, unknownField: "VALUE" },
+        // 値が無効なパターン
+        { count: 1 },
+        { count: 10 },
+        { count: -1 },
+        { count: -10 },
       ];
 
       describe("from myself", async () => {
@@ -370,7 +388,14 @@ describe("Firestore Security Rules", () => {
       const dummyShardId = "0";
       const validInputs = [{ count: 1 }];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
+        // 型が正しくないパターン
+        { count: "0" },
+        { count: false },
+        { count: [1] },
+        { count: { count: 1 } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
         { count: 1, unknownField: "VALUE" },
       ];
@@ -547,18 +572,32 @@ describe("Firestore Security Rules", () => {
         { name: "a".repeat(255), index: 0 },
       ];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
         { name: "SECTION_NAME" },
         { index: 0 },
+        // 型が正しくないパターン
+        { name: 1, index: 0 },
+        { name: false, index: 0 },
+        { name: ["SECTION_NAME"], index: 0 },
+        { name: { name: "SECTION_NAME" }, index: 0 },
+        { name: "SECTION_NAME", index: "0" },
+        { name: "SECTION_NAME", index: false },
+        { name: "SECTION_NAME", index: [0] },
+        { name: "SECTION_NAME", index: { index: 0 } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
         { index: 0, unknownField: "VALUE" },
         { name: "SECTION_NAME", unknownField: "VALUE" },
         { name: "SECTION_NAME", index: 0, unknownField: "VALUE" },
+        // 値が無効なパターン
+        { name: "", index: 0 },
+        { name: "  ", index: 0 },
+        { name: "a".repeat(256), index: 0 },
+        { name: "a".repeat(500), index: 0 },
         { name: "SECTION_NAME", index: -1 },
         { name: "SECTION_NAME", index: -2 },
         { name: "SECTION_NAME", index: -10 },
-        { name: "a".repeat(256), index: 0 },
-        { name: "a".repeat(500), index: 0 },
       ];
 
       describe("from myself", async () => {
@@ -621,20 +660,35 @@ describe("Firestore Security Rules", () => {
       const validInputs = [
         { name: "UPDATED_SECTION_NAME", index: 1 },
         { name: "UPDATED_SECTION_NAME" },
+        { name: "a".repeat(255) },
         { index: 1 },
-        { name: "a".repeat(255), index: 1 },
+        { index: 10 },
       ];
       const invalidInputs = [
+        // フィールドが足りないパターン
         {},
+        // 型が正しくないパターン
+        { name: 1, index: 1 },
+        { name: false, index: 1 },
+        { name: ["UPDATED_SECTION_NAME"], index: 1 },
+        { name: { name: "UPDATED_SECTION_NAME" }, index: 1 },
+        { name: "UPDATED_SECTION_NAME", index: "1" },
+        { name: "UPDATED_SECTION_NAME", index: false },
+        { name: "UPDATED_SECTION_NAME", index: [1] },
+        { name: "UPDATED_SECTION_NAME", index: { index: 1 } },
+        // 余計なフィールドがあるパターン
         { unknownField: "VALUE" },
         { index: 1, unknownField: "VALUE" },
         { name: "UPDATED_SECTION_NAME", unknownField: "VALUE" },
-        { name: "UPDATED_SECTION_NAME", index: 0, unknownField: "VALUE" },
+        { name: "UPDATED_SECTION_NAME", index: 1, unknownField: "VALUE" },
+        // 値が無効なパターン
+        { name: "", index: 1 },
+        { name: "  ", index: 1 },
+        { name: "a".repeat(256), index: 1 },
+        { name: "a".repeat(500), index: 1 },
         { name: "UPDATED_SECTION_NAME", index: -1 },
         { name: "UPDATED_SECTION_NAME", index: -2 },
         { name: "UPDATED_SECTION_NAME", index: -10 },
-        { name: "a".repeat(256), index: 0 },
-        { name: "a".repeat(500), index: 0 },
       ];
 
       beforeEach(async () => {
