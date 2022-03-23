@@ -37,7 +37,7 @@ export const assertCreateSection = (
   sectionId: string,
   input: unknown
 ) => {
-  assert(expected, "create section", () =>
+  assert(expected, `create section with input: ${JSON.stringify(input)}`, () =>
     createSection(db, uid, projectId, sectionId, input)
   );
 };
@@ -50,7 +50,7 @@ export const assertUpdateSection = (
   sectionId: string,
   input: unknown
 ) => {
-  assert(expected, "update section", () =>
+  assert(expected, `update section with input: ${JSON.stringify(input)}`, () =>
     updateSection(db, uid, projectId, sectionId, input)
   );
 };
