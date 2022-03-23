@@ -8,6 +8,14 @@ import {
   assertUpdateProject,
   assertDeleteProject,
 } from "../helpers/projects/assertions";
+import { createSection } from "../helpers/sections/db";
+import {
+  assertListSections,
+  assertGetSection,
+  assertCreateSection,
+  assertUpdateSection,
+  assertDeleteSection,
+} from "../helpers/sections/assertions";
 import { createTasksCounterShard } from "../helpers/tasks/db";
 import {
   assertListTasksCounterShards,
@@ -229,6 +237,8 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("get", () => {
+      const dummyShardId = "0";
+
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
         assertGetTasksCounterShard(
@@ -236,7 +246,7 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          "0"
+          dummyShardId
         );
       });
 
@@ -247,7 +257,7 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          "0"
+          dummyShardId
         );
       });
 
@@ -258,7 +268,7 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          "0"
+          dummyShardId
         );
       });
     });
@@ -488,83 +498,244 @@ describe("Firestore Security Rules", () => {
 
     describe("list", () => {
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertListSections("success", db, dummyUid, dummyProjectId);
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertListSections("fail", db, dummyUid, dummyProjectId);
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertListSections("fail", db, dummyUid, dummyProjectId);
       });
     });
 
     describe("get", () => {
+      const dummySectionId = "SECTION_ID";
+
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertGetSection(
+          "success",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId
+        );
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertGetSection("fail", db, dummyUid, dummyProjectId, dummySectionId);
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertGetSection("fail", db, dummyUid, dummyProjectId, dummySectionId);
       });
     });
 
     describe("create", () => {
+      const dummySectionId = "SECTION_ID";
+      const validInputs = [
+        { name: "SECTION_NAME", index: 0 },
+        { name: "SECTION_NAME", index: 1 },
+        { name: "SECTION_NAME", index: 10 },
+        { name: "a".repeat(255), index: 0 },
+      ];
+      const invalidInputs = [
+        {},
+        { name: "SECTION_NAME" },
+        { index: 0 },
+        { unknownField: "VALUE" },
+        { index: 0, unknownField: "VALUE" },
+        { name: "SECTION_NAME", unknownField: "VALUE" },
+        { name: "SECTION_NAME", index: 0, unknownField: "VALUE" },
+        { name: "SECTION_NAME", index: -1 },
+        { name: "SECTION_NAME", index: -2 },
+        { name: "SECTION_NAME", index: -10 },
+        { name: "a".repeat(256), index: 0 },
+        { name: "a".repeat(500), index: 0 },
+      ];
+
       describe("from myself", async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+
         describe("with valid input", () => {
-          it.todo("pending");
+          for (const input of validInputs) {
+            assertCreateSection(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummySectionId,
+              input
+            );
+          }
         });
 
         describe("with invalid input", () => {
-          it.todo("pending");
+          for (const input of invalidInputs) {
+            assertCreateSection(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummySectionId,
+              input
+            );
+          }
         });
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER" });
+        assertCreateSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId,
+          validInputs[0]
+        );
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertCreateSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId,
+          validInputs[0]
+        );
       });
     });
 
     describe("update", () => {
+      const dummySectionId = "SECTION_ID";
+      const validInputs = [
+        { name: "UPDATED_SECTION_NAME", index: 1 },
+        { name: "UPDATED_SECTION_NAME" },
+        { index: 1 },
+        { name: "a".repeat(255), index: 1 },
+      ];
+      const invalidInputs = [
+        {},
+        { unknownField: "VALUE" },
+        { index: 1, unknownField: "VALUE" },
+        { name: "UPDATED_SECTION_NAME", unknownField: "VALUE" },
+        { name: "UPDATED_SECTION_NAME", index: 0, unknownField: "VALUE" },
+        { name: "UPDATED_SECTION_NAME", index: -1 },
+        { name: "UPDATED_SECTION_NAME", index: -2 },
+        { name: "UPDATED_SECTION_NAME", index: -10 },
+        { name: "a".repeat(256), index: 0 },
+        { name: "a".repeat(500), index: 0 },
+      ];
+
+      beforeEach(async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createSection(db, dummyUid, dummyProjectId, dummySectionId, {
+            name: "SECTION_NAME",
+            index: 0,
+          })
+        );
+      });
+
       describe("from myself", async () => {
+        const db = await getDb({ authenticateWith: dummyUid });
+
         describe("with valid input", () => {
-          it.todo("pending");
+          for (const input of validInputs) {
+            assertUpdateSection(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummySectionId,
+              input
+            );
+          }
         });
 
         describe("with invalid input", () => {
-          it.todo("pending");
+          for (const input of invalidInputs) {
+            assertUpdateSection(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              dummySectionId,
+              input
+            );
+          }
         });
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertUpdateSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId,
+          validInputs[0]
+        );
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertUpdateSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId,
+          validInputs[0]
+        );
       });
     });
 
     describe("delete", () => {
+      const dummySectionId = "SECTION_ID";
+
       describe("from myself", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: dummyUid });
+        assertDeleteSection(
+          "success",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId
+        );
       });
 
       describe("from another user", async () => {
-        it.todo("pending");
+        const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
+        assertDeleteSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId
+        );
       });
 
       describe("from unauthenticated user", async () => {
-        it.todo("pending");
+        const db = await getDb();
+        assertDeleteSection(
+          "fail",
+          db,
+          dummyUid,
+          dummyProjectId,
+          dummySectionId
+        );
       });
     });
   });
