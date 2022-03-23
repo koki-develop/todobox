@@ -1,6 +1,7 @@
 import { assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
 import firebase from "firebase/compat";
 import { it } from "vitest";
+import { assert, AssertResult } from "../assertions";
 import {
   listProjects,
   getProject,
@@ -9,22 +10,19 @@ import {
   deleteProject,
 } from "./db";
 
-export type AssertResult = "success" | "fail";
-
 export const assertListProjects = (
   expected: AssertResult,
   db: firebase.firestore.Firestore,
   uid: string
 ) => {
-  if (expected === "success") {
-    it("should be able to list projects", async () => {
-      await assertSucceeds(listProjects(db, uid));
-    });
-  } else {
-    it("should not be able to list projects", async () => {
-      await assertFails(listProjects(db, uid));
-    });
-  }
+  assert(
+    expected,
+    {
+      success: "should be able to list projects",
+      fail: "should not be able to list projects",
+    },
+    () => listProjects(db, uid)
+  );
 };
 
 export const assertGetProject = (
