@@ -5,17 +5,17 @@ export type AssertResult = "success" | "fail";
 
 export const assert = <T>(
   expected: AssertResult,
-  messages: { success: string; fail: string },
+  actionName: string,
   action: () => Promise<T>
 ) => {
   switch (expected) {
     case "success":
-      it(messages.success, async () => {
+      it(`should be able to ${actionName}`, async () => {
         await assertSucceeds(action());
       });
       break;
     case "fail":
-      it(messages.fail, async () => {
+      it(`should not be able to ${actionName}`, async () => {
         await assertFails(action());
       });
       break;

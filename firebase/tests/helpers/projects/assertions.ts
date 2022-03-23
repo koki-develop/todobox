@@ -1,6 +1,4 @@
-import { assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
 import firebase from "firebase/compat";
-import { it } from "vitest";
 import { assert, AssertResult } from "../assertions";
 import {
   listProjects,
@@ -15,14 +13,7 @@ export const assertListProjects = (
   db: firebase.firestore.Firestore,
   uid: string
 ) => {
-  assert(
-    expected,
-    {
-      success: "should be able to list projects",
-      fail: "should not be able to list projects",
-    },
-    () => listProjects(db, uid)
-  );
+  assert(expected, "list projects", () => listProjects(db, uid));
 };
 
 export const assertGetProject = (
@@ -31,15 +22,7 @@ export const assertGetProject = (
   uid: string,
   projectId: string
 ) => {
-  if (expected === "success") {
-    it("should be able to get project", async () => {
-      await assertSucceeds(getProject(db, uid, projectId));
-    });
-  } else {
-    it("should not be able to get project", async () => {
-      await assertFails(getProject(db, uid, projectId));
-    });
-  }
+  assert(expected, "get project", () => getProject(db, uid, projectId));
 };
 
 export const assertCreateProject = (
@@ -49,19 +32,9 @@ export const assertCreateProject = (
   projectId: string,
   input: unknown
 ) => {
-  if (expected === "success") {
-    it(`should be able to create project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertSucceeds(createProject(db, uid, projectId, input));
-    });
-  } else {
-    it(`should not be able to create project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertFails(createProject(db, uid, projectId, input));
-    });
-  }
+  assert(expected, `create project with input: ${JSON.stringify(input)}`, () =>
+    createProject(db, uid, projectId, input)
+  );
 };
 
 export const assertUpdateProject = (
@@ -71,19 +44,9 @@ export const assertUpdateProject = (
   projectId: string,
   input: unknown
 ) => {
-  if (expected === "success") {
-    it(`should be able to update project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertSucceeds(updateProject(db, uid, projectId, input));
-    });
-  } else {
-    it(`should not be able to update project with input: ${JSON.stringify(
-      input
-    )}`, async () => {
-      await assertFails(updateProject(db, uid, projectId, input));
-    });
-  }
+  assert(expected, `update project with input: ${JSON.stringify(input)}`, () =>
+    updateProject(db, uid, projectId, input)
+  );
 };
 
 export const assertDeleteProject = (
@@ -92,13 +55,5 @@ export const assertDeleteProject = (
   uid: string,
   projectId: string
 ) => {
-  if (expected === "success") {
-    it("should be able to delete project", async () => {
-      await assertSucceeds(deleteProject(db, uid, projectId));
-    });
-  } else {
-    it("should not be able to delete project", async () => {
-      await assertFails(deleteProject(db, uid, projectId));
-    });
-  }
+  assert(expected, "delete project", () => deleteProject(db, uid, projectId));
 };
