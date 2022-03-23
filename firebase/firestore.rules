@@ -147,7 +147,7 @@ service cloud.firestore {
   }
 
   function validateUpdateCounterShardInput(data) {
-    return hasKeys(data, ['count']) &&
+    return hasAnyAffectedKeys(data, ['count']) &&
       (
         // count
         data.count is int

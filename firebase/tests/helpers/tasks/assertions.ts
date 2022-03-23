@@ -39,8 +39,12 @@ export const assertCreateTasksCounterShard = (
   shardId: string,
   input: unknown
 ) => {
-  assert(expected, `create tasks counter shard with input: ${input}`, () =>
-    createTasksCounterShard(db, uid, projectId, shardId, input)
+  assert(
+    expected,
+    `create tasks counter shard with id: ${shardId}, input: ${JSON.stringify(
+      input
+    )}`,
+    () => createTasksCounterShard(db, uid, projectId, shardId, input)
   );
 };
 
@@ -52,8 +56,10 @@ export const assertUpdateTasksCounterShard = (
   shardId: string,
   input: unknown
 ) => {
-  assert(expected, `update tasks counter shard with input: ${input}`, () =>
-    updateTasksCounterShard(db, uid, projectId, shardId, input)
+  assert(
+    expected,
+    `update tasks counter shard with input: ${JSON.stringify(input)}`,
+    () => updateTasksCounterShard(db, uid, projectId, shardId, input)
   );
 };
 
