@@ -11,7 +11,7 @@ service cloud.firestore {
       data.keys().hasAll(keys);
   }
 
-  function hasAnyAffectedKeys(data, keys) {
+  function affectedKeysHasOnly(data, keys) {
     return data.diff(resource.data).affectedKeys().hasOnly(keys);
   }
 
@@ -26,7 +26,7 @@ service cloud.firestore {
   }
 
   function validateUpdateProjectInput(data) {
-    return hasAnyAffectedKeys(data, ['name']) &&
+    return affectedKeysHasOnly(data, ['name']) &&
     (
       // name
       !data.keys().hasAny(['name']) || (
@@ -52,7 +52,7 @@ service cloud.firestore {
   }
 
   function validateUpdateSectionInput(data) {
-    return hasAnyAffectedKeys(data, ['name', 'index']) &&
+    return affectedKeysHasOnly(data, ['name', 'index']) &&
     (
       // name
       !data.keys().hasAny(['name']) || (
@@ -99,7 +99,7 @@ service cloud.firestore {
   }
 
   function validateUpdateTaskInput(database, userId, projectId, data) {
-    return hasAnyAffectedKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+    return affectedKeysHasOnly(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
     (
       // sectionId
       !data.keys().hasAny(['sectionId']) || (
@@ -146,7 +146,7 @@ service cloud.firestore {
   }
 
   function validateUpdateCounterShardInput(data) {
-    return hasAnyAffectedKeys(data, ['count']) &&
+    return affectedKeysHasOnly(data, ['count']) &&
       (
         // count
         data.count is int
