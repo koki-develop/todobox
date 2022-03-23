@@ -1,12 +1,72 @@
 import firebase from "firebase/compat";
 import { assert, AssertResult } from "../assertions";
 import {
+  listTasks,
+  getTask,
+  createTask,
+  updateTask,
+  deleteTask,
   listTasksCounterShards,
   getTasksCounterShard,
   createTasksCounterShard,
   updateTasksCounterShard,
   deleteTasksCounterShard,
 } from "./db";
+
+export const assertListTasks = (
+  expected: AssertResult,
+  db: firebase.firestore.Firestore,
+  uid: string,
+  projectId: string
+) => {
+  assert(expected, "list tasks", () => listTasks(db, uid, projectId));
+};
+
+export const assertGetTask = (
+  expected: AssertResult,
+  db: firebase.firestore.Firestore,
+  uid: string,
+  projectId: string,
+  taskId: string
+) => {
+  assert(expected, "get task", () => getTask(db, uid, projectId, taskId));
+};
+
+export const assertCreateTask = (
+  expected: AssertResult,
+  db: firebase.firestore.Firestore,
+  uid: string,
+  projectId: string,
+  taskId: string,
+  input: unknown
+) => {
+  assert(expected, `create task with input: ${JSON.stringify(input)}`, () =>
+    createTask(db, uid, projectId, taskId, input)
+  );
+};
+
+export const assertUpdateTask = (
+  expected: AssertResult,
+  db: firebase.firestore.Firestore,
+  uid: string,
+  projectId: string,
+  taskId: string,
+  input: unknown
+) => {
+  assert(expected, `update task with input: ${JSON.stringify(input)}`, () =>
+    updateTask(db, uid, projectId, taskId, input)
+  );
+};
+
+export const assertDeleteTask = (
+  expected: AssertResult,
+  db: firebase.firestore.Firestore,
+  uid: string,
+  projectId: string,
+  taskId: string
+) => {
+  assert(expected, "delete task", () => deleteTask(db, uid, projectId, taskId));
+};
 
 export const assertListTasksCounterShards = (
   expected: AssertResult,
