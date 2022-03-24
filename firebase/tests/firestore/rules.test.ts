@@ -833,6 +833,17 @@ describe("Firestore Security Rules", () => {
             );
           }
         });
+
+        describe("when section does not exist", () => {
+          assertUpdateSection(
+            "fail",
+            db,
+            dummyUid,
+            dummyProjectId,
+            ulid(),
+            validInputs[0]
+          );
+        });
       });
 
       describe("from another user", async () => {
