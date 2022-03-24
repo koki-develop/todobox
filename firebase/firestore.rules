@@ -15,8 +15,13 @@ service cloud.firestore {
     return data.diff(resource.data).affectedKeys().hasOnly(keys);
   }
 
-  function validateCreateProjectInput(data) {
-    return hasKeys(data, ['name']) &&
+  function isUlid(str) {
+    return str.matches('^[0-9ABCDEFGHJKMNPQRSTVWXYZ]{26}$')
+  }
+
+  function validateCreateProjectInput(projectId, data) {
+    return isUlid(projectId) &&
+    hasKeys(data, ['name']) &&
       (
         // name
         data.name is string &&
@@ -157,7 +162,7 @@ service cloud.firestore {
     match /users/{userId} {
       match /projects/{projectId} {
         allow list, get: if loggedInWith(userId);
-        allow create: if loggedInWith(userId) && validateCreateProjectInput(request.resource.data);
+        allow create: if loggedInWith(userId) && validateCreateProjectInput(projectId, request.resource.data);
         allow update: if loggedInWith(userId) && validateUpdateProjectInput(request.resource.data);
         allow delete: if loggedInWith(userId);
 

@@ -1,5 +1,6 @@
 import { assertSucceeds } from "@firebase/rules-unit-testing";
 import { afterAll, describe, beforeEach } from "vitest";
+import { ulid } from "ulid";
 import { createProject } from "../helpers/projects/db";
 import {
   assertListProjects,
@@ -63,7 +64,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("get", () => {
-      const dummyProjectId = "PROJECT_ID";
+      const dummyProjectId = ulid();
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -89,7 +90,8 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("create", () => {
-      const dummyProjectId = "PROJECT_ID";
+      const validIds = [ulid(), ulid(), ulid()];
+      const invalidIds = ["INVALID_ID", "1", "aaa"];
       const validInputs = [
         { name: "PROJECT_NAME" },
         { name: "  PROJECT_NAME  " },
@@ -116,15 +118,27 @@ describe("Firestore Security Rules", () => {
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
 
+        describe("with valid id", async () => {
+          for (const id of validIds) {
+            assertCreateProject("success", db, dummyUid, id, validInputs[0]);
+          }
+        });
+
+        describe("with invalid id", async () => {
+          for (const id of invalidIds) {
+            assertCreateProject("fail", db, dummyUid, id, validInputs[0]);
+          }
+        });
+
         describe("with valid input", async () => {
           for (const input of validInputs) {
-            assertCreateProject("success", db, dummyUid, dummyProjectId, input);
+            assertCreateProject("success", db, dummyUid, validIds[0], input);
           }
         });
 
         describe("witn invalid input", async () => {
           for (const input of invalidInputs) {
-            assertCreateProject("fail", db, dummyUid, dummyProjectId, input);
+            assertCreateProject("fail", db, dummyUid, validIds[0], input);
           }
         });
       });
@@ -132,18 +146,18 @@ describe("Firestore Security Rules", () => {
       describe("from another user", async () => {
         const db = await getDb({ authenticateWith: "ANOTHER_USER_ID" });
         const input = validInputs[0];
-        assertCreateProject("fail", db, dummyUid, dummyProjectId, input);
+        assertCreateProject("fail", db, dummyUid, validIds[0], input);
       });
 
       describe("from unauthenticated user", async () => {
         const db = await getDb();
         const input = validInputs[0];
-        assertCreateProject("fail", db, dummyUid, dummyProjectId, input);
+        assertCreateProject("fail", db, dummyUid, validIds[0], input);
       });
     });
 
     describe("update", () => {
-      const dummyProjectId = "PROJECT_ID";
+      const dummyProjectId = ulid();
       const validInputs = [
         { name: "UPDATED_PROJECT_NAME" },
         { name: "  UPDATED_PROJECT_NAME  " },
@@ -202,7 +216,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("delete", () => {
-      const dummyProjectId = "PROJECT_ID";
+      const dummyProjectId = ulid();
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -229,7 +243,7 @@ describe("Firestore Security Rules", () => {
   });
 
   describe("task counter shards", () => {
-    const dummyProjectId = "PROJECT_ID";
+    const dummyProjectId = ulid();
 
     beforeEach(async () => {
       const db = await getDb({ authenticateWith: dummyUid });
@@ -530,7 +544,7 @@ describe("Firestore Security Rules", () => {
   });
 
   describe("sections", () => {
-    const dummyProjectId = "PROJECT_ID";
+    const dummyProjectId = ulid();
 
     beforeEach(async () => {
       const db = await getDb({ authenticateWith: dummyUid });
@@ -821,7 +835,7 @@ describe("Firestore Security Rules", () => {
   });
 
   describe("tasks", () => {
-    const dummyProjectId = "PROJECT_ID";
+    const dummyProjectId = ulid();
 
     beforeEach(async () => {
       const db = await getDb({ authenticateWith: dummyUid });

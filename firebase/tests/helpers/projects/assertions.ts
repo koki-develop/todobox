@@ -34,7 +34,7 @@ export const assertCreateProject = (
 ) => {
   assertAction(
     expected,
-    `create project with input: ${JSON.stringify(input)}`,
+    `create project with id: ${projectId}, input: ${JSON.stringify(input)}`,
     () => createProject(db, uid, projectId, input)
   );
 };
