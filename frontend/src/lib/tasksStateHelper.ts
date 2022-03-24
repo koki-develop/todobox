@@ -356,7 +356,7 @@ export class TasksStateHelper {
             ...result,
             {
               sectionId: current.sectionId,
-              completedTasks: [{ ...current, index: -1 }],
+              completedTasks: [{ ...current }],
               incompletedTasks: [],
             },
           ];
@@ -372,7 +372,7 @@ export class TasksStateHelper {
         }
       } else {
         if (current.completedAt) {
-          group.completedTasks.push({ ...current, index: -1 });
+          group.completedTasks.push({ ...current });
         } else {
           group.incompletedTasks.push(current);
         }
