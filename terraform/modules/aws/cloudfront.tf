@@ -17,9 +17,9 @@ resource "aws_cloudfront_distribution" "frontend" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
+    min_ttl                = var.stage == "prod" ? 0 : 0
+    default_ttl            = var.stage == "prod" ? 3600 : 0
+    max_ttl                = var.stage == "prod" ? 86400 : 0
     forwarded_values {
       query_string = false
       cookies {
