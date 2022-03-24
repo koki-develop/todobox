@@ -3,7 +3,7 @@ import { it } from "vitest";
 
 export type AssertResult = "success" | "fail";
 
-export const assert = <T>(
+export const assertAction = <T>(
   expected: AssertResult,
   actionName: string,
   action: () => Promise<T>

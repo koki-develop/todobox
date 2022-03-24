@@ -1,5 +1,5 @@
 import firebase from "firebase/compat";
-import { assert, AssertResult } from "../assertions";
+import { assertAction, AssertResult } from "../assertions";
 import {
   listSections,
   getSection,
@@ -14,7 +14,9 @@ export const assertListSections = (
   uid: string,
   projectId: string
 ) => {
-  assert(expected, "list sections", () => listSections(db, uid, projectId));
+  assertAction(expected, "list sections", () =>
+    listSections(db, uid, projectId)
+  );
 };
 
 export const assertGetSection = (
@@ -24,7 +26,7 @@ export const assertGetSection = (
   projectId: string,
   sectionId: string
 ) => {
-  assert(expected, "get section", () =>
+  assertAction(expected, "get section", () =>
     getSection(db, uid, projectId, sectionId)
   );
 };
@@ -37,8 +39,10 @@ export const assertCreateSection = (
   sectionId: string,
   input: unknown
 ) => {
-  assert(expected, `create section with input: ${JSON.stringify(input)}`, () =>
-    createSection(db, uid, projectId, sectionId, input)
+  assertAction(
+    expected,
+    `create section with input: ${JSON.stringify(input)}`,
+    () => createSection(db, uid, projectId, sectionId, input)
   );
 };
 
@@ -50,8 +54,10 @@ export const assertUpdateSection = (
   sectionId: string,
   input: unknown
 ) => {
-  assert(expected, `update section with input: ${JSON.stringify(input)}`, () =>
-    updateSection(db, uid, projectId, sectionId, input)
+  assertAction(
+    expected,
+    `update section with input: ${JSON.stringify(input)}`,
+    () => updateSection(db, uid, projectId, sectionId, input)
   );
 };
 
@@ -62,7 +68,7 @@ export const assertDeleteSection = (
   projectId: string,
   sectionId: string
 ) => {
-  assert(expected, "delete section", () =>
+  assertAction(expected, "delete section", () =>
     deleteSection(db, uid, projectId, sectionId)
   );
 };

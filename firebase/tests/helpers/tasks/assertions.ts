@@ -1,5 +1,5 @@
 import firebase from "firebase/compat";
-import { assert, AssertResult } from "../assertions";
+import { assertAction, AssertResult } from "../assertions";
 import {
   listTasks,
   getTask,
@@ -19,7 +19,7 @@ export const assertListTasks = (
   uid: string,
   projectId: string
 ) => {
-  assert(expected, "list tasks", () => listTasks(db, uid, projectId));
+  assertAction(expected, "list tasks", () => listTasks(db, uid, projectId));
 };
 
 export const assertGetTask = (
@@ -29,7 +29,7 @@ export const assertGetTask = (
   projectId: string,
   taskId: string
 ) => {
-  assert(expected, "get task", () => getTask(db, uid, projectId, taskId));
+  assertAction(expected, "get task", () => getTask(db, uid, projectId, taskId));
 };
 
 export const assertCreateTask = (
@@ -40,8 +40,10 @@ export const assertCreateTask = (
   taskId: string,
   input: unknown
 ) => {
-  assert(expected, `create task with input: ${JSON.stringify(input)}`, () =>
-    createTask(db, uid, projectId, taskId, input)
+  assertAction(
+    expected,
+    `create task with input: ${JSON.stringify(input)}`,
+    () => createTask(db, uid, projectId, taskId, input)
   );
 };
 
@@ -53,8 +55,10 @@ export const assertUpdateTask = (
   taskId: string,
   input: unknown
 ) => {
-  assert(expected, `update task with input: ${JSON.stringify(input)}`, () =>
-    updateTask(db, uid, projectId, taskId, input)
+  assertAction(
+    expected,
+    `update task with input: ${JSON.stringify(input)}`,
+    () => updateTask(db, uid, projectId, taskId, input)
   );
 };
 
@@ -65,7 +69,9 @@ export const assertDeleteTask = (
   projectId: string,
   taskId: string
 ) => {
-  assert(expected, "delete task", () => deleteTask(db, uid, projectId, taskId));
+  assertAction(expected, "delete task", () =>
+    deleteTask(db, uid, projectId, taskId)
+  );
 };
 
 export const assertListTasksCounterShards = (
@@ -74,7 +80,7 @@ export const assertListTasksCounterShards = (
   uid: string,
   projectId: string
 ) => {
-  assert(expected, "list tasks counter shards", () =>
+  assertAction(expected, "list tasks counter shards", () =>
     listTasksCounterShards(db, uid, projectId)
   );
 };
@@ -86,7 +92,7 @@ export const assertGetTasksCounterShard = (
   projectId: string,
   shardId: string
 ) => {
-  assert(expected, "get tasks counter shard", () =>
+  assertAction(expected, "get tasks counter shard", () =>
     getTasksCounterShard(db, uid, projectId, shardId)
   );
 };
@@ -99,7 +105,7 @@ export const assertCreateTasksCounterShard = (
   shardId: string,
   input: unknown
 ) => {
-  assert(
+  assertAction(
     expected,
     `create tasks counter shard with id: ${shardId}, input: ${JSON.stringify(
       input
@@ -116,7 +122,7 @@ export const assertUpdateTasksCounterShard = (
   shardId: string,
   input: unknown
 ) => {
-  assert(
+  assertAction(
     expected,
     `update tasks counter shard with input: ${JSON.stringify(input)}`,
     () => updateTasksCounterShard(db, uid, projectId, shardId, input)
@@ -130,7 +136,7 @@ export const assertDeleteTasksCounterShard = (
   projectId: string,
   shardId: string
 ) => {
-  assert(expected, "delete tasks counter shard", () =>
+  assertAction(expected, "delete tasks counter shard", () =>
     deleteTasksCounterShard(db, uid, projectId, shardId)
   );
 };
