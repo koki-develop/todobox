@@ -484,6 +484,17 @@ describe("Firestore Security Rules", () => {
             );
           }
         });
+
+        describe("when shard does not exist", () => {
+          assertUpdateTasksCounterShard(
+            "fail",
+            db,
+            dummyUid,
+            dummyProjectId,
+            "9",
+            validInputs[0]
+          );
+        });
       });
 
       describe("from another user", async () => {
