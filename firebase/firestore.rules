@@ -45,8 +45,9 @@ service cloud.firestore {
     );
   }
 
-  function validateCreateSectionInput(sectionId, data) {
-    return isUlid(sectionId) &&
+  function validateCreateSectionInput(database, userId, projectId, sectionId, data) {
+    return projectExists(database, userId, projectId) &&
+      isUlid(sectionId) &&
       hasKeys(data, ['name', 'index']) &&
       (
         // name
@@ -180,7 +181,7 @@ service cloud.firestore {
 
         match /sections/{sectionId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && validateCreateSectionInput(sectionId, request.resource.data);
+          allow create: if loggedInWith(userId) && validateCreateSectionInput(database, userId, projectId, sectionId, request.resource.data);
           allow update: if loggedInWith(userId) && validateUpdateSectionInput(request.resource.data);
           allow delete: if loggedInWith(userId);
         }

@@ -723,6 +723,17 @@ describe("Firestore Security Rules", () => {
             );
           }
         });
+
+        describe("when project does not exist", () => {
+          assertCreateSection(
+            "fail",
+            db,
+            dummyUid,
+            ulid(),
+            validIds[0],
+            validInputs[0]
+          );
+        });
       });
 
       describe("from another user", async () => {
