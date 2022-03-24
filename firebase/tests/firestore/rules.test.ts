@@ -597,7 +597,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("get", () => {
-      const dummySectionId = "SECTION_ID";
+      const dummySectionId = ulid();
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -632,7 +632,8 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("create", () => {
-      const dummySectionId = "SECTION_ID";
+      const validIds = [ulid()];
+      const invalidIds = ["INVALID_ID", "aaa", "0"];
       const validInputs = [
         { name: "SECTION_NAME", index: 0 },
         { name: "SECTION_NAME", index: 1 },
@@ -678,7 +679,7 @@ describe("Firestore Security Rules", () => {
               db,
               dummyUid,
               dummyProjectId,
-              dummySectionId,
+              validIds[0],
               input
             );
           }
@@ -691,8 +692,34 @@ describe("Firestore Security Rules", () => {
               db,
               dummyUid,
               dummyProjectId,
-              dummySectionId,
+              validIds[0],
               input
+            );
+          }
+        });
+
+        describe("with valid id", () => {
+          for (const id of validIds) {
+            assertCreateSection(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              id,
+              validInputs[0]
+            );
+          }
+        });
+
+        describe("with invalid id", () => {
+          for (const id of invalidIds) {
+            assertCreateSection(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              id,
+              validInputs[0]
             );
           }
         });
@@ -705,7 +732,7 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          dummySectionId,
+          validIds[0],
           validInputs[0]
         );
       });
@@ -717,14 +744,14 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          dummySectionId,
+          validIds[0],
           validInputs[0]
         );
       });
     });
 
     describe("update", () => {
-      const dummySectionId = "SECTION_ID";
+      const dummySectionId = ulid();
       const validInputs = [
         { name: "UPDATED_SECTION_NAME", index: 1 },
         { name: "UPDATED_SECTION_NAME" },
@@ -823,7 +850,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("delete", () => {
-      const dummySectionId = "SECTION_ID";
+      const dummySectionId = ulid();
 
       describe("from myself", async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -921,7 +948,7 @@ describe("Firestore Security Rules", () => {
 
     describe("create", () => {
       const dummyTaskId = "TASK_ID";
-      const dummySectionId = "SECTION_ID";
+      const dummySectionId = ulid();
       // TODO: テストケース追加
       const validInputBase = {
         title: "TASK_TITLE",
