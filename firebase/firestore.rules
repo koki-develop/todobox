@@ -23,6 +23,10 @@ service cloud.firestore {
     return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId))
   }
 
+  function sectionExists(database, userId, projectId, sectionId) {
+    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(sectionId))
+  }
+
   function validateCreateProjectInput(projectId, data) {
     return isUlid(projectId) &&
     hasKeys(data, ['name']) &&
@@ -87,7 +91,7 @@ service cloud.firestore {
       // sectionId
       data.sectionId == null || (
         data.sectionId is string &&
-        exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(data.sectionId))
+        sectionExists(database, userId, projectId, data.sectionId)
       )
     ) &&
     (
@@ -118,7 +122,7 @@ service cloud.firestore {
       !data.keys().hasAny(['sectionId']) || (
       data.sectionId == null || (
         data.sectionId is string &&
-        exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(data.sectionId))
+        sectionExists(database, userId, projectId, data.sectionId)
       ))
     ) &&
     (
