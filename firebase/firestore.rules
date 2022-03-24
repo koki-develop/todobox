@@ -140,8 +140,9 @@ service cloud.firestore {
     );
   }
 
-  function validateCreateCounterShardInput(id, data) {
-    return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].hasAny([id]) &&
+  function validateCreateCounterShardInput(database, userId, projectId, shardId, data) {
+    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)) &&
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].hasAny([shardId]) &&
       hasKeys(data, ['count']) &&
       (
         // count
@@ -168,7 +169,7 @@ service cloud.firestore {
 
         match /counters/tasks/shards/{shardId} {
           allow list, get: if loggedInWith(userId)
-          allow create: if loggedInWith(userId) && validateCreateCounterShardInput(shardId, request.resource.data);
+          allow create: if loggedInWith(userId) && validateCreateCounterShardInput(database, userId, projectId, shardId, request.resource.data);
           allow update: if loggedInWith(userId) && validateUpdateCounterShardInput(request.resource.data);
         }
 

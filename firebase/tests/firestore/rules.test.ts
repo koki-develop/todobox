@@ -395,6 +395,17 @@ describe("Firestore Security Rules", () => {
             );
           }
         });
+
+        describe("when project does not exists", () => {
+          assertCreateTasksCounterShard(
+            "fail",
+            db,
+            dummyUid,
+            ulid(),
+            validIds[0],
+            validInputs[0]
+          );
+        });
       });
 
       describe("from another user", async () => {
