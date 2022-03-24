@@ -200,6 +200,10 @@ describe("Firestore Security Rules", () => {
             assertUpdateProject("fail", db, dummyUid, dummyProjectId, input);
           }
         });
+
+        describe("when project does not exists", () => {
+          assertUpdateProject("fail", db, dummyUid, ulid(), validInputs[0]);
+        });
       });
 
       describe("from another user", async () => {
