@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "frontend" {
       for_each = var.stage != "prod" ? [1] : []
       content {
         event_type   = "viewer-request"
-        function_arn = aws_cloudfront_function.basicauth.arn
+        function_arn = aws_cloudfront_function.basicauth[0].arn
       }
     }
   }
@@ -59,6 +59,8 @@ resource "aws_cloudfront_distribution" "frontend" {
 resource "aws_cloudfront_origin_access_identity" "frontend" {}
 
 resource "aws_cloudfront_function" "basicauth" {
+  count = var.stage == "prod" ? 0 : 1
+
   name    = "${local.prefix}-basicauth"
   runtime = "cloudfront-js-1.0"
   publish = true

@@ -24,6 +24,11 @@ const ProjectDeleteConfirmModal: React.VFC<ProjectDeleteConfirmModalProps> =
 
     const [deleting, setDeleting] = useState<boolean>(false);
 
+    const handleClose = useCallback(() => {
+      if (deleting) return;
+      onCancel();
+    }, [deleting, onCancel]);
+
     const handleDelete = useCallback(() => {
       setDeleting(true);
       deleteProject(project.id)
@@ -36,7 +41,7 @@ const ProjectDeleteConfirmModal: React.VFC<ProjectDeleteConfirmModalProps> =
     }, [deleteProject, onDeleted, project.id]);
 
     return (
-      <ModalCard open={open} onClose={onCancel}>
+      <ModalCard open={open} onClose={handleClose}>
         <ModalCardHeader
           title={`プロジェクト「${project.name}」を削除しますか？`}
         />
