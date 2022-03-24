@@ -2,28 +2,45 @@ import GoogleIcon from "@mui/icons-material/Google";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import Field from "@/components/utils/Field";
+import LoadableButton from "@/components/utils/LoadableButton";
 import { useCurrentUser } from "@/hooks/userHooks";
 
 const LoginPage: React.VFC = React.memo(() => {
-  const { loginWithGoogle, loginAnonymously } = useCurrentUser();
+  const [loggingInWithGoogle, setLoggingInWithGoogle] =
+    useState<boolean>(false);
+  const [loggingInAnonymously, setLoggingInAnonymously] =
+    useState<boolean>(false);
 
+  const loggingIn = useMemo(
+    () => loggingInWithGoogle || loggingInAnonymously,
+    [loggingInAnonymously, loggingInWithGoogle]
+  );
+
+  const { loginWithGoogle, loginAnonymously } = useCurrentUser();
   const theme = useTheme();
 
   const handleClickLoginWithGoogle = useCallback(async () => {
-    await loginWithGoogle();
+    setLoggingInWithGoogle(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await loginWithGoogle().finally(() => {
+      setLoggingInWithGoogle(false);
+    });
   }, [loginWithGoogle]);
 
   const handleClickLoginAnonymously = useCallback(async () => {
-    await loginAnonymously();
+    setLoggingInAnonymously(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await loginAnonymously().finally(() => {
+      setLoggingInAnonymously(false);
+    });
   }, [loginAnonymously]);
 
   return (
@@ -55,25 +72,29 @@ const LoginPage: React.VFC = React.memo(() => {
           </Field>
 
           <Field>
-            <Button
+            <LoadableButton
               fullWidth
+              loading={loggingInWithGoogle}
+              disabled={loggingIn}
               color="google"
               startIcon={<GoogleIcon />}
               variant="contained"
               onClick={handleClickLoginWithGoogle}
             >
               Google アカウントでログイン
-            </Button>
+            </LoadableButton>
           </Field>
 
           <Field>
-            <Button
+            <LoadableButton
               fullWidth
+              loading={loggingInAnonymously}
+              disabled={loggingIn}
               variant="contained"
               onClick={handleClickLoginAnonymously}
             >
               ゲストログイン
-            </Button>
+            </LoadableButton>
           </Field>
         </Paper>
       </Box>
