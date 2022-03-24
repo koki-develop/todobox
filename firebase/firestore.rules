@@ -79,8 +79,10 @@ service cloud.firestore {
     );
   }
 
-  function validateCreateTaskInput(database, userId, projectId, data) {
-    return hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+  function validateCreateTaskInput(database, userId, projectId, taskId, data) {
+    return isUlid(taskId) &&
+    projectExists(database, userId, projectId) &&
+    hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
     (
       // sectionId
       data.sectionId == null || (
@@ -188,7 +190,7 @@ service cloud.firestore {
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && validateCreateTaskInput(database, userId, projectId, request.resource.data)
+          allow create: if loggedInWith(userId) && validateCreateTaskInput(database, userId, projectId, taskId, request.resource.data)
           allow update: if loggedInWith(userId) && validateUpdateTaskInput(database, userId, projectId, request.resource.data)
           allow delete: if loggedInWith(userId);
         }

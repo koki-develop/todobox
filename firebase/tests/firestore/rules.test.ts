@@ -1,5 +1,5 @@
 import { assertSucceeds } from "@firebase/rules-unit-testing";
-import { afterAll, describe, beforeEach } from "vitest";
+import { afterAll, describe, beforeEach, it } from "vitest";
 import { ulid } from "ulid";
 import { createProject } from "../helpers/projects/db";
 import {
@@ -937,7 +937,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("get", () => {
-      const dummyTaskId = "TASK_ID";
+      const dummyTaskId = ulid();
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
@@ -969,9 +969,9 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("create", () => {
-      const dummyTaskId = "TASK_ID";
       const dummySectionId = ulid();
-      // TODO: テストケース追加
+      const validIds = [ulid()];
+      const invalidIds = ["INVALID_ID", "aaa", "0"];
       const validInputBase = {
         title: "TASK_TITLE",
         sectionId: null,
@@ -1022,6 +1022,8 @@ describe("Firestore Security Rules", () => {
         { ...validInputBase, title: "a".repeat(500) },
         { ...validInputBase, description: "a".repeat(1001) },
         { ...validInputBase, completedAt: new Date() },
+        // 親リソースが存在しないパターン
+        { ...validInputBase, sectionId: ulid() },
       ];
 
       beforeEach(async () => {
@@ -1044,7 +1046,7 @@ describe("Firestore Security Rules", () => {
               db,
               dummyUid,
               dummyProjectId,
-              dummyTaskId,
+              validIds[0],
               input
             );
           }
@@ -1057,10 +1059,47 @@ describe("Firestore Security Rules", () => {
               db,
               dummyUid,
               dummyProjectId,
-              dummyTaskId,
+              validIds[0],
               input
             );
           }
+        });
+
+        describe("with valid id", () => {
+          for (const id of validIds) {
+            assertCreateTask(
+              "success",
+              db,
+              dummyUid,
+              dummyProjectId,
+              id,
+              validInputs[0]
+            );
+          }
+        });
+
+        describe("with invalid id", () => {
+          for (const id of invalidIds) {
+            assertCreateTask(
+              "fail",
+              db,
+              dummyUid,
+              dummyProjectId,
+              id,
+              validInputs[0]
+            );
+          }
+        });
+
+        describe("when project does not exist", () => {
+          assertCreateTask(
+            "fail",
+            db,
+            dummyUid,
+            ulid(),
+            validIds[0],
+            validInputs[0]
+          );
         });
       });
 
@@ -1071,7 +1110,7 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          dummyTaskId,
+          validIds[0],
           validInputs[0]
         );
       });
@@ -1083,14 +1122,14 @@ describe("Firestore Security Rules", () => {
           db,
           dummyUid,
           dummyProjectId,
-          dummyTaskId,
+          validIds[0],
           validInputs[0]
         );
       });
     });
 
     describe("update", () => {
-      const dummyTaskId = "TASK_ID";
+      const dummyTaskId = ulid();
       // TODO: テストケース追加
       const validInputs = [{ title: "UPDATED_TASK" }];
       const invalidInputs = [{ title: 1 }];
@@ -1164,7 +1203,7 @@ describe("Firestore Security Rules", () => {
     });
 
     describe("delete", () => {
-      const dummyTaskId = "TASK_ID";
+      const dummyTaskId = ulid();
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
