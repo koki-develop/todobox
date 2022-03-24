@@ -68,11 +68,16 @@ export class TasksRepository {
     callback: (count: number) => void
   ): Unsubscribe {
     const ref = this._getCounterShardsRef(userId, projectId);
-    return onSnapshot(ref, (snapshot) => {
-      const count = snapshot.docs.reduce<number>((result, current) => {
-        return result + current.data().count;
-      }, 0);
-      callback(count);
+    return onSnapshot(ref, async (snapshot) => {
+      if (snapshot.empty) {
+        await this.initializeCounter(userId, projectId);
+        callback(0);
+      } else {
+        const count = snapshot.docs.reduce<number>((result, current) => {
+          return result + current.data().count;
+        }, 0);
+        callback(count);
+      }
     });
   }
 
@@ -146,6 +151,15 @@ export class TasksRepository {
     for (const taskId of taskIds) {
       this.deleteBatch(batch, userId, projectId, taskId);
     }
+  }
+
+  public static async initializeCounter(
+    userId: string,
+    projectId: string
+  ): Promise<void> {
+    const batch = writeBatch(firestore);
+    this.initializeCounterBatch(batch, userId, projectId);
+    await batch.commit();
   }
 
   // 参考: https://cloud.google.com/firestore/docs/solutions/counters

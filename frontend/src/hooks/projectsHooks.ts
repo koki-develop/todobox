@@ -1,4 +1,3 @@
-import { writeBatch } from "firebase/firestore";
 import { useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -12,10 +11,8 @@ import {
   Project,
   UpdateProjectInput,
 } from "@/models/project";
-import { firestore } from "@/lib/firebase";
 import { ProjectsRepository } from "@/lib/projectsRepository";
 import { ProjectsStateHelper } from "@/lib/projectsStateHelper";
-import { TasksRepository } from "@/lib/tasksRepository";
 import { useToast } from "@/hooks/useToast";
 import { useCurrentUser } from "@/hooks/userHooks";
 
@@ -33,14 +30,7 @@ export const useProjects = () => {
       if (!currentUser) return;
 
       const project = ProjectsRepository.build(input);
-      const batch = writeBatch(firestore);
-      ProjectsRepository.createBatch(batch, currentUser.uid, project);
-      TasksRepository.initializeCounterBatch(
-        batch,
-        currentUser.uid,
-        project.id
-      );
-      await batch.commit();
+      await ProjectsRepository.create(currentUser.uid, project);
 
       setProjects((prev) => ProjectsStateHelper.create(prev, project));
       showToast("プロジェクトを作成しました。", "success");
