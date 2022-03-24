@@ -22,6 +22,11 @@ const UserDeleteConfirmModal: React.VFC<UserDeleteConfirmModalProps> =
 
     const [deleting, setDeleting] = useState<boolean>(false);
 
+    const handleClose = useCallback(() => {
+      if (deleting) return;
+      onCancel();
+    }, [deleting, onCancel]);
+
     const handleDelete = useCallback(() => {
       setDeleting(true);
       deleteAccount()
@@ -35,7 +40,7 @@ const UserDeleteConfirmModal: React.VFC<UserDeleteConfirmModalProps> =
     }, [deleteAccount, onDeleted]);
 
     return (
-      <ModalCard open={open} onClose={onCancel}>
+      <ModalCard open={open} onClose={handleClose}>
         <ModalCardHeader title="アカウントを削除しますか？" />
         <CardContent>
           アカウントとそれに紐づく全てのデータを完全に削除します。この操作は取り消せません。
