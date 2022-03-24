@@ -19,6 +19,10 @@ service cloud.firestore {
     return str.matches('^[0-9ABCDEFGHJKMNPQRSTVWXYZ]{26}$')
   }
 
+  function projectExists(database, userId, projectId) {
+    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId))
+  }
+
   function validateCreateProjectInput(projectId, data) {
     return isUlid(projectId) &&
     hasKeys(data, ['name']) &&
@@ -141,7 +145,7 @@ service cloud.firestore {
   }
 
   function validateCreateCounterShardInput(database, userId, projectId, shardId, data) {
-    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)) &&
+    return projectExists(database, userId, projectId) &&
       ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].hasAny([shardId]) &&
       hasKeys(data, ['count']) &&
       (
