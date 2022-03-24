@@ -3,6 +3,7 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -14,6 +15,7 @@ import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
+import MuiLink from "@mui/material/Link";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -211,50 +213,74 @@ const ProjectLayout: React.VFC = React.memo(() => {
             </Box>
           </Box>
           <Divider />
-          <List disablePadding sx={{ width: drawerWidth }}>
-            <Link to="/projects" sx={{ color: theme.palette.text.primary }}>
-              <ListItemButton selected={location.pathname === "/projects"}>
-                <ListItemIcon>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="ホーム" />
-              </ListItemButton>
-            </Link>
-            <Divider />
-            <ListItemButton onClick={handleToggleDrawerProjectList}>
-              <ListItemIcon>
-                <AccountTreeIcon />
-              </ListItemIcon>
-              <ListItemText primary="プロジェクト" />
-              {openDrawerProjectList ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </ListItemButton>
-          </List>
-          <Divider />
           <Box
             sx={{
-              display: openDrawerProjectList ? undefined : "none",
+              display: "flex",
+              flexDirection: "column",
               flexGrow: 1,
               overflowY: "auto",
-              width: drawerWidth,
             }}
           >
-            <List dense disablePadding>
-              {projects.map((project) => (
-                <React.Fragment key={project.id}>
-                  <Link
-                    to={`/projects/${project.id}`}
-                    sx={{ color: theme.palette.text.primary }}
-                  >
-                    <ListItemButton
-                      selected={project.id === selectedProject?.id}
-                    >
-                      <ListItemText primary={project.name} />
-                    </ListItemButton>
-                  </Link>
-                  <Divider />
-                </React.Fragment>
-              ))}
+            <List disablePadding sx={{ width: drawerWidth }}>
+              <Link to="/projects" sx={{ color: theme.palette.text.primary }}>
+                <ListItemButton selected={location.pathname === "/projects"}>
+                  <ListItemIcon>
+                    <HomeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="ホーム" />
+                </ListItemButton>
+              </Link>
+              <Divider />
+              <ListItemButton onClick={handleToggleDrawerProjectList}>
+                <ListItemIcon>
+                  <AccountTreeIcon />
+                </ListItemIcon>
+                <ListItemText primary="プロジェクト" />
+                {openDrawerProjectList ? (
+                  <ExpandLessIcon />
+                ) : (
+                  <ExpandMoreIcon />
+                )}
+              </ListItemButton>
             </List>
+            <Divider />
+            <Box
+              sx={{
+                display: openDrawerProjectList ? undefined : "none",
+                flexGrow: 1,
+                overflowY: "auto",
+                width: drawerWidth,
+              }}
+            >
+              <List dense disablePadding>
+                {projects.map((project) => (
+                  <React.Fragment key={project.id}>
+                    <Link
+                      to={`/projects/${project.id}`}
+                      sx={{ color: theme.palette.text.primary }}
+                    >
+                      <ListItemButton
+                        selected={project.id === selectedProject?.id}
+                      >
+                        <ListItemText primary={project.name} />
+                      </ListItemButton>
+                    </Link>
+                    <Divider />
+                  </React.Fragment>
+                ))}
+              </List>
+            </Box>
+          </Box>
+          <Divider />
+          <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+            <MuiLink
+              target="_blank"
+              rel="noreferrer noopener"
+              href="https://github.com/koki-develop/todo-box"
+              sx={{ color: theme.palette.text.primary }}
+            >
+              <GitHubIcon fontSize="large" />
+            </MuiLink>
           </Box>
         </Drawer>
       )}
