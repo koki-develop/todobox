@@ -32,7 +32,7 @@ import {
 } from "../helpers/tasks/assertions";
 import { clearDb, getDb } from "../helpers/db";
 import { cleanupTestEnvironment } from "../helpers/firebase";
-import { deleteKeys } from "../helpers/utils";
+import { pickKeys, deleteKeys } from "../helpers/utils";
 
 beforeEach(async () => {
   await clearDb();
@@ -981,6 +981,8 @@ describe("Firestore Security Rules", () => {
       };
       const validInputs = [
         { ...validInputBase },
+        { ...validInputBase, title: "a".repeat(255) },
+        { ...validInputBase, description: "a".repeat(1000) },
         { ...validInputBase, sectionId: dummySectionId },
         { ...validInputBase, index: 1 },
         { ...validInputBase, index: 10 },
@@ -1130,12 +1132,75 @@ describe("Firestore Security Rules", () => {
 
     describe("update", () => {
       const dummyTaskId = ulid();
-      // TODO: テストケース追加
-      const validInputs = [{ title: "UPDATED_TASK" }];
-      const invalidInputs = [{ title: 1 }];
+      const dummySectionId = ulid();
+      const validInputBase = {
+        title: "UPDATED_TASK_TITLE",
+        sectionId: dummySectionId,
+        description: "UPDATED_TASK_DESCRIPTION",
+        index: 1,
+        completedAt: new Date(),
+      };
+      const validInputs = [
+        { ...validInputBase },
+        pickKeys(validInputBase, "title"),
+        pickKeys(validInputBase, "sectionId"),
+        pickKeys(validInputBase, "description"),
+        pickKeys(validInputBase, "index"),
+        pickKeys(validInputBase, "completedAt"),
+        deleteKeys(validInputBase, "title"),
+        deleteKeys(validInputBase, "sectionId"),
+        deleteKeys(validInputBase, "description"),
+        deleteKeys(validInputBase, "index"),
+        deleteKeys(validInputBase, "completedAt"),
+      ];
+      const invalidInputs = [
+        // 型が正しくないパターン
+        { ...validInputBase, title: 1 },
+        { ...validInputBase, title: false },
+        { ...validInputBase, title: ["UPDATED_TASK_TITLE"] },
+        { ...validInputBase, title: { title: "UPDATED_TASK_TITLE" } },
+        { ...validInputBase, title: new Date() },
+        { ...validInputBase, sectionId: 1 },
+        { ...validInputBase, sectionId: false },
+        { ...validInputBase, sectionId: [dummySectionId] },
+        { ...validInputBase, sectionId: { sectionId: dummySectionId } },
+        { ...validInputBase, sectionId: new Date() },
+        { ...validInputBase, description: 1 },
+        { ...validInputBase, description: false },
+        { ...validInputBase, description: ["UPDATED_TASK_DESCRIPTION"] },
+        {
+          ...validInputBase,
+          description: { description: "UPDATED_TASK_DESCRIPTION" },
+        },
+        { ...validInputBase, description: new Date() },
+        { ...validInputBase, index: "0" },
+        { ...validInputBase, index: false },
+        { ...validInputBase, index: [1] },
+        { ...validInputBase, index: { index: 1 } },
+        { ...validInputBase, index: new Date() },
+        { ...validInputBase, completedAt: "COMPLETED_AT" },
+        { ...validInputBase, completedAt: 0 },
+        { ...validInputBase, completedAt: false },
+        { ...validInputBase, completedAt: [new Date()] },
+        { ...validInputBase, completedAt: { completedAt: new Date() } },
+        // 値が無効なパターン
+        { ...validInputBase, title: "a".repeat(256) },
+        { ...validInputBase, title: "a".repeat(500) },
+        { ...validInputBase, description: "a".repeat(1001) },
+        { ...validInputBase, index: -1 },
+        { ...validInputBase, index: -10 },
+        // 親リソースが存在しないパターン
+        { ...validInputBase, sectionId: ulid() },
+      ];
 
       beforeEach(async () => {
         const db = await getDb({ authenticateWith: dummyUid });
+        await assertSucceeds(
+          createSection(db, dummyUid, dummyProjectId, dummySectionId, {
+            name: "SECTION_NAME",
+            index: 0,
+          })
+        );
         await assertSucceeds(
           createTask(db, dummyUid, dummyProjectId, dummyTaskId, {
             title: "TASK_TITLE",
