@@ -1175,6 +1175,17 @@ describe("Firestore Security Rules", () => {
             );
           }
         });
+
+        describe("when task does not exist", () => {
+          assertUpdateTask(
+            "fail",
+            db,
+            dummyUid,
+            dummyProjectId,
+            ulid(),
+            validInputs[0]
+          );
+        });
       });
 
       describe("from another user", async () => {
