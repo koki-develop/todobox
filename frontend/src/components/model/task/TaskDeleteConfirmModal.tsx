@@ -33,6 +33,11 @@ const TaskDeleteConfirmModal: React.VFC<TaskDeleteConfirmModalProps> =
       );
     }, [selectedTasks, task.id]);
 
+    const handleClose = useCallback(() => {
+      if (deleting) return;
+      onCancel();
+    }, [deleting, onCancel]);
+
     const handleDelete = useCallback(() => {
       setDeleting(true);
       (async () => {
@@ -67,7 +72,7 @@ const TaskDeleteConfirmModal: React.VFC<TaskDeleteConfirmModalProps> =
     ]);
 
     return (
-      <ModalCard open={open} onClose={onCancel}>
+      <ModalCard open={open} onClose={handleClose}>
         <ModalCardHeader
           title={
             deleteOne

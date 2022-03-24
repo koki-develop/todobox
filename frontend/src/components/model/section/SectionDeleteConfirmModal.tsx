@@ -40,6 +40,11 @@ const SectionDeleteConfirmModal: React.VFC<SectionDeleteConfirmModalProps> =
       }
     }, [section.name, tasks.length]);
 
+    const handleClose = useCallback(() => {
+      if (deleting) return;
+      onCancel();
+    }, [deleting, onCancel]);
+
     const handleDelete = useCallback(() => {
       setDeleting(true);
       deleteSection(projectId, section.id)
@@ -52,7 +57,7 @@ const SectionDeleteConfirmModal: React.VFC<SectionDeleteConfirmModalProps> =
     }, [deleteSection, onDeleted, projectId, section.id]);
 
     return (
-      <ModalCard open={open} onClose={onCancel}>
+      <ModalCard open={open} onClose={handleClose}>
         <ModalCardHeader title={message} />
         <CardContent>この操作は取り消せません。</CardContent>
         <ModalCardActions>
