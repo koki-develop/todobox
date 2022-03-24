@@ -201,7 +201,7 @@ describe("Firestore Security Rules", () => {
           }
         });
 
-        describe("when project does not exists", () => {
+        describe("when project does not exist", () => {
           assertUpdateProject("fail", db, dummyUid, ulid(), validInputs[0]);
         });
       });
@@ -396,7 +396,7 @@ describe("Firestore Security Rules", () => {
           }
         });
 
-        describe("when project does not exists", () => {
+        describe("when project does not exist", () => {
           assertCreateTasksCounterShard(
             "fail",
             db,
