@@ -8,11 +8,13 @@ import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useTheme } from "@mui/material/styles";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "@/components/utils/Link";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
 import { Project } from "@/models/project";
+import { TasksRepository } from "@/lib/tasksRepository";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 export type ProjectCardProps = {
   project: Project;
@@ -24,10 +26,15 @@ export type ProjectCardProps = {
 const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
   const { project, onEdit, onDelete } = props;
 
+  const { currentUser } = useCurrentUser();
+
   const theme = useTheme();
 
   const menuButtonEl = useRef<HTMLButtonElement | null>(null);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
+  const [tasksCount, setTasksCount] = useState<number>(0);
+  const [tasksCountInitialized, setTasksCountInitialized] =
+    useState<boolean>(false);
 
   const handleOpenMenu = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -50,6 +57,23 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
     setOpenMenu(false);
     onDelete(project);
   }, [onDelete, project]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const unsubscribe = TasksRepository.listenCount(
+      currentUser.uid,
+      project.id,
+      (count) => {
+        setTasksCount(count);
+        setTasksCountInitialized(true);
+      }
+    );
+    return () => {
+      unsubscribe();
+      setTasksCountInitialized(false);
+      setTasksCount(0);
+    };
+  }, [currentUser, project.id]);
 
   return (
     <>
@@ -75,8 +99,9 @@ const ProjectCard: React.VFC<ProjectCardProps> = React.memo((props) => {
                   whiteSpace: "nowrap",
                 },
               }}
-              // FIXME: 仮実装
-              subheader="12件のタスク"
+              subheader={
+                tasksCountInitialized ? `${tasksCount}件のタスク` : "読込中"
+              }
               sx={{
                 "& .MuiCardHeader-content": {
                   overflow: "hidden",

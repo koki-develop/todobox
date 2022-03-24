@@ -15,12 +15,13 @@ const TaskDraggableListItem: React.VFC<TaskDraggableListItemProps> = React.memo(
         draggableId={taskListItemProps.task.id}
         index={taskListItemProps.task.index}
       >
-        {(provided) => (
+        {(provided, snapshot) => (
           <TaskListItem
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             {...taskListItemProps}
+            dragging={snapshot.isDragging}
           />
         )}
       </Draggable>

@@ -1,36 +1,201 @@
+// TODO: リファクタ
 rules_version = '2';
 service cloud.firestore {
   function loggedInWith(userId) {
-    return request.auth != null && request.auth.uid == userId
+    return request.auth != null &&
+      request.auth.uid == userId;
   }
 
-  function createOnly(resource, keys) {
-    return resource.data.keys().hasOnly(keys) && resource.data.keys().hasAll(keys);
+  function hasKeys(data, keys) {
+    return data.keys().hasOnly(keys) &&
+      data.keys().hasAll(keys);
   }
 
-  function updateOnly(resource, keys) {
-    return resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+  function affectedKeysHasOnly(data, keys) {
+    return data.diff(resource.data).affectedKeys().hasOnly(keys);
+  }
+
+  function isUlid(str) {
+    return str.matches('^[0-9ABCDEFGHJKMNPQRSTVWXYZ]{26}$')
+  }
+
+  function projectExists(database, userId, projectId) {
+    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId))
+  }
+
+  function sectionExists(database, userId, projectId, sectionId) {
+    return exists(/databases/$(database)/documents/users/$(userId)/projects/$(projectId)/sections/$(sectionId))
+  }
+
+  function validateCreateProjectInput(projectId, data) {
+    return isUlid(projectId) &&
+    hasKeys(data, ['name']) &&
+      (
+        // name
+        data.name is string &&
+        data.name.trim() != "" &&
+        data.name.size() <= 30
+      );
+  }
+
+  function validateUpdateProjectInput(data) {
+    return affectedKeysHasOnly(data, ['name']) &&
+    (
+      // name
+      !data.keys().hasAny(['name']) || (
+      data.name is string &&
+      data.name.trim() != "" &&
+      data.name.size() <= 30)
+    );
+  }
+
+  function validateCreateSectionInput(database, userId, projectId, sectionId, data) {
+    return projectExists(database, userId, projectId) &&
+      isUlid(sectionId) &&
+      hasKeys(data, ['name', 'index']) &&
+      (
+        // name
+        data.name is string &&
+        data.name.trim() != "" &&
+        data.name.size() <= 255
+      ) &&
+      (
+        // index
+        data.index is int &&
+        data.index >= 0
+      );
+  }
+
+  function validateUpdateSectionInput(data) {
+    return affectedKeysHasOnly(data, ['name', 'index']) &&
+    (
+      // name
+      !data.keys().hasAny(['name']) || (
+      data.name is string &&
+      data.name.trim() != "" &&
+      data.name.size() <= 255)
+    ) &&
+    (
+      // index
+      !data.keys().hasAny(['index']) || (
+      data.index is int &&
+      data.index >= 0)
+    );
+  }
+
+  function validateCreateTaskInput(database, userId, projectId, taskId, data) {
+    return isUlid(taskId) &&
+    projectExists(database, userId, projectId) &&
+    hasKeys(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+    (
+      // sectionId
+      data.sectionId == null || (
+        data.sectionId is string &&
+        sectionExists(database, userId, projectId, data.sectionId)
+      )
+    ) &&
+    (
+      // index
+      data.index is int &&
+      data.index >= 0
+    ) &&
+    (
+      // title
+      data.title is string &&
+      data.title.size() <= 255
+    ) &&
+    (
+      // description
+      data.description is string &&
+      data.description.size() <= 1000
+    ) &&
+    (
+      // completedAt
+      data.completedAt == null
+    );
+  }
+
+  function validateUpdateTaskInput(database, userId, projectId, data) {
+    return affectedKeysHasOnly(data, ['sectionId', 'index', 'title', 'description', 'completedAt']) &&
+    (
+      // sectionId
+      !data.keys().hasAny(['sectionId']) || (
+      data.sectionId == null || (
+        data.sectionId is string &&
+        sectionExists(database, userId, projectId, data.sectionId)
+      ))
+    ) &&
+    (
+      // index
+      !data.keys().hasAny(['index']) || (
+      data.index is int &&
+      data.index >= 0)
+    ) &&
+    (
+      // title
+      !data.keys().hasAny(['title']) || (
+      data.title is string &&
+      data.title.size() <= 255)
+    ) &&
+    (
+      // description
+      !data.keys().hasAny(['description']) || (
+      data.description is string &&
+      data.description.size() <= 1000)
+    ) &&
+    (
+      // completedAt
+      !data.keys().hasAny(['completedAt']) || (
+      data.completedAt == null || (
+        data.completedAt is timestamp
+      ))
+    );
+  }
+
+  function validateCreateCounterShardInput(database, userId, projectId, shardId, data) {
+    return projectExists(database, userId, projectId) &&
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].hasAny([shardId]) &&
+      hasKeys(data, ['count']) &&
+      (
+        // count
+        data.count is int &&
+        data.count == 0
+      );
+  }
+
+  function validateUpdateCounterShardInput(data) {
+    return affectedKeysHasOnly(data, ['count']) &&
+      (
+        // count
+        data.count is int
+      );
   }
 
   match /databases/{database}/documents {
     match /users/{userId} {
       match /projects/{projectId} {
-        allow list, get: if loggedInWith(userId)
-        allow create: if loggedInWith(userId) && createOnly(request.resource, ['name']);
-        allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name'])
+        allow list, get: if loggedInWith(userId);
+        allow create: if loggedInWith(userId) && validateCreateProjectInput(projectId, request.resource.data);
+        allow update: if loggedInWith(userId) && validateUpdateProjectInput(request.resource.data);
         allow delete: if loggedInWith(userId);
+
+        match /counters/tasks/shards/{shardId} {
+          allow list, get: if loggedInWith(userId)
+          allow create: if loggedInWith(userId) && validateCreateCounterShardInput(database, userId, projectId, shardId, request.resource.data);
+          allow update: if loggedInWith(userId) && validateUpdateCounterShardInput(request.resource.data);
+        }
 
         match /sections/{sectionId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && createOnly(request.resource, ['name', 'index']);
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['name', 'index']);
+          allow create: if loggedInWith(userId) && validateCreateSectionInput(database, userId, projectId, sectionId, request.resource.data);
+          allow update: if loggedInWith(userId) && validateUpdateSectionInput(request.resource.data);
           allow delete: if loggedInWith(userId);
         }
 
         match /tasks/{taskId} {
           allow list, get: if loggedInWith(userId);
-          allow create: if loggedInWith(userId) && createOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
-          allow update: if loggedInWith(userId) && updateOnly(request.resource, ['sectionId', 'index', 'title', 'completedAt']);
+          allow create: if loggedInWith(userId) && validateCreateTaskInput(database, userId, projectId, taskId, request.resource.data)
+          allow update: if loggedInWith(userId) && validateUpdateTaskInput(database, userId, projectId, request.resource.data)
           allow delete: if loggedInWith(userId);
         }
       }

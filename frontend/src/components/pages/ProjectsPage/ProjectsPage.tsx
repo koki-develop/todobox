@@ -4,34 +4,32 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { User } from "firebase/auth";
 import React, { useCallback, useState } from "react";
-import { useProjects } from "@/components/providers/ProjectsProvider";
 import ProjectCardList from "@/components/model/project/ProjectCardList";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import Field from "@/components/utils/Field";
 import Loading from "@/components/utils/Loading";
 import { Project } from "@/models/project";
+import { useProjects } from "@/hooks/projectsHooks";
 
 export type ProjectsPageProps = {
   currentUser: User;
 };
 
-const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
-  const { currentUser } = props;
-
-  const { initialized: projectsLoaded, projects } = useProjects();
+const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo(() => {
+  const { projects, projectsInitialized } = useProjects();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const [openDeleteConfirmDialog, setOpenDeleteConfirmDialog] =
     useState<boolean>(false);
   const [openProjectForm, setOpenProjectForm] = useState<boolean>(false);
 
-  const handleClickAddProject = useCallback(() => {
+  const handleCreateProject = useCallback(() => {
     setEditingProject(null);
     setOpenProjectForm(true);
   }, []);
 
-  const handleCloseProjectForm = useCallback(() => {
+  const handleCreatedProject = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
 
@@ -40,36 +38,35 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
     setOpenProjectForm(true);
   }, []);
 
+  const handleUpdatedProject = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
+
   const handleDeleteProject = useCallback((project: Project) => {
     setDeletingProject(project);
     setOpenDeleteConfirmDialog(true);
-  }, []);
-
-  const handleCancelDeleteProject = useCallback(() => {
-    setOpenDeleteConfirmDialog(false);
-  }, []);
-
-  const handleCreatedProject = useCallback(() => {
-    setOpenProjectForm(false);
-  }, []);
-
-  const handleUpdatedProject = useCallback(() => {
-    setOpenProjectForm(false);
   }, []);
 
   const handleDeletedProject = useCallback(() => {
     setOpenDeleteConfirmDialog(false);
   }, []);
 
+  const handleCancelDeleteProject = useCallback(() => {
+    setOpenDeleteConfirmDialog(false);
+  }, []);
+
+  const handleCloseProjectForm = useCallback(() => {
+    setOpenProjectForm(false);
+  }, []);
+
   return (
-    <Container sx={{ pt: 2 }} maxWidth="md">
-      {!projectsLoaded && <Loading />}
-      {projectsLoaded && (
+    <Container sx={{ py: 2 }} maxWidth="md">
+      {!projectsInitialized && <Loading />}
+      {projectsInitialized && (
         <Box>
           <ProjectModalForm
             open={openProjectForm}
             project={editingProject}
-            userId={currentUser.uid}
             onClose={handleCloseProjectForm}
             onCreated={handleCreatedProject}
             onUpdated={handleUpdatedProject}
@@ -78,14 +75,13 @@ const ProjectsPage: React.VFC<ProjectsPageProps> = React.memo((props) => {
             <ProjectDeleteConfirmModal
               open={openDeleteConfirmDialog}
               project={deletingProject}
-              userId={currentUser.uid}
               onCancel={handleCancelDeleteProject}
               onDeleted={handleDeletedProject}
             />
           )}
 
           <Field sx={{ display: "flex", justifyContent: "center" }}>
-            <Button startIcon={<AddIcon />} onClick={handleClickAddProject}>
+            <Button startIcon={<AddIcon />} onClick={handleCreateProject}>
               プロジェクトを作成
             </Button>
           </Field>

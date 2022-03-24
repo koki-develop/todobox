@@ -54,9 +54,10 @@ const TaskNewListItem: React.VFC<TaskNewListItemProps> = React.memo((props) => {
     <TaskListItemContainer
       sx={{ px: 2, border: "1px solid", borderColor: "divider", height: 38 }}
     >
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} style={{ width: "100%" }}>
         <TextField
           autoFocus
+          fullWidth
           placeholder="新しいタスク"
           variant="standard"
           onBlur={handleBlur}

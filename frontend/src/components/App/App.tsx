@@ -4,9 +4,9 @@ import { SnackbarProvider } from "notistack";
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import { theme } from "@/components/Layout/theme";
-import AuthProvider from "@/components/providers/AuthProvider";
-import ProjectsProvider from "@/components/providers/ProjectsProvider";
+import ProjectsListener from "@/components/model/project/ProjectsListener";
+import CurrentUserListener from "@/components/model/user/CurrentUserListener";
+import { theme } from "@/components/ProjectLayout/theme";
 import AppRoutes from "./AppRoutes";
 
 const App: React.VFC = React.memo(() => {
@@ -18,14 +18,12 @@ const App: React.VFC = React.memo(() => {
         autoHideDuration={3000}
       >
         <RecoilRoot>
-          <AuthProvider>
-            <ProjectsProvider>
-              <CssBaseline />
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
-            </ProjectsProvider>
-          </AuthProvider>
+          <CurrentUserListener />
+          <ProjectsListener />
+          <CssBaseline />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
         </RecoilRoot>
       </SnackbarProvider>
     </ThemeProvider>

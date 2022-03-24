@@ -1,6 +1,7 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -11,26 +12,21 @@ import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useRef, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
+import SectionListItemInput from "@/components/model/section/SectionListItemInput";
 import TaskList from "@/components/model/task/TaskList";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { Section } from "@/models/section";
+import { Section, UpdateSectionInput } from "@/models/section";
 import { Task } from "@/models/task";
-import SectionListItemInput from "./SectionListItemInput";
+import { useSections } from "@/hooks/sectionsHooks";
 
 export type SectionListItemProps = {
   projectId: string;
-  sections: Section[];
   section: Section;
-  tasks: Task[];
   selectedTasks: Task[];
+  showCompletedTasks: boolean;
 
-  onUpdate: (section: Section) => void;
   onDelete: (section: Section) => void;
-  onCompleteTask: (task: Task) => void;
-  onIncompleteTask: (task: Task) => void;
-  onCreateTask: (task: Task) => void;
-  onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -40,19 +36,15 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   const {
     projectId,
     section,
-    sections,
-    tasks,
     selectedTasks,
-    onUpdate,
+    showCompletedTasks,
     onDelete,
-    onCompleteTask,
-    onIncompleteTask,
-    onCreateTask,
-    onDeleteTask,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
   } = props;
+
+  const { updateSection } = useSections();
 
   const [expanded, setExpanded] = useState<boolean>(true);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -87,11 +79,11 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
   }, []);
 
   const handleUpdate = useCallback(
-    (section: Section) => {
+    async (input: UpdateSectionInput) => {
       setEditing(false);
-      onUpdate(section);
+      await updateSection(projectId, section, input);
     },
-    [onUpdate]
+    [projectId, section, updateSection]
   );
 
   const handleDelete = useCallback(() => {
@@ -105,7 +97,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
       draggableId={section.id}
       index={section.index}
     >
-      {(provided) => (
+      {(provided, snapshot) => (
         <Box
           ref={provided.innerRef}
           {...provided.draggableProps}
@@ -113,14 +105,15 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
         >
           {editing ? (
             <SectionListItemInput
-              projectId={projectId}
               section={section}
-              sections={sections}
               onUpdate={handleUpdate}
               onCancel={handleCancelEdit}
             />
           ) : (
-            <SectionListItemCard {...provided.dragHandleProps}>
+            <SectionListItemCard
+              {...provided.dragHandleProps}
+              dragging={snapshot.isDragging}
+            >
               <IconButton
                 size="small"
                 sx={{ mr: 1 }}
@@ -137,7 +130,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
                   whiteSpace: "nowrap",
                 }}
               >
-                [{section.index}] {section.name}
+                {section.name}
               </Typography>
               <IconButton
                 ref={menuButtonRef}
@@ -157,7 +150,7 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
               >
                 <PopperListItem onClick={handleEdit}>
                   <ListItemIcon>
-                    <DeleteIcon />
+                    <EditIcon />
                   </ListItemIcon>
                   <ListItemText primary="セクションを編集" />
                 </PopperListItem>
@@ -181,12 +174,8 @@ const SectionListItem: React.VFC<SectionListItemProps> = React.memo((props) => {
             <TaskList
               projectId={projectId}
               sectionId={section.id}
-              tasks={tasks}
               selectedTasks={selectedTasks}
-              onCompleteTask={onCompleteTask}
-              onIncompleteTask={onIncompleteTask}
-              onDeleteTask={onDeleteTask}
-              onCreateTask={onCreateTask}
+              showCompletedTasks={showCompletedTasks}
               onClickTask={onClickTask}
               onSelectTask={onSelectTask}
               onMultiSelectTask={onMultiSelectTask}

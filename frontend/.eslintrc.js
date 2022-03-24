@@ -58,11 +58,6 @@ module.exports = {
             position: "before",
           },
           {
-            pattern: "@/components/providers/**",
-            group: "internal",
-            position: "before",
-          },
-          {
             pattern: "@/components/model/**",
             group: "internal",
             position: "before",

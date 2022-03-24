@@ -13,7 +13,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { User } from "firebase/auth";
-import { writeBatch } from "firebase/firestore";
 import qs from "query-string";
 import React, {
   useCallback,
@@ -25,68 +24,43 @@ import React, {
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ProjectDeleteConfirmModal from "@/components/model/project/ProjectDeleteConfirmModal";
+import ProjectListener from "@/components/model/project/ProjectListener";
 import ProjectModalForm from "@/components/model/project/ProjectModalForm";
 import SectionList from "@/components/model/section/SectionList";
+import SectionsListener from "@/components/model/section/SectionsListener";
 import TaskList from "@/components/model/task/TaskList";
 import TaskModalCard from "@/components/model/task/TaskModalCard";
+import TasksListener from "@/components/model/task/TasksListener";
 import Field from "@/components/utils/Field";
 import Link from "@/components/utils/Link";
 import Loading from "@/components/utils/Loading";
 import PopperList from "@/components/utils/PopperList";
 import PopperListItem from "@/components/utils/PopperListItem";
-import { Project } from "@/models/project";
-import { Section } from "@/models/section";
 import { Task } from "@/models/task";
-import { firestore } from "@/lib/firebase";
-import { listenProject } from "@/lib/projectUtils";
-import {
-  createSection,
-  deleteSectionBatch,
-  deleteSectionState,
-  listenSections,
-  moveSectionState,
-  updateOrAddSectionState,
-  updateSection,
-  updateSections,
-  updateSectionsBatch,
-} from "@/lib/sectionUtils";
-import {
-  completeTaskState,
-  createTask,
-  deleteTaskBatch,
-  deleteTaskState,
-  getTasksByRange,
-  incompleteTaskState,
-  moveTaskState,
-  moveTasksState,
-  deleteTasksState,
-  updateOrAddTaskState,
-  updateTasks,
-  updateTasksBatch,
-  deleteTasksBatch,
-  listenIncompletedTasks,
-  listenCompletedTasks,
-  separateTasks,
-} from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/tasksStateHelper";
+import { useProjects } from "@/hooks/projectsHooks";
+import { useSections } from "@/hooks/sectionsHooks";
+import { useTasks } from "@/hooks/taskHooks";
 
 export type ProjectPageProps = {
   currentUser: User;
 };
 
-const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
-  const { currentUser } = props;
-
+const ProjectPage: React.VFC<ProjectPageProps> = React.memo(() => {
   const params = useParams();
   const projectId = params.id as string;
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const { project, projectInitialized } = useProjects();
+  const { sections, sectionsInitialized, moveSection } = useSections();
+  const { incompletedTasks, tasksInitialized, moveTask, moveTasks } =
+    useTasks();
+
   const projectMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const completedFilterMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  const [projectLoaded, setProjectLoaded] = useState<boolean>(false);
-  const [project, setProject] = useState<Project | null>(null);
   const [openProjectMenu, setOpenProjectMenu] = useState<boolean>(false);
   const [openCompletedFilterMenu, setOpenCompletedFilterMenu] =
     useState<boolean>(false);
@@ -94,19 +68,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const [openDeleteProjectConfirm, setOpenDeleteProjectConfirm] =
     useState<boolean>(false);
 
-  const [sectionsLoaded, setSectionsLoaded] = useState<boolean>(false);
-  const [sections, setSections] = useState<Section[]>([]);
-
   const [showCompletedTasks, setShowCompletedTasks] = useState<boolean>(false);
-  const [allTasks, setAllTasks] = useState<{
-    completed: Task[];
-    incompleted: Task[];
-  }>({ completed: [], incompleted: [] });
-  const [incompletedTasksLoaded, setIncompletedTasksLoaded] =
-    useState<boolean>(false);
-  const [completedTasksLoaded, setCompletedTasksLoaded] =
-    useState<boolean>(false);
   const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
+  const [showingTaskId, setShowingTaskId] = useState<string | null>(null);
+  const [openTaskModal, setOpenTaskModal] = useState<boolean>(false);
 
   /*
    * project
@@ -125,8 +90,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     setOpenProjectForm(true);
   }, []);
 
-  const handleUpdatedProject = useCallback((updatedProject: Project) => {
-    setProject(updatedProject);
+  const handleUpdatedProject = useCallback(() => {
     setOpenProjectForm(false);
   }, []);
 
@@ -147,112 +111,23 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     setOpenProjectForm(false);
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = listenProject(currentUser.uid, projectId, (project) => {
-      setProject(project);
-      setProjectLoaded(true);
-    });
-    return unsubscribe;
-  }, [currentUser.uid, projectId]);
-
   /*
    * section
    */
 
-  const handleCreateSection = useCallback(
-    (createdSection: Section) => {
-      setSections((prev) => updateOrAddSectionState(prev, createdSection));
-      createSection(currentUser.uid, createdSection);
-    },
-    [currentUser.uid]
-  );
-
-  const handleUpdateSection = useCallback(
-    (updatedSection: Section) => {
-      setSections((prev) => updateOrAddSectionState(prev, updatedSection));
-      updateSection(currentUser.uid, updatedSection);
-    },
-    [currentUser.uid]
-  );
-
-  const handleDeleteSection = useCallback(
-    (deletedSection: Section) => {
-      setSections((prev) => {
-        const batch = writeBatch(firestore);
-        const next = deleteSectionState(prev, deletedSection.id);
-        updateSectionsBatch(batch, currentUser.uid, next);
-        deleteSectionBatch(
-          batch,
-          currentUser.uid,
-          projectId,
-          deletedSection.id
-        );
-        batch.commit();
-        return next;
-      });
-    },
-    [currentUser.uid, projectId]
-  );
-
   const handleDragEndSection = useCallback(
     (result: DropResult) => {
-      const { source, destination } = result;
+      const { draggableId, source, destination } = result;
       if (!destination) return;
-
-      const fromIndex = source.index;
-      const toIndex = destination.index;
-      if (fromIndex === toIndex) return;
-
-      setSections((prev) => {
-        const next = moveSectionState(prev, fromIndex, toIndex);
-        updateSections(currentUser.uid, next);
-        return next;
-      });
+      if (source.index === destination.index) return;
+      moveSection(projectId, draggableId, destination.index);
     },
-    [currentUser.uid]
+    [moveSection, projectId]
   );
-
-  useEffect(() => {
-    if (!project) {
-      setSectionsLoaded(true);
-      return;
-    }
-
-    const unsubscribe = listenSections(
-      currentUser.uid,
-      project.id,
-      (sections) => {
-        setSections(sections);
-        setSectionsLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project]);
 
   /*
    * task
    */
-
-  const showingTaskId = useMemo(() => {
-    const query = qs.parse(location.search);
-    return (query.task as string) ?? undefined;
-  }, [location.search]);
-
-  const noSectionTasks = useMemo(() => {
-    return [
-      ...(showCompletedTasks ? allTasks.completed : []),
-      ...allTasks.incompleted,
-    ].filter((task) => task.sectionId == null);
-  }, [allTasks.completed, allTasks.incompleted, showCompletedTasks]);
-
-  const completedTasks = useMemo(() => {
-    if (!showCompletedTasks) return [];
-    return allTasks.completed;
-  }, [allTasks.completed, showCompletedTasks]);
-
-  const incompletedTasks = useMemo(() => {
-    return allTasks.incompleted;
-  }, [allTasks.incompleted]);
 
   const handleSelectAllTasks = useCallback(() => {
     setShowCompletedTasks(true);
@@ -272,122 +147,11 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
     setOpenCompletedFilterMenu(false);
   }, []);
 
-  const handleCompleteTask = useCallback(
-    (completedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = completeTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          completedTask.id
-        );
-        updateTasks(currentUser.uid, next);
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-      setSelectedTasks(
-        selectedTasks.filter(
-          (selectedTask) => selectedTask.id !== completedTask.id
-        )
-      );
-    },
-    [currentUser.uid, sections, selectedTasks]
-  );
-
-  const handleIncompleteTask = useCallback(
-    (incompletedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = incompleteTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          incompletedTask.id
-        );
-        updateTasks(currentUser.uid, next);
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-    },
-    [currentUser.uid, sections]
-  );
-
-  const handleCreateTask = useCallback(
-    (createdTask: Task) => {
-      setAllTasks((prev) => {
-        const next = updateOrAddTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          createdTask
-        );
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-      createTask(currentUser.uid, createdTask);
-    },
-    [currentUser.uid, sections]
-  );
-
-  const handleDeleteTask = useCallback(
-    (deletedTask: Task) => {
-      setAllTasks((prev) => {
-        if (
-          selectedTasks.length > 1 &&
-          selectedTasks.some(
-            (selectedTask) => selectedTask.id === deletedTask.id
-          )
-        ) {
-          // 複数削除
-          const deletedTaskIds = selectedTasks.map(
-            (selectedTask) => selectedTask.id
-          );
-          const next = deleteTasksState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            deletedTaskIds
-          );
-          const batch = writeBatch(firestore);
-          updateTasksBatch(batch, currentUser.uid, next);
-          deleteTasksBatch(batch, currentUser.uid, projectId, deletedTaskIds);
-          batch.commit();
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        } else {
-          // 単一削除
-          const next = deleteTaskState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            deletedTask.id
-          );
-          const batch = writeBatch(firestore);
-          updateTasksBatch(batch, currentUser.uid, next);
-          deleteTaskBatch(batch, currentUser.uid, projectId, deletedTask.id);
-          batch.commit();
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        }
-      });
-    },
-    [currentUser.uid, projectId, sections, selectedTasks]
-  );
-
   const handleClickTask = useCallback(
     (clickedTask: Task) => {
       navigate(`?task=${clickedTask.id}`);
     },
     [navigate]
-  );
-
-  const handleUpdatedTask = useCallback(
-    (updatedTask: Task) => {
-      setAllTasks((prev) => {
-        const next = updateOrAddTaskState(
-          sections,
-          [...prev.completed, ...prev.incompleted],
-          updatedTask
-        );
-        const [completed, incompleted] = separateTasks(next);
-        return { completed, incompleted };
-      });
-    },
-    [sections]
   );
 
   const handleCloseTaskModal = useCallback(() => {
@@ -416,9 +180,9 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         return;
       }
       const toTask = selectedTasks.slice(-1)[0];
-      const range = getTasksByRange(
-        sections,
+      const range = TasksStateHelper.getTasksByRange(
         incompletedTasks,
+        sections,
         selectedTask.id,
         toTask.id
       ).filter((task) => !task.completedAt);
@@ -433,7 +197,7 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   );
 
   const handleDragEndTask = useCallback(
-    (result: DropResult) => {
+    async (result: DropResult) => {
       const { source, destination } = result;
       if (!destination) return;
       const fromSectionId =
@@ -452,77 +216,38 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         !selectedTasks.some((selectedTask) => selectedTask.id === taskId)
       ) {
         // 単一移動
-        setAllTasks((prev) => {
-          const next = moveTaskState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            taskId,
-            toSectionId,
-            toIndex
-          );
-          updateTasks(currentUser.uid, next);
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        });
+        await moveTask(projectId, taskId, toSectionId, toIndex);
       } else {
         // 複数移動
-        const firstTaskId = taskId;
         const otherTaskIds = selectedTasks
-          .filter((selectedTask) => selectedTask.id !== firstTaskId)
+          .filter((selectedTask) => selectedTask.id !== taskId)
           .map((selectedTask) => selectedTask.id);
-        setAllTasks((prev) => {
-          const next = moveTasksState(
-            sections,
-            [...prev.completed, ...prev.incompleted],
-            firstTaskId,
-            otherTaskIds,
-            toSectionId,
-            toIndex
-          );
-          updateTasks(currentUser.uid, next);
-          const [completed, incompleted] = separateTasks(next);
-          return { completed, incompleted };
-        });
+        await moveTasks(projectId, taskId, otherTaskIds, toSectionId, toIndex);
       }
     },
-    [currentUser.uid, sections, selectedTasks]
+    [moveTask, moveTasks, projectId, selectedTasks]
   );
 
   useEffect(() => {
-    if (!project) {
-      setIncompletedTasksLoaded(true);
-      return;
+    const query = qs.parse(location.search);
+    const taskId = (query.task as string) ?? null;
+    if (taskId) {
+      setShowingTaskId(taskId);
+      setOpenTaskModal(true);
+    } else {
+      setOpenTaskModal(false);
     }
-    const unsubscribe = listenIncompletedTasks(
-      currentUser.uid,
-      projectId,
-      (tasks) => {
-        setAllTasks((prev) => ({ ...prev, incompleted: tasks }));
-        setIncompletedTasksLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId]);
+  }, [location.search]);
 
   useEffect(() => {
-    if (!project) {
-      setCompletedTasksLoaded(true);
-      return;
-    }
-    if (!showCompletedTasks) {
-      setCompletedTasksLoaded(true);
-      return;
-    }
-    const unsubscribe = listenCompletedTasks(
-      currentUser.uid,
-      projectId,
-      (tasks) => {
-        setAllTasks((prev) => ({ ...prev, completed: tasks }));
-        setCompletedTasksLoaded(true);
-      }
-    );
-    return unsubscribe;
-  }, [currentUser.uid, project, projectId, showCompletedTasks]);
+    setSelectedTasks((prev) => {
+      return prev.filter((prevSelectedTask) => {
+        return incompletedTasks.some(
+          (incompletedTask) => incompletedTask.id === prevSelectedTask.id
+        );
+      });
+    });
+  }, [incompletedTasks]);
 
   /*
    * other
@@ -531,18 +256,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
   const headerHeight = 56;
 
   const loaded = useMemo(() => {
-    return (
-      projectLoaded &&
-      sectionsLoaded &&
-      incompletedTasksLoaded &&
-      completedTasksLoaded
-    );
-  }, [
-    completedTasksLoaded,
-    incompletedTasksLoaded,
-    projectLoaded,
-    sectionsLoaded,
-  ]);
+    return projectInitialized && sectionsInitialized && tasksInitialized;
+  }, [projectInitialized, sectionsInitialized, tasksInitialized]);
 
   const handleDragEnd = useCallback(
     (result: DropResult) => {
@@ -566,6 +281,10 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
         height: "100%",
       }}
     >
+      <ProjectListener projectId={projectId} />
+      <SectionsListener projectId={projectId} />
+      <TasksListener projectId={projectId} withCompleted={showCompletedTasks} />
+
       {!loaded && <Loading />}
       {loaded && !project && (
         <Box
@@ -586,32 +305,29 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
           <ProjectModalForm
             open={openProjectForm}
             project={project}
-            userId={currentUser.uid}
             onUpdated={handleUpdatedProject}
             onClose={handleCloseProjectForm}
           />
           <ProjectDeleteConfirmModal
             open={openDeleteProjectConfirm}
             project={project}
-            userId={currentUser.uid}
             onCancel={handleCancelDeleteProject}
             onDeleted={handleDeletedProject}
           />
-          <TaskModalCard
-            userId={currentUser.uid}
-            projectId={projectId}
-            taskId={showingTaskId}
-            open={Boolean(showingTaskId)}
-            onUpdated={handleUpdatedTask}
-            onClose={handleCloseTaskModal}
-          />
+          {showingTaskId && (
+            <TaskModalCard
+              projectId={projectId}
+              taskId={showingTaskId}
+              open={openTaskModal}
+              onClose={handleCloseTaskModal}
+            />
+          )}
 
           {/* project header */}
           <Container maxWidth="lg">
             <Field
               sx={{
                 alignItems: "center",
-                backgroundColor: "white",
                 display: "flex",
                 height: headerHeight,
                 position: "sticky",
@@ -655,10 +371,14 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
               </Box>
             </Field>
           </Container>
+
           <Divider />
 
           {/* content */}
-          <Container maxWidth="lg" sx={{ flexGrow: 1, overflowY: "auto" }}>
+          <Container
+            maxWidth="lg"
+            sx={{ flexGrow: 1, overflowY: "auto", pb: 2 }}
+          >
             <Box sx={{ display: "flex", my: 1, justifyContent: "flex-end" }}>
               <Button
                 ref={completedFilterMenuButtonRef}
@@ -692,12 +412,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                   <TaskList
                     projectId={projectId}
                     sectionId={null}
-                    tasks={noSectionTasks}
                     selectedTasks={selectedTasks}
-                    onCompleteTask={handleCompleteTask}
-                    onIncompleteTask={handleIncompleteTask}
-                    onCreateTask={handleCreateTask}
-                    onDeleteTask={handleDeleteTask}
+                    showCompletedTasks={showCompletedTasks}
                     onClickTask={handleClickTask}
                     onSelectTask={handleSelectTask}
                     onMultiSelectTask={handleMultiSelectTask}
@@ -705,16 +421,8 @@ const ProjectPage: React.VFC<ProjectPageProps> = React.memo((props) => {
                 </Box>
                 <SectionList
                   projectId={projectId}
-                  sections={sections}
-                  onCreateSection={handleCreateSection}
-                  onUpdateSection={handleUpdateSection}
-                  onDeleteSection={handleDeleteSection}
-                  tasks={[...completedTasks, ...incompletedTasks]}
                   selectedTasks={selectedTasks}
-                  onCompleteTask={handleCompleteTask}
-                  onIncompleteTask={handleIncompleteTask}
-                  onCreateTask={handleCreateTask}
-                  onDeleteTask={handleDeleteTask}
+                  showCompletedTasks={showCompletedTasks}
                   onClickTask={handleClickTask}
                   onSelectTask={handleSelectTask}
                   onMultiSelectTask={handleMultiSelectTask}

@@ -4,9 +4,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "firebase emulators:start --import ./data --export-on-exit ./data --only auth,functions,firestore,storage",
+    "test": "vitest --reporter verbose",
+    "test:firestore": "firebase emulators:exec --only firestore \"yarn run test\"",
     "deploy": "firebase deploy --force"
   },
   "devDependencies": {
-    "firebase-tools": "^10.2.2"
+    "@firebase/rules-unit-testing": "^2.0.2",
+    "firebase": "^9.6.9",
+    "firebase-tools": "^10.2.2",
+    "ulid": "^2.3.0",
+    "vitest": "^0.7.6"
   }
 }

@@ -77,7 +77,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
     );
 
     const handleComplete = useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
+      async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         onComplete(task);
       },
@@ -99,6 +99,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
     const handleDelete = useCallback(
       (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
+        setOpenMenu(false);
         onDelete(task);
       },
       [onDelete, task]
@@ -126,6 +127,7 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
             border: "1px solid",
             borderColor: "divider",
             height: 38,
+            overflow: "hidden",
             pl: 1,
           }}
         >
@@ -139,7 +141,20 @@ const TaskListItem: React.VFC<TaskListItemProps> = React.forwardRef(
               <CheckCircleOutlineIcon fontSize="small" />
             )}
           </IconButton>
-          <ListItemText primary={`[${task.index}] ${task.title}`} />
+          <ListItemText
+            primary={task.title}
+            primaryTypographyProps={{
+              sx: {
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                ...(task.completedAt && {
+                  color: theme.palette.text.disabled,
+                  textDecoration: "line-through",
+                }),
+              },
+            }}
+          />
           <IconButton
             ref={menuButtonRef}
             className="moreIconButton"

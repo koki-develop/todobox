@@ -4,23 +4,26 @@ import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SectionListItemCard from "@/components/model/section/SectionListItemCard";
 import Form from "@/components/utils/Form";
-import { Section } from "@/models/section";
-import { buildSection } from "@/lib/sectionUtils";
+import {
+  CreateSectionInput,
+  Section,
+  UpdateSectionInput,
+} from "@/models/section";
+import { useSections } from "@/hooks/sectionsHooks";
 
 export type SectionListItemInputProps = {
-  projectId: string;
   section?: Section;
-  sections: Section[];
 
-  onCreate?: (section: Section) => void;
-  onUpdate?: (section: Section) => void;
+  onCreate?: (input: CreateSectionInput) => void;
+  onUpdate?: (input: UpdateSectionInput) => void;
   onCancel: () => void;
 };
 
 const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
   (props) => {
-    const { projectId, section, sections, onCreate, onUpdate, onCancel } =
-      props;
+    const { section, onCreate, onUpdate, onCancel } = props;
+
+    const { sections } = useSections();
 
     const [name, setName] = useState<string>("");
 
@@ -49,8 +52,8 @@ const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
         onCancel();
         return;
       }
-      const updatedSection = { ...section, name: trimmedName };
-      onUpdate?.(updatedSection);
+      const input = { name: trimmedName };
+      onUpdate?.(input);
     }, [name, onCancel, onUpdate, section]);
 
     const handleCreate = useCallback(() => {
@@ -60,9 +63,9 @@ const SectionListItemInput: React.VFC<SectionListItemInputProps> = React.memo(
         return;
       }
       const index = (sections.slice(-1)[0]?.index ?? -1) + 1;
-      const section = buildSection({ projectId, name: trimmedName, index });
-      onCreate?.(section);
-    }, [name, onCancel, onCreate, projectId, sections]);
+      const input = { name: trimmedName, index };
+      onCreate?.(input);
+    }, [name, onCancel, onCreate, sections]);
 
     const handleSubmit = useMemo(() => {
       return section ? handleUpdate : handleCreate;

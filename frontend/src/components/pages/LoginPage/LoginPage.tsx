@@ -1,56 +1,133 @@
 import GoogleIcon from "@mui/icons-material/Google";
-import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import {
-  signInWithRedirect,
-  signInAnonymously,
-  GoogleAuthProvider,
-} from "firebase/auth";
-import React, { useCallback } from "react";
+import { useTheme } from "@mui/material/styles";
+import React, { useCallback, useState, useMemo } from "react";
 import Field from "@/components/utils/Field";
-import { auth } from "@/lib/firebase";
+import LoadableButton from "@/components/utils/LoadableButton";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 const LoginPage: React.VFC = React.memo(() => {
-  const handleClickLoginWithGoogle = useCallback(() => {
-    signInWithRedirect(auth, new GoogleAuthProvider());
-  }, []);
+  const [loggingInWithGoogle, setLoggingInWithGoogle] =
+    useState<boolean>(false);
+  const [loggingInAnonymously, setLoggingInAnonymously] =
+    useState<boolean>(false);
 
-  const handleClickLoginAnonymously = useCallback(() => {
-    signInAnonymously(auth);
-  }, []);
+  const loggingIn = useMemo(
+    () => loggingInWithGoogle || loggingInAnonymously,
+    [loggingInAnonymously, loggingInWithGoogle]
+  );
+
+  const { loginWithGoogle, loginAnonymously } = useCurrentUser();
+  const theme = useTheme();
+
+  const handleClickLoginWithGoogle = useCallback(async () => {
+    setLoggingInWithGoogle(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await loginWithGoogle().finally(() => {
+      setLoggingInWithGoogle(false);
+    });
+  }, [loginWithGoogle]);
+
+  const handleClickLoginAnonymously = useCallback(async () => {
+    setLoggingInAnonymously(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await loginAnonymously().finally(() => {
+      setLoggingInAnonymously(false);
+    });
+  }, [loginAnonymously]);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 20 }}>
-      <Paper sx={{ p: 4 }} elevation={10}>
-        <Field>
-          <Typography sx={{ textAlign: "center" }} variant="h5">
-            TODO BOX
-          </Typography>
-        </Field>
+    <Container maxWidth="xs" sx={{ pt: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Alert severity="warning" sx={{ justifyContent: "center" }}>
+          <AlertTitle sx={{ fontWeight: "bold" }}>
+            このアプリケーションはサンプルです。
+          </AlertTitle>
+          保存されたデータは定期的に削除されます。
+        </Alert>
+      </Box>
 
-        <Field>
-          <Button
-            fullWidth
-            startIcon={<GoogleIcon />}
-            variant="contained"
-            onClick={handleClickLoginWithGoogle}
-          >
-            Google でログイン
-          </Button>
-        </Field>
+      <Box sx={{ mb: 4 }}>
+        <Paper sx={{ p: 4, pt: 2 }} elevation={4}>
+          <Field>
+            <Typography
+              sx={{
+                fontFamily: "Anton",
+                mb: 1,
+                textAlign: "center",
+              }}
+              variant="h4"
+            >
+              Todo Box
+            </Typography>
 
-        <Field>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleClickLoginAnonymously}
+            <Divider />
+          </Field>
+
+          <Field>
+            <LoadableButton
+              fullWidth
+              loading={loggingInWithGoogle}
+              disabled={loggingIn}
+              color="google"
+              startIcon={<GoogleIcon />}
+              variant="contained"
+              onClick={handleClickLoginWithGoogle}
+            >
+              Google アカウントでログイン
+            </LoadableButton>
+          </Field>
+
+          <Field>
+            <LoadableButton
+              fullWidth
+              loading={loggingInAnonymously}
+              disabled={loggingIn}
+              variant="contained"
+              onClick={handleClickLoginAnonymously}
+            >
+              ゲストログイン
+            </LoadableButton>
+          </Field>
+        </Paper>
+      </Box>
+
+      <Box
+        component="footer"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ textAlign: "center", mb: 1 }}>
+          <Link
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://koki.me"
+            sx={{ color: theme.palette.text.primary }}
           >
-            ゲストログイン
-          </Button>
-        </Field>
-      </Paper>
+            &copy;2022 koki
+          </Link>
+        </Box>
+        <Box sx={{ textAlign: "center" }}>
+          <Link
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://github.com/koki-develop/todo-box"
+            sx={{ color: theme.palette.text.primary }}
+          >
+            View on GitHub
+          </Link>
+        </Box>
+      </Box>
     </Container>
   );
 });

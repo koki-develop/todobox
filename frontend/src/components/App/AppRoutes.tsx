@@ -1,13 +1,13 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import AccountPage from "@/components/pages/AccountPage";
 import LoginPage from "@/components/pages/LoginPage";
 import NotFoundPage from "@/components/pages/NotFoundPage";
 import ProjectPage from "@/components/pages/ProjectPage";
 import ProjectsPage from "@/components/pages/ProjectsPage";
-import SettingsPage from "@/components/pages/SettingsPage";
-import { useAuth } from "@/components/providers/AuthProvider";
 import Loading from "@/components/utils/Loading";
-import Layout from "@/components/Layout";
+import ProjectLayout from "@/components/ProjectLayout";
+import { useCurrentUser } from "@/hooks/userHooks";
 
 type WithAuthOptions = {
   loginPage?: boolean;
@@ -16,7 +16,7 @@ type WithAuthOptions = {
 const withAuth = (options?: WithAuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const WithAuth = (Component: React.VFC<any>) => {
-    const { initialized, currentUser } = useAuth();
+    const { initialized, currentUser } = useCurrentUser();
 
     if (!initialized) {
       return <Loading />;
@@ -43,10 +43,10 @@ const AppRoutes: React.VFC = React.memo(() => {
   return (
     <Routes>
       <Route path="/" element={withAuth({ loginPage: true })(LoginPage)} />
-      <Route element={<Layout />}>
+      <Route element={<ProjectLayout />}>
         <Route path="/projects" element={withAuth()(ProjectsPage)} />
         <Route path="/projects/:id" element={withAuth()(ProjectPage)} />
-        <Route path="/settings" element={withAuth()(SettingsPage)} />
+        <Route path="/account" element={withAuth()(AccountPage)} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

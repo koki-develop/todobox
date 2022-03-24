@@ -4,15 +4,7 @@ import * as functions from "firebase-functions";
 admin.initializeApp(functions.firebaseConfig() ?? undefined);
 
 const firestore = admin.firestore();
-const functionBuilder = functions.runWith({ timeoutSeconds: 300 });
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
+const functionBuilder = functions.runWith({ timeoutSeconds: 540 });
 
 export const deleteUser = functionBuilder.https.onCall(
   async (_data, context) => {
@@ -33,10 +25,39 @@ export const handleDeleteUser = functionBuilder.auth
     const snapshot = await firestore
       .collection(`users/${user.uid}/projects`)
       .get();
-    const docs = snapshot.docs;
-    for (const doc of docs) {
-      await doc.ref.delete();
+
+    const batch = firestore.batch();
+    for (const doc of snapshot.docs) {
+      batch.delete(doc.ref);
     }
+    await batch.commit();
+  });
+
+export const handleDeleteSection = functionBuilder.firestore
+  .document("users/{userId}/projects/{projectId}/sections/{sectionId}")
+  .onDelete(async (_snapshot, context) => {
+    const { userId, projectId, sectionId } = context.params;
+
+    const tasksSnapshot = await firestore
+      .collection(`users/${userId}/projects/${projectId}/tasks`)
+      .where("sectionId", "==", sectionId)
+      .get();
+
+    const batch = firestore.batch();
+    for (const doc of tasksSnapshot.docs) {
+      batch.delete(doc.ref);
+    }
+    const shardId = Math.floor(Math.random() * 10);
+    const shardRef = firestore.doc(
+      `users/${userId}/projects/${projectId}/counters/tasks/shards/${shardId}`
+    );
+    const decrementCount = tasksSnapshot.docs.filter(
+      (doc) => !Boolean(doc.data().completedAt)
+    ).length;
+    batch.update(shardRef, {
+      count: admin.firestore.FieldValue.increment(-decrementCount),
+    });
+    await batch.commit();
   });
 
 export const handleDeleteProject = functionBuilder.firestore
@@ -44,6 +65,11 @@ export const handleDeleteProject = functionBuilder.firestore
   .onDelete(async (_snapshot, context) => {
     const { userId, projectId } = context.params;
 
+    const batch = firestore.batch();
+
+    const tasksCounterShardsSnapshot = await firestore
+      .collection(`users/${userId}/projects/${projectId}/counters/tasks/shards`)
+      .get();
     const sectionsSnapshot = await firestore
       .collection(`users/${userId}/projects/${projectId}/sections`)
       .get();
@@ -51,10 +77,15 @@ export const handleDeleteProject = functionBuilder.firestore
       .collection(`users/${userId}/projects/${projectId}/tasks`)
       .get();
 
+    for (const doc of tasksCounterShardsSnapshot.docs) {
+      batch.delete(doc.ref);
+    }
     for (const doc of sectionsSnapshot.docs) {
-      await doc.ref.delete();
+      batch.delete(doc.ref);
     }
     for (const doc of tasksSnapshot.docs) {
-      await doc.ref.delete();
+      batch.delete(doc.ref);
     }
+
+    await batch.commit();
   });

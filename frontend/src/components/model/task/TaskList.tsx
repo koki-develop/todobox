@@ -4,22 +4,20 @@ import List from "@mui/material/List";
 import { useTheme } from "@mui/material/styles";
 import React, { useCallback, useMemo, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
+import TaskDeleteConfirmModal from "@/components/model/task/TaskDeleteConfirmModal";
 import TaskDraggableListItem from "@/components/model/task/TaskDraggableListItem";
 import TaskListItem from "@/components/model/task/TaskListItem";
 import TaskNewListItem from "@/components/model/task/TaskNewListItem";
 import { Task } from "@/models/task";
-import { buildTask, separateTasks } from "@/lib/taskUtils";
+import { TasksStateHelper } from "@/lib/tasksStateHelper";
+import { useTasks } from "@/hooks/taskHooks";
 
 export type TaskListProps = {
   projectId: string;
   sectionId: string | null;
-  tasks: Task[];
   selectedTasks: Task[];
+  showCompletedTasks: boolean;
 
-  onCompleteTask: (task: Task) => void;
-  onIncompleteTask: (task: Task) => void;
-  onCreateTask: (task: Task) => void;
-  onDeleteTask: (task: Task) => void;
   onClickTask: (task: Task) => void;
   onSelectTask: (task: Task) => void;
   onMultiSelectTask: (task: Task) => void;
@@ -29,12 +27,8 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   const {
     projectId,
     sectionId,
-    tasks,
     selectedTasks,
-    onCompleteTask,
-    onIncompleteTask,
-    onCreateTask,
-    onDeleteTask,
+    showCompletedTasks,
     onClickTask,
     onSelectTask,
     onMultiSelectTask,
@@ -42,15 +36,29 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
 
   const theme = useTheme();
 
+  const {
+    completedTasks,
+    incompletedTasks,
+    createTask,
+    completeTask,
+    incompleteTask,
+  } = useTasks();
+
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState<boolean>(false);
   const [inputtingTask, setInputtingTask] = useState<boolean>(false);
 
   const droppableId = useMemo(() => {
     return sectionId == null ? "none" : sectionId;
   }, [sectionId]);
 
-  const [completedTasks, incompletedTasks] = useMemo(() => {
-    return separateTasks(tasks);
-  }, [tasks]);
+  const sectionCompletedTasks = useMemo(() => {
+    return TasksStateHelper.filterBySectionId(completedTasks, sectionId);
+  }, [completedTasks, sectionId]);
+
+  const sectionIncompletedTasks = useMemo(() => {
+    return TasksStateHelper.filterBySectionId(incompletedTasks, sectionId);
+  }, [incompletedTasks, sectionId]);
 
   const handleStartCreateTask = useCallback(() => {
     setInputtingTask(true);
@@ -61,28 +69,60 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
   }, []);
 
   const handleCreateTask = useCallback(
-    (title: string, cont: boolean) => {
+    async (title: string, cont: boolean) => {
       if (!cont) {
         setInputtingTask(false);
       }
       const index =
-        incompletedTasks.length === 0
+        sectionIncompletedTasks.length === 0
           ? 0
-          : incompletedTasks.slice(-1)[0].index + 1;
-      const task = buildTask({
-        projectId,
-        sectionId,
-        title,
-        index,
-      });
-      onCreateTask(task);
+          : sectionIncompletedTasks.slice(-1)[0].index + 1;
+
+      await createTask(projectId, { sectionId, title, index, description: "" });
     },
-    [incompletedTasks, onCreateTask, projectId, sectionId]
+    [createTask, projectId, sectionId, sectionIncompletedTasks]
   );
+
+  const handleCompleteTask = useCallback(
+    async (task: Task) => {
+      await completeTask(projectId, task.id);
+    },
+    [completeTask, projectId]
+  );
+
+  const handleIncompleteTask = useCallback(
+    async (task: Task) => {
+      await incompleteTask(projectId, task.id);
+    },
+    [incompleteTask, projectId]
+  );
+
+  const handleDeleteTask = useCallback((task: Task) => {
+    setDeletingTask(task);
+    setOpenDeleteConfirm(true);
+  }, []);
+
+  const handleDeletedTask = useCallback(() => {
+    setOpenDeleteConfirm(false);
+  }, []);
+
+  const handleCancelDeleteTask = useCallback(() => {
+    setOpenDeleteConfirm(false);
+  }, []);
 
   // TODO: リファクタ
   return (
     <>
+      {deletingTask && (
+        <TaskDeleteConfirmModal
+          open={openDeleteConfirm}
+          projectId={projectId}
+          task={deletingTask}
+          selectedTasks={selectedTasks}
+          onDeleted={handleDeletedTask}
+          onCancel={handleCancelDeleteTask}
+        />
+      )}
       <Droppable droppableId={droppableId} type="tasks">
         {(provided, snapshot) => (
           <List
@@ -91,14 +131,14 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
             sx={{ mb: 2 }}
             {...provided.droppableProps}
           >
-            {incompletedTasks.map((task) => (
+            {sectionIncompletedTasks.map((task) => (
               <TaskDraggableListItem
                 key={task.id}
                 task={task}
                 selectedTasks={selectedTasks}
-                onComplete={onCompleteTask}
-                onIncomplete={onIncompleteTask}
-                onDelete={onDeleteTask}
+                onComplete={handleCompleteTask}
+                onIncomplete={handleIncompleteTask}
+                onDelete={handleDeleteTask}
                 onClick={onClickTask}
                 onSelect={onSelectTask}
                 onMultiSelect={onMultiSelectTask}
@@ -133,21 +173,23 @@ const TaskList: React.VFC<TaskListProps> = React.memo((props) => {
           </List>
         )}
       </Droppable>
-      <List disablePadding sx={{ mb: 2 }}>
-        {completedTasks.map((task) => (
-          <TaskListItem
-            key={task.id}
-            task={task}
-            selectedTasks={selectedTasks}
-            onComplete={onCompleteTask}
-            onIncomplete={onIncompleteTask}
-            onDelete={onDeleteTask}
-            onClick={onClickTask}
-            onSelect={onSelectTask}
-            onMultiSelect={onMultiSelectTask}
-          />
-        ))}
-      </List>
+      {showCompletedTasks && (
+        <List disablePadding sx={{ mb: 2 }}>
+          {sectionCompletedTasks.map((task) => (
+            <TaskListItem
+              key={task.id}
+              task={task}
+              selectedTasks={selectedTasks}
+              onComplete={handleCompleteTask}
+              onIncomplete={handleIncompleteTask}
+              onDelete={handleDeleteTask}
+              onClick={onClickTask}
+              onSelect={onSelectTask}
+              onMultiSelect={onMultiSelectTask}
+            />
+          ))}
+        </List>
+      )}
     </>
   );
 });
