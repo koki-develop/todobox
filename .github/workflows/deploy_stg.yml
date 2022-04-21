@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - fix/todo-box-to-todobox
 
 jobs:
   test_firebase:
