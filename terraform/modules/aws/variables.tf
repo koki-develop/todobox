@@ -13,6 +13,6 @@ variable "basicauth_password" {
 }
 
 locals {
-  prefix = "todo-box-${var.stage}"
+  prefix = "todobox-${var.stage}"
   domain = var.stage == "prod" ? "todobox.xyz" : "${var.stage}.todobox.xyz"
 }

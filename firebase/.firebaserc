@@ -1,8 +1,8 @@
 {
   "projects": {
-    "default": "todo-box-stg",
-    "stg": "todo-box-stg",
-    "prod": "todo-box-prod"
+    "default": "todobox-stg",
+    "stg": "todobox-stg",
+    "prod": "todobox-prod"
   },
   "targets": {}
 }
