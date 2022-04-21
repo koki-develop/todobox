@@ -1,7 +1,7 @@
 import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
 import fs from "fs";
 
-const FIREBASE_PROJECT_ID = "test-todo-box";
+const FIREBASE_PROJECT_ID = "test-todobox";
 
 export const getTestEnvironment = async () => {
   const firestoreRules = fs.readFileSync("firestore.rules", "utf8");
