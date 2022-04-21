@@ -121,7 +121,7 @@ const LoginPage: React.VFC = React.memo(() => {
           <Link
             target="_blank"
             rel="noreferrer noopener"
-            href="https://github.com/koki-develop/todo-box"
+            href="https://github.com/koki-develop/todobox"
             sx={{ color: theme.palette.text.primary }}
           >
             View on GitHub
