@@ -5,6 +5,8 @@
 
 シンプルな Todo アプリ。
 
+![](./README/screenshot.png)
+
 # LICENSE
 
 [MIT](./LICENSE)
