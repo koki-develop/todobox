@@ -35,11 +35,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16.x
-
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -47,30 +42,16 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: us-east-1
 
-    - name: Create dotenv
-      shell: bash
-      working-directory: frontend
-      run: |
-        echo "VITE_STAGE=\"${{ inputs.stage }}\""                                                > frontend/.env
-        echo "VITE_FIREBASE_API_KEY=\"${{ inputs.firebase-api-key }}\""                         >> frontend/.env
-        echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ inputs.firebase-auth-domain }}\""                 >> frontend/.env
-        echo "VITE_FIREBASE_PROJECT_ID=\"${{ inputs.firebase-project-id }}\""                   >> frontend/.env
-        echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ inputs.firebase-storage-bucket }}\""           >> frontend/.env
-        echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ inputs.firebase-messaging-sender-id }}\"" >> frontend/.env
-        echo "VITE_FIREBASE_APP_ID=\"${{ inputs.firebase-app-id }}\""                           >> frontend/.env
-
-    - name: Save Yarn Cache
-      uses: ./.github/actions/save-yarn-cache
-
-    - name: Install Dependencies
-      shell: bash
-      working-directory: frontend
-      run: yarn install --frozen-lockfile
-
-    - name: Build
-      shell: bash
-      working-directory: frontend
-      run: yarn run build
+    - name: Build Frontend
+      uses: ./.github/actions/build-frontend
+      with:
+        stage: ${{ inputs.stage }}
+        firebase-api-key: ${{ inputs.firebase-api-key }}
+        firebase-auth-domain: ${{ inputs.firebase-auth-domain }}
+        firebase-project-id: ${{ inputs.firebase-project-id }}
+        firebase-storage-bucket: ${{ inputs.firebase-storage-bucket }}
+        firebase-messaging-sender-id: ${{ inputs.firebase-messaging-sender-id }}
+        firebase-app-id: ${{ inputs.firebase-app-id }}
 
     - name: Upload to S3
       shell: bash
