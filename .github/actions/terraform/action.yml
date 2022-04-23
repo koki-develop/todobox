@@ -9,6 +9,12 @@ inputs:
   stage:
     description: stg もしくは prod
     required: true
+  basicauth-username:
+    description: Basic 認証のユーザー名
+    required: false
+  basicauth-password:
+    description: Basic 認証のパスワード
+    required: false
 
 runs:
   using: composite
@@ -23,5 +29,5 @@ runs:
       working-directory: terraform
       run: |
         terraform ${{ inputs.command }} \
-          -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
-          -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
+          -var 'basicauth_username=${{ inputs.basicauth-username }}' \
+          -var 'basicauth_password=${{ inputs.basicauth-password }}'
