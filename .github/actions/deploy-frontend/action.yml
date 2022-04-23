@@ -1,0 +1,78 @@
+name: Deploy Frontend
+
+description: フロントエンドのデプロイ
+
+inputs:
+  stage:
+    description: stg もしくは prod
+    required: true
+  firebase-api-key:
+    description: Firebase アプリの API キー
+    required: true
+  firebase-auth-domain:
+    description: Firebase アプリの認証ドメイン
+    required: true
+  firebase-project-id:
+    description: Firebase アプリのプロジェクト ID
+    required: true
+  firebase-storage-bucket:
+    description: Firebase アプリのストレージバケット
+    required: true
+  firebase-messaging-sender-id:
+    description: Firebase アプリの Messaging Sender ID
+    required: true
+  firebase-app-id:
+    description: Firebase アプリのアプリ ID
+    required: true
+  # TODO: OIDC アクセスを使う
+  aws-access-key-id:
+    description: AWS アクセスキー ID
+    required: true
+  aws-secret-access-key:
+    description: AWS シークレットアクセスキー
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: us-east-1
+
+    - name: Create dotenv
+      shell: bash
+      working-directory: frontend
+      run: |
+        echo "VITE_STAGE=\"${{ inputs.stage }}\""                                                > .env
+        echo "VITE_FIREBASE_API_KEY=\"${{ inputs.firebase-api-key }}\""                         >> .env
+        echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ inputs.firebase-auth-domain }}\""                 >> .env
+        echo "VITE_FIREBASE_PROJECT_ID=\"${{ inputs.firebase-project-id }}\""                   >> .env
+        echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ inputs.firebase-storage-bucket }}\""           >> .env
+        echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ inputs.firebase-messaging-sender-id }}\"" >> .env
+        echo "VITE_FIREBASE_APP_ID=\"${{ inputs.firebase-app-id }}\""                           >> .env
+
+    - name: Save Yarn Cache
+      uses: ./.github/actions/save-yarn-cache
+
+    - name: Install Dependencies
+      shell: bash
+      working-directory: frontend
+      run: yarn install --frozen-lockfile
+
+    - name: Build
+      shell: bash
+      working-directory: frontend
+      run: yarn run build
+
+    - name: Upload to S3
+      shell: bash
+      working-directory: frontend
+      run: aws s3 sync --delete ./dist s3://todobox-${{ inputs.stage }}-frontend

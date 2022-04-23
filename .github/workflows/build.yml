@@ -19,7 +19,7 @@ jobs:
 
   deploy_firebase:
     runs-on: ubuntu-latest
-    environment: stg
+    environment: prod
     needs:
       - test_firebase
     defaults:
@@ -52,7 +52,7 @@ jobs:
 
   deploy_infra:
     runs-on: ubuntu-latest
-    environment: stg
+    environment: prod
     needs:
       - test_infra
     defaults:
@@ -90,37 +90,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
         with:
-          node-version: 16.x
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
+          stage: prod
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-project-id: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Create dotenv
-        run: |
-          echo "VITE_STAGE=\"prod\""                                                                     > .env
-          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.FIREBASE_API_KEY }}\""                         >> .env
-          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.FIREBASE_AUTH_DOMAIN }}\""                 >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.FIREBASE_PROJECT_ID }}\""                   >> .env
-          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.FIREBASE_STORAGE_BUCKET }}\""           >> .env
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}\"" >> .env
-          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.FIREBASE_APP_ID }}\""                           >> .env
-
-      - name: Save Yarn Cache
-        uses: ./.github/actions/save-yarn-cache
-
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build
-        run: yarn run build
-
-      - name: Upload to S3
-        run: aws s3 sync --delete ./dist s3://todobox-prod-frontend
