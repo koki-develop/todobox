@@ -27,13 +27,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+      - name: Setup Terraform
+        uses: ./.github/actions/setup-terraform
       - name: Exec terraform plan for stg
         uses: ./.github/actions/terraform
         with:
           stage: stg
           command: plan
-
       - name: Exec terraform plan for prod
         uses: ./.github/actions/terraform
         with:
