@@ -1,0 +1,35 @@
+name: Deploy Firebase
+
+description: Firebase のデプロイ
+
+inputs:
+  token:
+    description: Firebase トークン
+    required: true
+  stage:
+    description: stg もしくは prod
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+
+    - name: Save Yarn Cache
+      uses: ./.github/actions/save-yarn-cache
+
+    - name: Install Dependencies for firebase
+      shell: bash
+      working-directory: firebase
+      run: yarn install --frozen-lockfile
+    - name: Install Dependencies for functions
+      shell: bash
+      working-directory: firebase/functions
+      run: yarn install --frozen-lockfile
+
+    - name: Deploy
+      shell: bash
+      run: yarn run deploy --project ${{ inputs.stage }} --token ${{ inputs.token }}
