@@ -61,28 +61,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Deploy Infra
+        uses: ./.github/actions/deploy-infra
         with:
-          terraform_version: 1.1.7
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
+          stage: stg
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Exec terraform init
-        run: terraform init
-      - name: Select workspace
-        run: terraform workspace select stg
-      - name: Exec terraform apply
-        run: |
-          terraform apply -auto-approve \
-            -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
-            -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
+          basicauth-username: ${{ secrets.BASICAUTH_USERNAME }}
+          basicauth-password: ${{ secrets.BASICAUTH_PASSWORD }}
 
   test_frontend:
     runs-on: ubuntu-latest

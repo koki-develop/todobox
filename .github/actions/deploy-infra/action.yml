@@ -1,0 +1,36 @@
+name: Test Deploy
+
+description: インフラのデプロイ
+
+inputs:
+  stage:
+    description: stg もしくは prod
+    required: true
+  aws-access-key-id:
+    description: AWS アクセスキー ID
+    required: true
+  aws-secret-access-key:
+    description: AWS シークレットアクセスキー
+    required: true
+  basicauth-username:
+    description: Basic 認証のユーザー名
+    required: false
+  basicauth-password:
+    description: Basic 認証のパスワード
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Terraform
+      uses: ./.github/actions/setup-terraform
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+    - name: Exec terraform apply for ${{ inputs.stage }}
+      uses: ./.github/actions/terraform
+      with:
+        stage: ${{ inputs.stage }}
+        command: apply -auto-approve
+        basicauth-username: ${{ inputs.basicauth-username }}
+        basicauth-password: ${{ inputs.basicauth-password }}
