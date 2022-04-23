@@ -1,0 +1,44 @@
+name: Terraform
+
+description: terraform コマンドを実行する
+
+inputs:
+  command:
+    description: plan もしくは apply
+    required: true
+  stage:
+    description: stg もしくは prod
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.7
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Exec terraform init
+      shell: bash
+      working-directory: terraform
+      run: terraform init
+
+    - name: Select workspace
+      shell: bash
+      working-directory: terraform
+      run: terraform workspace select ${{ inputs.stage }}
+
+    - name: Exec terraform ${{ inputs.command }}
+      shell: bash
+      working-directory: terraform
+      run: |
+        terraform ${{ inputs.command }} \
+          -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
+          -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
