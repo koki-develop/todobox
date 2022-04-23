@@ -1,0 +1,29 @@
+name: Test Frontend
+
+description: フロントエンドのテスト
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+
+    - name: Save Yarn Cache
+      uses: ./.github/actions/save-yarn-cache
+
+    - name: Install Dependencies
+      working-directory: frontend
+      shell: bash
+      run: yarn install --frozen-lockfile
+
+    - name: Test
+      working-directory: frontend
+      shell: bash
+      run: yarn run test
+
+    - name: Lint
+      working-directory: frontend
+      shell: bash
+      run: yarn run lint
