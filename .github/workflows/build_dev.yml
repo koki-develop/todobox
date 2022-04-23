@@ -28,23 +28,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Terraform
-        uses: ./.github/actions/setup-terraform
+      - name: Test Infra
+        uses: ./.github/actions/test-infra
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Exec terraform plan for stg
-        uses: ./.github/actions/terraform
-        with:
-          stage: stg
-          command: plan
           basicauth-username: ${{ secrets.BASICAUTH_USERNAME }}
           basicauth-password: ${{ secrets.BASICAUTH_PASSWORD }}
-      - name: Exec terraform plan for prod
-        uses: ./.github/actions/terraform
-        with:
-          stage: prod
-          command: plan
 
   test_frontend:
     runs-on: ubuntu-latest
