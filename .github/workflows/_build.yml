@@ -66,3 +66,28 @@ jobs:
           terraform plan \
             -var 'basicauth_username=${{ secrets.basicauth-username }}' \
             -var 'basicauth_password=${{ secrets.basicauth-password }}'
+
+  frontend_test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - name: install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: build
+        run: yarn run build
+      - name: lint
+        run: yarn run lint
+      - name: test
+        run: yarn run test
