@@ -68,7 +68,7 @@ jobs:
             -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
 
       - name: tfsec
-        uses: aquasecurity/tfsec-action@v1.0.0
+        uses: aquasecurity/tfsec-action@v1.0.2
         with:
           working_directory: terraform/app
           additional_args: --config-file terraform/app/tfsec.yml
