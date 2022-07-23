@@ -2,6 +2,19 @@ name: build
 
 on:
   workflow_call:
+    inputs:
+      env:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+      basicauth-username:
+        required: true
+      basicauth-password:
+        required: true
 
 jobs:
   firestore_security_rules_test:
@@ -24,3 +37,32 @@ jobs:
 
       - name: run firestore security rules test
         run: yarn run test:firestore
+
+  terraform_plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.7
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: us-east-1
+
+      - name: run terraform plan
+        run: |
+          terraform init
+          terraform workspace select ${{ inputs.env }}
+          terraform plan \
+            -var 'basicauth_username=${{ secrets.basicauth-username }}' \
+            -var 'basicauth_password=${{ secrets.basicauth-password }}'
