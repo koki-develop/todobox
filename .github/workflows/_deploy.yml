@@ -79,7 +79,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: run terraform plan
+      - name: run terraform apply
         run: |
           terraform init
           terraform workspace select ${{ inputs.stage }}
