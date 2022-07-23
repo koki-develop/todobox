@@ -65,7 +65,7 @@ resource "aws_cloudfront_function" "basicauth" {
   runtime = "cloudfront-js-1.0"
   publish = true
   code = templatefile(
-    "${path.module}/basicauth.js",
+    "${path.module}/functions/basicauth.js",
     {
       authString = format("Basic %s", base64encode("${var.basicauth_username}:${var.basicauth_password}"))
     }
