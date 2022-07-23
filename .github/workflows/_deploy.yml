@@ -87,7 +87,7 @@ jobs:
             -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
             -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
 
-  frontend_test:
+  frontend_deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.stage }}
     defaults:
