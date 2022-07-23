@@ -87,6 +87,7 @@ jobs:
 
   frontend_test:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.stage }}
     defaults:
       run:
         working-directory: frontend
