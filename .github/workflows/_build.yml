@@ -43,7 +43,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/app
     steps:
       - name: checkout
         uses: actions/checkout@v3

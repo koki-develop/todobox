@@ -63,7 +63,7 @@ jobs:
     environment: ${{ inputs.stage }}
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/app
     steps:
       - name: checkout
         uses: actions/checkout@v3
