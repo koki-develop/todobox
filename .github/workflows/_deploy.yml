@@ -26,7 +26,11 @@ jobs:
           node-version: 16
           cache: yarn
           cache-dependency-path: firebase/yarn.lock
-      - name: install dependencies
+      - name: install dependencies for firebase
+        run: yarn install --frozen-lockfile
+      # TODO: キャッシュを効かせる
+      - name: install dependencies for function
+        working-directory: firebase/functions
         run: yarn install --frozen-lockfile
 
       - name: deploy
