@@ -352,7 +352,7 @@
     "@firebase/util" "1.5.2"
     tslib "^2.1.0"
 
-"@firebase/rules-unit-testing@^2.0.2":
+"@firebase/rules-unit-testing@2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@firebase/rules-unit-testing/-/rules-unit-testing-2.0.2.tgz#8fdd794977e67638acd39230af18ba604e4d9d77"
   integrity sha512-odW2Znq5BjWC0QdNLfUbQEI2IxwFX6mgVwFB/vpfs8MUd44ohCHLif8veASKjhrIf0uVIs9vjfOsHb5ONlC76g==
@@ -2186,7 +2186,7 @@ firebase-frameworks@^0.3.0:
   dependencies:
     tslib "^2.3.1"
 
-firebase-tools@^10.2.2:
+firebase-tools@10.7.0:
   version "10.7.0"
   resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-10.7.0.tgz#38fa1035db895fbb468024ed3c6259086f443745"
   integrity sha512-yCrYNvfL3IbAGgsRsYsO/cqqdabEn4ujnEq1vEgUGvPadStvUrU51/pdLAAI4cFQ4HbKCULKiVXqz52JZOJT2A==
@@ -2252,7 +2252,7 @@ firebase-tools@^10.2.2:
     winston-transport "^4.4.0"
     ws "^7.2.3"
 
-firebase@^9.6.9:
+firebase@9.6.11:
   version "9.6.11"
   resolved "https://registry.yarnpkg.com/firebase/-/firebase-9.6.11.tgz#ec198b3bd646d0028b5d6240261cd89b200a590d"
   integrity sha512-Zdmag/wGNkA4IAek+2yQoWrF2vyqIowu+2eOcSaE6jE2hDZYA3nHNutsQ+jquSxE3SeJk3Dh1OEsffqgunBy/w==
@@ -4910,7 +4910,7 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-ulid@^2.3.0:
+ulid@2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/ulid/-/ulid-2.3.0.tgz#93063522771a9774121a84d126ecd3eb9804071f"
   integrity sha512-keqHubrlpvT6G2wH0OEfSW4mquYRcbe/J8NMmveoQOjUqmo+hXtO+ORCpWhdbZ7k72UtY61BL7haGxW6enBnjw==
@@ -5079,7 +5079,7 @@ vite@^2.8.6:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.7.6:
+vitest@0.7.13:
   version "0.7.13"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.7.13.tgz#00dd6cb66dc2b570251d6fce7bc1a491c628f82a"
   integrity sha512-UCHeJEOK+qCBa/e4UtkCfv0wIZ125T4Nf2R0J/46v/Wnv6bt9zGfAyKAI6siYFhvLvg20MgDIreROtVgedHFWw==
