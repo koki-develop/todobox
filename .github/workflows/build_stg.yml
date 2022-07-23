@@ -1,4 +1,4 @@
-name: build for staging
+name: build for stg
 
 on:
   push:
