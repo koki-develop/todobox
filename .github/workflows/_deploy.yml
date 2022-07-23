@@ -33,6 +33,7 @@ on:
 jobs:
   firebase_deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.stage }}
     defaults:
       run:
         working-directory: firebase
@@ -58,6 +59,7 @@ jobs:
 
   terraform_apply:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.stage }}
     defaults:
       run:
         working-directory: terraform
