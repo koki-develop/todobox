@@ -3,7 +3,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      App = "lgtm-generator"
+      App = "todobox"
     }
   }
 }
