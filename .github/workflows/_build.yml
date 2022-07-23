@@ -73,6 +73,16 @@ jobs:
           working_directory: terraform/app
           additional_args: --config-file terraform/app/tfsec.yml
 
+      - name: setup tflint
+        uses: terraform-linters/setup-tflint@v2
+        with:
+          tflint_version: v0.38.1
+      - name: tflint
+        run: |
+          tflint --init
+          tflint .
+          tflint ./modules/aws
+
   frontend_test:
     runs-on: ubuntu-latest
     defaults:
