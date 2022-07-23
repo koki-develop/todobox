@@ -8,19 +8,14 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/_build.yml
+    secrets: inherit
     with:
       stage: stg
-    secrets:
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      basicauth-username: ${{ secrets.BASICAUTH_USERNAME }}
-      basicauth-password: ${{ secrets.BASICAUTH_PASSWORD }}
 
   deploy:
     uses: ./.github/workflows/_deploy.yml
+    secrets: inherit
     needs:
       - build
     with:
       stage: stg
-    secrets:
-      firebase-token: ${{ secrets.FIREBASE_TOKEN }}

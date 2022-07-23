@@ -7,7 +7,15 @@ on:
         required: true
         type: string
     secrets:
-      firebase-token:
+      FIREBASE_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      BASICAUTH_USERNAME:
+        required: true
+      BASICAUTH_PASSWORD:
         required: true
 
 jobs:
@@ -34,7 +42,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: deploy
-        run: yarn run deploy --project ${{ inputs.stage }} --token ${{ secrets.firebase-token }}
+        run: yarn run deploy --project ${{ inputs.stage }} --token ${{ secrets.FIREBASE_TOKEN }}
 
   terraform_apply:
     runs-on: ubuntu-latest
@@ -53,8 +61,8 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.aws-access-key-id }}
-          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: run terraform plan
@@ -62,5 +70,5 @@ jobs:
           terraform init
           terraform workspace select ${{ inputs.stage }}
           terraform apply -auto-approve \
-            -var 'basicauth_username=${{ secrets.basicauth-username }}' \
-            -var 'basicauth_password=${{ secrets.basicauth-password }}'
+            -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
+            -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'

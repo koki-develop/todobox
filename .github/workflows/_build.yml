@@ -7,13 +7,13 @@ on:
         required: true
         type: string
     secrets:
-      aws-access-key-id:
+      AWS_ACCESS_KEY_ID:
         required: true
-      aws-secret-access-key:
+      AWS_SECRET_ACCESS_KEY:
         required: true
-      basicauth-username:
+      BASICAUTH_USERNAME:
         required: true
-      basicauth-password:
+      BASICAUTH_PASSWORD:
         required: true
 
 jobs:
@@ -55,8 +55,8 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.aws-access-key-id }}
-          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: run terraform plan
@@ -64,8 +64,8 @@ jobs:
           terraform init
           terraform workspace select ${{ inputs.stage }}
           terraform plan \
-            -var 'basicauth_username=${{ secrets.basicauth-username }}' \
-            -var 'basicauth_password=${{ secrets.basicauth-password }}'
+            -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
+            -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
 
   frontend_test:
     runs-on: ubuntu-latest
