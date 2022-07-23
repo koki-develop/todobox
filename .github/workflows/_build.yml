@@ -3,7 +3,7 @@ name: build
 on:
   workflow_call:
     inputs:
-      env:
+      stage:
         required: true
         type: string
     secrets:
@@ -62,7 +62,7 @@ jobs:
       - name: run terraform plan
         run: |
           terraform init
-          terraform workspace select ${{ inputs.env }}
+          terraform workspace select ${{ inputs.stage }}
           terraform plan \
             -var 'basicauth_username=${{ secrets.basicauth-username }}' \
             -var 'basicauth_password=${{ secrets.basicauth-password }}'
