@@ -9,6 +9,18 @@ on:
     secrets:
       FIREBASE_TOKEN:
         required: true
+      FIREBASE_API_KEY:
+        required: true
+      FIREBASE_APP_ID:
+        required: true
+      FIREBASE_AUTH_DOMAIN:
+        required: true
+      FIREBASE_MESSAGING_SENDER_ID:
+        required: true
+      FIREBASE_PROJECT_ID:
+        required: true
+      FIREBASE_STORAGE_BUCKET:
+        required: true
       AWS_ACCESS_KEY_ID:
         required: true
       AWS_SECRET_ACCESS_KEY:
@@ -72,3 +84,37 @@ jobs:
           terraform apply -auto-approve \
             -var 'basicauth_username=${{ secrets.BASICAUTH_USERNAME }}' \
             -var 'basicauth_password=${{ secrets.BASICAUTH_PASSWORD }}'
+
+  frontend_test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+          cache-dependency-path: firebase/yarn.lock
+      - name: install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: create dotenv
+        run: |
+          echo "VITE_STAGE=\"${{ inputs.stage }}\""                                                > .env
+          echo "VITE_FIREBASE_API_KEY=\"${{ secrets.FIREBASE_API_KEY }}\""                         >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=\"${{ secrets.FIREBASE_AUTH_DOMAIN }}\""                 >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=\"${{ secrets.FIREBASE_PROJECT_ID }}\""                   >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=\"${{ secrets.FIREBASE_STORAGE_BUCKET }}\""           >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=\"${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}\"" >> .env
+          echo "VITE_FIREBASE_APP_ID=\"${{ secrets.FIREBASE_APP_ID }}\""                           >> .env
+
+      - name: build
+        run: yarn run build
+
+      - name: upload to s3
+        run: aws s3 sync --delete ./dist s3://todobox-${{ inputs.stage }}-frontend
