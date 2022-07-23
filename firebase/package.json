@@ -9,10 +9,10 @@
     "deploy": "firebase deploy --force"
   },
   "devDependencies": {
-    "@firebase/rules-unit-testing": "^2.0.2",
-    "firebase": "^9.6.9",
-    "firebase-tools": "^10.2.2",
-    "ulid": "^2.3.0",
-    "vitest": "^0.7.6"
+    "@firebase/rules-unit-testing": "2.0.2",
+    "firebase": "9.6.11",
+    "firebase-tools": "10.7.0",
+    "ulid": "2.3.0",
+    "vitest": "0.7.13"
   }
 }
