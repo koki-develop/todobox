@@ -14,6 +14,7 @@ terraform {
     region               = "us-east-1"
     bucket               = "todobox-tfstates"
     key                  = "terraform.tfstate"
+    encrypt              = true
   }
 }
 
